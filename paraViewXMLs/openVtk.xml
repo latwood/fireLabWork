@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<pqevents>
+
+<!-- this section is for opening the vtk or stl surface file !-->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <!-- notice this is the spot for changing the file path. HAS TO BE DONE MANUALLY!! !-->
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="/home/latwood/Documents/diffusivityComparison/vshapedValley_notilt100.09mRes/NativeSolver_DomainAvg/diurnal/6-15-2016_21hr00min_72F/0mphSmoke_DT_0.001/vshapedValley_notilt_0_0_06-15-2016_2100_100m_surf.vtk" /> 
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
+  <!-- notice this is where to change the file color !-->
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor" command="setChosenColor" arguments="140,140,140" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,58,6,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,58,6,/0:0/0:0" />
+
+</pqevents>

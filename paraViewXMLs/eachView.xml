@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<pqevents>
+
+<!-- stuff for changing the view to a preset !-->
+
+  <!-- change it to view from the west !-->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
+  
+  <!-- change it to view from the east !-->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
+
+  <!-- change it to view from the south !-->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+
+  <!-- change it to view from the north !-->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
+
+  <!-- change it to view from the bottom !-->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveZ" command="activate" arguments="" />
+
+  <!-- change it to view from the top !-->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeZ" command="activate" arguments="" />
+
+<!-- stuff for changing the view angle a little more manually !-->
+
+  <!-- first open up the camera menu !-->
+  <pqevent object="pqClientMainWindow/pqParaViewBehaviors0/pqViewFrameActionsBehavior0/pqStandardViewFrameActionGroup0/CameraButton" command="activate" arguments="" />
+  <!-- set the elevation angle to a value !-->
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationAngle" command="set_double" arguments="45" />
+  <!-- press the change elevation angle button !-->
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationButton" command="activate" arguments="" />
+  <!-- set the azimuth angle to a value !-->
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthAngle" command="set_double" arguments="45" />
+  <!-- press the change azimuth angle button !-->
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthButton" command="activate" arguments="" />
+  <!-- close the camera menu !-->
+  <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
+
+<!-- stuff for changing the view to a non preset, but useful angle !-->
+	<!-- FOR SOME ODD REASON THIS IS DIFFERENT FOR EVERY MESH! SOMETHING TO DO WITH THE DIFFERING MESH DIMENSIONS! FIGURE THIS OUT THROUGH TRIAL AND ERROR FOR EACH CASE USING ABOVE STUFF! !-->
+
+
+</pqevents>

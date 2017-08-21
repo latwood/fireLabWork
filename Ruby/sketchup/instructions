@@ -1,0 +1,7 @@
+Okay, so I calculated the cell center positions and made a list of them. I then opened paraFoam, made it viewable by T as surfaceWithEdges and added that legend. I placed the legend at the bottom.
+Then I did cell centers of the whole thing. Then I did y normal slices for each cell center. Finally I did glyphs with transform scales of 0.2 for each dimension, and made the cell centers visible by U, using that as the scale for that.
+Then I went through, only having each 12 slices and glyphs turned on, and made 1500x1500 pictures for that time.
+At each subsequent time, need to rescale the scales, but make sure to do it while highlighting the openfoam case and the cell centers, not the glyphs or slices
+I almost forgot. I did a south view at elevation 45, shifting scales or the domain up till everything looked nice
+
+Scale for U shouldn't change unless U is updated. Vectors shouldn't change either, which would mean that there aren't quite enough points
