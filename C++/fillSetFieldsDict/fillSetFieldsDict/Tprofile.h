@@ -29,8 +29,7 @@ public:
     void generateLinearTprofile(double lowTvalue,double highTvalue,double cellsInProfile);
     void generateLogTprofile(std::vector<std::string> givenValues);
     void generateLogTprofile(double lowTvalue,double highTvalue,double cellsInProfile);
-    void generateTfullCellsProfile(std::vector<std::string> valuesForEachOriginalCell);
-
+    void generateTfullCellsProfile(double rows, double cols,std::vector<std::string> valuesForEachOriginalCell);
 
 private:
 

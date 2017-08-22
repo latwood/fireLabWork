@@ -14,15 +14,15 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     dy_refined = pow(2,timesRefined);
     dz_refined = pow(2,timesRefined);
 
-    minZ_defaultTvalue.addTvalue("300");
-    //minZ_Tvalues.generateTprofile("310");
-    minZ_Tvalues.generateLinearTprofile(310,300,dx*dx_refined);
+    minZ_defaultTvalue.generateTprofile("300");
+    minZ_Tvalues.generateTprofile("310");
+    //minZ_Tvalues.generateLinearTprofile(310,300,dy);
 
-    northFace_defaultTvalue.addTvalue("300");
-    northFace_Tvalues.generateTprofile("300");
-    //northFace_Tvalues.generateLinearTprofile(310,300,6+dz_refined-1);
+    northFace_defaultTvalue.generateTprofile("300");
+    northFace_Tvalues.generateTprofile("310");
+    //northFace_Tvalues.generateLinearTprofile(310,300,dz);
 
-    westFace_defaultTvalue.addTvalue("300");
+    westFace_defaultTvalue.generateTprofile("300");
     //westFace_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> westFace_desiredTvalues;
@@ -33,7 +33,7 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     */
     westFace_Tvalues.generateLinearTprofile(305,300,6);
 
-    eastFace_defaultTvalue.addTvalue("300");
+    eastFace_defaultTvalue.generateTprofile("300");
     //eastFace_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> eastFace_desiredTvalues;
@@ -44,7 +44,7 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     */
     eastFace_Tvalues.generateLinearTprofile(305,300,6);
 
-    southFace_defaultTvalue.addTvalue("300");
+    southFace_defaultTvalue.generateTprofile("300");
     //southFace_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> southFace_desiredTvalues;
@@ -55,7 +55,7 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     */
     southFace_Tvalues.generateLinearTprofile(305,300,6);
 
-    maxZ_defaultTvalue.addTvalue("300");
+    maxZ_defaultTvalue.generateTprofile("300");
     //maxZ_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> maxZ_desiredTvalues;
@@ -66,7 +66,7 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     */
     maxZ_Tvalues.generateLinearTprofile(305,300,6);
 
-    internalField_defaultTvalue.addTvalue("300");
+    internalField_defaultTvalue.generateTprofile("300");
     //internalField_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> internalField_desiredTvalues;
@@ -79,13 +79,13 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
 
     //could have an input checker function here before getting into the execution
 
-    //generateExampleMinZ();
+    generateExampleMinZ();
     //generateAdjustableMinZ_topToBot();
     //generateAdjustableMinZ_simplest_topToBot();
     //generateAdjustableMinZ_refineCells_topToBot();
     //generateAdjustableMinZ_leftToRight();
     //generateAdjustableMinZ_simplest_leftToRight();
-    generateAdjustableMinZ_refineCells_leftToRight();
+    //generateAdjustableMinZ_refineCells_leftToRight();
     generateExampleNorthFace();
     //generateAdjustableNorthFace_simplest();
     //generateAdjustableNorthFace_refineCells();
@@ -100,43 +100,38 @@ std::vector<std::string> generateLinesToAddRefinedMesh::getLines()
     return linesToAdd;
 }
 
-void generateLinesToAddRefinedMesh::fillLinesToAdd(Tvalue defaultValue,Tprofile theValues)
+void generateLinesToAddRefinedMesh::fillLinesToAdd(Tprofile defaultValue,Tprofile theValues)
 {
     //default values reset all the values before doing what really needs to be filled
-    std::vector<double> cellIndices = defaultValue.getCellIndices();
-    if(cellIndices.size() != 0)
+    for(size_t t = 0; t < defaultValue.size(); t++)
     {
-        if(defaultValue.getValue() == "")
+        std::vector<double> cellIndices = defaultValue[t].getCellIndices();
+        if(cellIndices.size() != 0)
         {
-            std::cout << "Error! defaultTvalue filled, but has no value!\n";
-            //need to add a name to Tvalue to do this correctly
-            //hmm, more complicated. Implies changing default values to be a Tprofile otherwise
-            //no easy place for a name
-            std::exit(EXIT_FAILURE);
+            linesToAdd.push_back("	labelToFace");
+            linesToAdd.push_back("	{");
+            linesToAdd.push_back("		value");
+            linesToAdd.push_back("		(");
+            for(double i = 0; i < cellIndices.size(); i++)
+            {
+                std::ostringstream strm;
+                strm << cellIndices[i];
+                std::string str = strm.str();
+                linesToAdd.push_back("		"+str);
+            }
+            linesToAdd.push_back("		);");
+            linesToAdd.push_back("		fieldValues");
+            linesToAdd.push_back("		(");
+            linesToAdd.push_back("			volScalarFieldValue T "+defaultValue[t].getValue());
+            linesToAdd.push_back("		);");
+            linesToAdd.push_back("	}");
         }
-        linesToAdd.push_back("	labelToFace");
-        linesToAdd.push_back("	{");
-        linesToAdd.push_back("		value");
-        linesToAdd.push_back("		(");
-        for(double i = 0; i < cellIndices.size(); i++)
-        {
-            std::ostringstream strm;
-            strm << cellIndices[i];
-            std::string str = strm.str();
-            linesToAdd.push_back("		"+str);
-        }
-        linesToAdd.push_back("		);");
-        linesToAdd.push_back("		fieldValues");
-        linesToAdd.push_back("		(");
-        linesToAdd.push_back("			volScalarFieldValue T "+defaultValue.getValue());
-        linesToAdd.push_back("		);");
-        linesToAdd.push_back("	}");
     }
 
     //now add all the rest of the values
     for(size_t t = 0; t < theValues.size(); t++)
     {
-        cellIndices = theValues[t].getCellIndices();
+        std::vector<double> cellIndices = theValues[t].getCellIndices();
         if(cellIndices.size() != 0)
         {
             linesToAdd.push_back("	labelToFace");
@@ -164,6 +159,12 @@ void generateLinesToAddRefinedMesh::generateExampleMinZ()
 {
 //This section is for filling in minZ with methods that aren't as structured. These are more easily
 //manipulated to look at how each individual point is filled in.
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleMinZ if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
     if(minZ_Tvalues.size() != 1)
     {
         std::cout << "Error, cannot perform function generateExampleMinZ if " <<
@@ -176,7 +177,7 @@ void generateLinesToAddRefinedMesh::generateExampleMinZ()
     {
         for(double j = 0; j < dx*dy; j++)
         {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+dx*dy*k+j);
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+dx*dy*k+j);
         }
     }
 
@@ -224,11 +225,17 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_topToBot()
 {
 //This section is for filling in minZ from top to bottom with methods that are structured.
 //This supports having multiple values for the Tprofile, but the number of Tprofile values has to be
-//a divisor of dy if timesRefined is not zero, or stuff gets placed out of order
+//a divisor of dy, or stuff gets placed out of order
     if(timesRefined == 0)
     {
         std::cout << "Error, cannot perform function generateAdjustableMinZ_topToBot if " <<
                      "timesRefined == 0! Use generateExampleMinZ instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_topToBot if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
     }
     if(minZ_Tvalues.size() <= 0 || fmod(dy,minZ_Tvalues.size()) != 0)
@@ -243,7 +250,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_topToBot()
     {
         for(double j = 0; j < dx*dy; j++)
         {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+dx*dy*k+j);
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+dx*dy*k+j);
         }
     }
 
@@ -308,12 +315,18 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_topToBot()
 
 void generateLinesToAddRefinedMesh::generateAdjustableMinZ_simplest_topToBot()
 {
-//This section is for filling in minZ with methods that aren't as structured. These are more easily
-//manipulated to look at how each individual point is filled in.
+//This section is for filling in minZ from top to bottom with methods that are structured.
+//The number of Tprofile values has to be equal to dy, or stuff gets placed out of order
     if(timesRefined == 0)
     {
         std::cout << "Error, cannot perform function generateAdjustableMinZ_simplest_topToBot if " <<
                      "timesRefined == 0! Use generateExampleMinZ instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_simplest_topToBot if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
     }
     if(minZ_Tvalues.size() != dy)
@@ -328,7 +341,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_simplest_topToBot()
     {
         for(double j = 0; j < dx*dy; j++)
         {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+dx*dy*k+j);
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+dx*dy*k+j);
         }
     }
 
@@ -391,12 +404,18 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_simplest_topToBot()
 
 void generateLinesToAddRefinedMesh::generateAdjustableMinZ_refineCells_topToBot()
 {
-//This section is for filling in minZ with methods that aren't as structured. These are more easily
-//manipulated to look at how each individual point is filled in.
+    //This section is for filling in minZ from top to bottom with methods that are structured.
+    //The number of Tprofile values has to be equal to dy*dy_refined, or stuff gets placed out of order
     if(timesRefined == 0)
     {
         std::cout << "Error, cannot perform function generateAdjustableMinZ_refineCells_topToBot if " <<
                      "timesRefined == 0! Use generateExampleMinZ instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_refineCells_topToBot if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
     }
     if(minZ_Tvalues.size() != dy*dy_refined)
@@ -411,7 +430,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_refineCells_topToBot(
     {
         for(double j = 0; j < dx*dy; j++)
         {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+dx*dy*k+j);
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+dx*dy*k+j);
         }
     }
 
@@ -476,11 +495,17 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_leftToRight()
 {
 //This section is for filling in minZ from left to right with methods that are structured.
 //This supports having multiple values for the Tprofile, but the number of Tprofile values has to be
-//a divisor of dx if timesRefined is not zero, or stuff gets placed out of order
+//a divisor of dx, or stuff gets placed out of order
     if(timesRefined == 0)
     {
         std::cout << "Error, cannot perform function generateAdjustableMinZ_leftToRight if " <<
                      "timesRefined == 0! Use generateExampleMinZ instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_leftToRight if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
     }
     if(minZ_Tvalues.size() <= 0 || fmod(dx,minZ_Tvalues.size()))
@@ -495,7 +520,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_leftToRight()
     {
         for(double j = 0; j < dx*dy; j++)
         {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+dx*dy*k+j);
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+dx*dy*k+j);
         }
     }
 
@@ -560,12 +585,18 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_leftToRight()
 
 void generateLinesToAddRefinedMesh::generateAdjustableMinZ_simplest_leftToRight()
 {
-//This section is for filling in minZ with methods that aren't as structured. These are more easily
-//manipulated to look at how each individual point is filled in.
+//This section is for filling in minZ from left to right with methods that are structured.
+//The number of Tprofile values has to be equal to dx, or stuff gets placed out of order
     if(timesRefined == 0)
     {
         std::cout << "Error, cannot perform function generateAdjustableMinZ_simplest_leftToRight if " <<
                      "timesRefined == 0! Use generateExampleMinZ instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_simplest_leftToRight if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
     }
     if(minZ_Tvalues.size() != dx)
@@ -580,7 +611,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_simplest_leftToRight(
     {
         for(double j = 0; j < dx*dy; j++)
         {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+dx*dy*k+j);
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+dx*dy*k+j);
         }
     }
 
@@ -643,12 +674,18 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_simplest_leftToRight(
 
 void generateLinesToAddRefinedMesh::generateAdjustableMinZ_refineCells_leftToRight()
 {
-//This section is for filling in minZ with methods that aren't as structured. These are more easily
-//manipulated to look at how each individual point is filled in.
+//This section is for filling in minZ from left to right with methods that are structured.
+//The number of Tprofile values has to be equal to dx*dx_refined, or stuff gets placed out of order
     if(timesRefined == 0)
     {
         std::cout << "Error, cannot perform function generateAdjustableMinZ_refineCells_leftToRight if " <<
                      "timesRefined == 0! Use generateExampleMinZ instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_refineCells_leftToRight if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
     }
     if(minZ_Tvalues.size() != dx*dx_refined)
@@ -663,7 +700,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableMinZ_refineCells_leftToRig
     {
         for(double j = 0; j < dx*dy; j++)
         {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+dx*dy*k+j);
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+dx*dy*k+j);
         }
     }
 
@@ -728,7 +765,12 @@ void generateLinesToAddRefinedMesh::generateExampleNorthFace()
 {
 //This section is for filling in north_face with methods that aren't as structured. These are more easily
 //manipulated to look at how each individual point is filled in.
-
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleNorthFace if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
     if(northFace_Tvalues.size() != 1)
     {
         std::cout << "Error, cannot perform function generateExampleNorthFace if " <<
@@ -740,13 +782,13 @@ void generateLinesToAddRefinedMesh::generateExampleNorthFace()
     //fill in the original cells first
     for(double i = 0; i < dx*dz; i++)
     {
-        northFace_defaultTvalue.addCellIndex(northFaceStartFace+i);
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+i);
     }
     //now fill in the refined cells. Notice that 2^0 = 1, so this becomes dx*0
     //and the loop isn't entered if timesRefined = 0.
     for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
     {
-        northFace_defaultTvalue.addCellIndex(northFaceStartFace+dx*dz+i);
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+dx*dz+i);
     }
 
     //fill the first set of points, the cells from before refine mesh
@@ -799,6 +841,12 @@ void generateLinesToAddRefinedMesh::generateAdjustableNorthFace_simplest()
                      "timesRefined == 0! Use generateExampleNorthFace instead!\n";
         std::exit(EXIT_FAILURE);
     }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableNorthFace_simplest if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
     if(northFace_Tvalues.size() != dz)
     {
         std::cout << "Error, cannot perform function generateAdjustableNorthFace_simplest if " <<
@@ -810,12 +858,12 @@ void generateLinesToAddRefinedMesh::generateAdjustableNorthFace_simplest()
     //fill in the original cells first
     for(double i = 0; i < dx*dz; i++)
     {
-        northFace_defaultTvalue.addCellIndex(northFaceStartFace+i);
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+i);
     }
     //now fill in the refined cells
     for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
     {
-        northFace_defaultTvalue.addCellIndex(northFaceStartFace+dx*dz+i);
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+dx*dz+i);
     }
 
     //fill the first set of points, the cells from before refine mesh
@@ -872,13 +920,19 @@ void generateLinesToAddRefinedMesh::generateAdjustableNorthFace_refineCells()
 {
 //This section is for filling in north_face from bottom to top with methods that are structured.
 //This also fills in the refined cell layers separately from the other layers
-//So if timesRefined != 0, the Tprofile has to be of the same size as the number of cells in the z direction
+//The Tprofile has to be of the same size as the number of cells in the z direction
 //This includes the cells from before refine mesh as well as the cells after refine mesh
 //If you want a single value for the north_face, use generateExampleNorthFace
     if(timesRefined == 0)
     {
         std::cout << "Error, cannot perform function generateAdjustableNorthFace_refineCells if " <<
                      "timesRefined == 0! Use generateExampleNorthFace instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableNorthFace_refineCells if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
     }
     if(northFace_Tvalues.size() != dz+dz_refined-1)
@@ -892,12 +946,12 @@ void generateLinesToAddRefinedMesh::generateAdjustableNorthFace_refineCells()
     //fill in the original cells first
     for(double i = 0; i < dx*dz; i++)
     {
-        northFace_defaultTvalue.addCellIndex(northFaceStartFace+i);
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+i);
     }
     //now fill in the refined cells
     for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
     {
-        northFace_defaultTvalue.addCellIndex(northFaceStartFace+dx*dz+i);
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+dx*dz+i);
     }
 
     for(double i = 0; i < dx; i++)

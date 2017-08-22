@@ -5,8 +5,8 @@ editSetFieldsDict::editSetFieldsDict(std::string setFieldsDictPath_value)
     setFieldsDictPath = setFieldsDictPath_value;
 
     readSetFieldsDict();
-    //generateLinesToAdd linesToAddGenerator(363294,359766,45,39,6);
-    generateLinesToAddRefinedMesh linesToAddGenerator(363294,359766,45,39,6,2);
+    generateLinesToAdd linesToAddGenerator(219991,215241,67,58,19);
+    //generateLinesToAddRefinedMesh linesToAddGenerator(363294,359766,45,39,6,2);
     linesToAdd = linesToAddGenerator.getLines();
     writeSetFieldsDict();
 }

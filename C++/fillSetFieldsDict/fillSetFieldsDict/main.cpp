@@ -90,7 +90,7 @@ int main()
      *
      */
 
-    std::string setFieldsDictPath = "/home/latwood/Documents/energyEqn-old/recreateImprovedForMeeting/fillSetFieldsDict/twiceRefined/system/setFieldsDict";
+    std::string setFieldsDictPath = "/home/latwood/Documents/energyEqn-old/recreateImprovedForMeeting/fillSetFieldsDict/notRefined/case/system/setFieldsDict";
 
     editSetFieldsDict fillSetFieldsDict(setFieldsDictPath);
 

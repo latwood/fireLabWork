@@ -20,7 +20,7 @@ public:
 
 private:
 
-    void fillLinesToAdd(Tvalue defaultValue,Tprofile theValues);
+    void fillLinesToAdd(Tprofile defaultValue,Tprofile theValues);
 
     void generateExampleMinZ();
     void generateAdjustableMinZ_topToBot();
@@ -63,19 +63,19 @@ private:
      * truncate whatever stuff is used. It will just use as many values in the Tprofile as there are locations
      * to use them, and ignore the rest
      */
-    Tvalue minZ_defaultTvalue;
+    Tprofile minZ_defaultTvalue;
     Tprofile minZ_Tvalues;
-    Tvalue northFace_defaultTvalue;
+    Tprofile northFace_defaultTvalue;
     Tprofile northFace_Tvalues;
-    Tvalue westFace_defaultTvalue;
+    Tprofile westFace_defaultTvalue;
     Tprofile westFace_Tvalues;
-    Tvalue eastFace_defaultTvalue;
+    Tprofile eastFace_defaultTvalue;
     Tprofile eastFace_Tvalues;
-    Tvalue southFace_defaultTvalue;
+    Tprofile southFace_defaultTvalue;
     Tprofile southFace_Tvalues;
-    Tvalue maxZ_defaultTvalue;
+    Tprofile maxZ_defaultTvalue;
     Tprofile maxZ_Tvalues;
-    Tvalue internalField_defaultTvalue;
+    Tprofile internalField_defaultTvalue;
     Tprofile internalField_Tvalues;
 
 };

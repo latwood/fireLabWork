@@ -10,7 +10,7 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     dy = dy_value;
     dz = dz_value;
 
-    minZ_defaultTvalue.addTvalue("300");
+    minZ_defaultTvalue.generateTprofile("300");
     /*
     std::vector<std::string> minZ_desiredTvalues;
     minZ_desiredTvalues.push_back("310");
@@ -20,10 +20,10 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     minZ_desiredTvalues.push_back("310");
     minZ_Tvalues.generateLinearTprofile(minZ_desiredTvalues);
     */
-    minZ_Tvalues.generateTprofile("310");
-    //minZ_Tvalues.generateLinearTprofile(310,300,dx);
+    //minZ_Tvalues.generateTprofile("310");
+    minZ_Tvalues.generateLinearTprofile(310,300,67);
 
-    northFace_defaultTvalue.addTvalue("300");
+    northFace_defaultTvalue.generateTprofile("300");
     /*
     std::vector<std::string> northFace_desiredTvalues;
     northFace_desiredTvalues.push_back("310");
@@ -32,9 +32,9 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     northFace_Tvalues.generateLinearTprofile(northFace_desiredTvalues);
     */
     //northFace_Tvalues.generateTprofile("310");
-    northFace_Tvalues.generateLinearTprofile(310,300,6);
+    northFace_Tvalues.generateLinearTprofile(310,300,dz);
 
-    westFace_defaultTvalue.addTvalue("300");
+    westFace_defaultTvalue.generateTprofile("300");
     //westFace_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> westFace_desiredTvalues;
@@ -45,7 +45,7 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     */
     westFace_Tvalues.generateLinearTprofile(305,300,6);
 
-    eastFace_defaultTvalue.addTvalue("300");
+    eastFace_defaultTvalue.generateTprofile("300");
     //eastFace_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> eastFace_desiredTvalues;
@@ -56,7 +56,7 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     */
     eastFace_Tvalues.generateLinearTprofile(305,300,6);
 
-    southFace_defaultTvalue.addTvalue("300");
+    southFace_defaultTvalue.generateTprofile("300");
     //southFace_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> southFace_desiredTvalues;
@@ -67,7 +67,7 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     */
     southFace_Tvalues.generateLinearTprofile(305,300,6);
 
-    maxZ_defaultTvalue.addTvalue("300");
+    maxZ_defaultTvalue.generateTprofile("300");
     //maxZ_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> maxZ_desiredTvalues;
@@ -78,7 +78,7 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     */
     maxZ_Tvalues.generateLinearTprofile(305,300,6);
 
-    internalField_defaultTvalue.addTvalue("300");
+    internalField_defaultTvalue.generateTprofile("300");
     //internalField_Tvalues.generateTprofile("310");
     /*
     std::vector<std::string> internalField_desiredTvalues;
@@ -89,13 +89,14 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     */
     internalField_Tvalues.generateLinearTprofile(305,300,6);
 
-    generateExampleMinZ();
+    //generateExampleMinZ();
     //generateAdjustableMinZ_topToBot();
-    //generateAdjustableMinZ_leftToRight();
+    generateAdjustableMinZ_leftToRight();
     //generateExampleNorthFace();
     generateAdjustableNorthFace();
 
-    fillLinesToAdd();
+    fillLinesToAdd(minZ_defaultTvalue,minZ_Tvalues);
+    fillLinesToAdd(northFace_defaultTvalue,northFace_Tvalues);
 
 }
 
@@ -104,115 +105,55 @@ std::vector<std::string> generateLinesToAdd::getLines()
     return linesToAdd;
 }
 
-void generateLinesToAdd::fillLinesToAdd()
+void generateLinesToAdd::fillLinesToAdd(Tprofile defaultValue,Tprofile theValues)
 {
-  //fill minZ first
-    //add minZ default values
     //default values reset all the values before doing what really needs to be filled
-    std::vector<double> minZcellIndices = minZ_defaultTvalue.getCellIndices();
-    if(minZcellIndices.size() != 0)
+    for(size_t t = 0; t < defaultValue.size(); t++)
     {
-        if(minZ_defaultTvalue.getValue() == "")
-        {
-            std::cout << "Error! minZ_defaultTvalue filled, but has no value!\n";
-            std::exit(EXIT_FAILURE);
-        }
-        linesToAdd.push_back("	labelToFace");
-        linesToAdd.push_back("	{");
-        linesToAdd.push_back("		value");
-        linesToAdd.push_back("		(");
-        for(double i = 0; i < minZcellIndices.size(); i++)
-        {
-            std::ostringstream strm;
-            strm << minZcellIndices[i];
-            std::string str = strm.str();
-            linesToAdd.push_back("		"+str);
-        }
-        linesToAdd.push_back("		);");
-        linesToAdd.push_back("		fieldValues");
-        linesToAdd.push_back("		(");
-        linesToAdd.push_back("			volScalarFieldValue T "+minZ_defaultTvalue.getValue());
-        linesToAdd.push_back("		);");
-        linesToAdd.push_back("	}");
-    }
-
-    //now add all the rest of the minZ values
-    for(size_t t = 0; t < minZ_Tvalues.size(); t++)
-    {
-        minZcellIndices = minZ_Tvalues[t].getCellIndices();
-        if(minZcellIndices.size() != 0)
+        std::vector<double> cellIndices = defaultValue[t].getCellIndices();
+        if(cellIndices.size() != 0)
         {
             linesToAdd.push_back("	labelToFace");
             linesToAdd.push_back("	{");
             linesToAdd.push_back("		value");
             linesToAdd.push_back("		(");
-            for(double i = 0; i < minZcellIndices.size(); i++)
+            for(double i = 0; i < cellIndices.size(); i++)
             {
                 std::ostringstream strm;
-                strm << minZcellIndices[i];
+                strm << cellIndices[i];
                 std::string str = strm.str();
                 linesToAdd.push_back("		"+str);
             }
             linesToAdd.push_back("		);");
             linesToAdd.push_back("		fieldValues");
             linesToAdd.push_back("		(");
-            linesToAdd.push_back("			volScalarFieldValue T "+minZ_Tvalues[t].getValue());
+            linesToAdd.push_back("			volScalarFieldValue T "+defaultValue[t].getValue());
             linesToAdd.push_back("		);");
             linesToAdd.push_back("	}");
         }
     }
 
-  //now fill north_face
-    //add north_face default values
-    //default values reset all the values before doing what really needs to be filled
-    std::vector<double> northFaceCellIndices = northFace_defaultTvalue.getCellIndices();
-    if(northFaceCellIndices.size() != 0)
+    //now add all the rest of the values
+    for(size_t t = 0; t < theValues.size(); t++)
     {
-        if(northFace_defaultTvalue.getValue() == "")
+        std::vector<double> cellIndices = theValues[t].getCellIndices();
+        if(cellIndices.size() != 0)
         {
-            std::cout << "Error! northFace_defaultTvalue filled, but has no value!\n";
-            std::exit(EXIT_FAILURE);
-        }
-        linesToAdd.push_back("	labelToFace");
-        linesToAdd.push_back("	{");
-        linesToAdd.push_back("		value");
-        linesToAdd.push_back("		(");
-        for(double i = 0; i < northFaceCellIndices.size(); i++)
-        {
-            std::ostringstream strm;
-            strm << northFaceCellIndices[i];
-            std::string str = strm.str();
-            linesToAdd.push_back("		"+str);
-        }
-        linesToAdd.push_back("		);");
-        linesToAdd.push_back("		fieldValues");
-        linesToAdd.push_back("		(");
-        linesToAdd.push_back("			volScalarFieldValue T "+northFace_defaultTvalue.getValue());
-        linesToAdd.push_back("		);");
-        linesToAdd.push_back("	}");
-    }
-
-    //now add all the rest of the north_face values
-    for(size_t t = 0; t < northFace_Tvalues.size(); t++)
-    {
-        northFaceCellIndices = northFace_Tvalues[t].getCellIndices();
-        if(northFaceCellIndices.size() != 0)
-            {
             linesToAdd.push_back("	labelToFace");
             linesToAdd.push_back("	{");
             linesToAdd.push_back("		value");
             linesToAdd.push_back("		(");
-            for(double i = 0; i < northFaceCellIndices.size(); i++)
+            for(double i = 0; i < cellIndices.size(); i++)
             {
                 std::ostringstream strm;
-                strm << northFaceCellIndices[i];
+                strm << cellIndices[i];
                 std::string str = strm.str();
                 linesToAdd.push_back("		"+str);
             }
             linesToAdd.push_back("		);");
             linesToAdd.push_back("		fieldValues");
             linesToAdd.push_back("		(");
-            linesToAdd.push_back("			volScalarFieldValue T "+northFace_Tvalues[t].getValue());
+            linesToAdd.push_back("			volScalarFieldValue T "+theValues[t].getValue());
             linesToAdd.push_back("		);");
             linesToAdd.push_back("	}");
         }
@@ -223,26 +164,31 @@ void generateLinesToAdd::generateExampleMinZ()
 {
 //This section is for filling in minZ with methods that aren't as structured. These are more easily
 //manipulated to look at how each individual point is filled in.
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleMinZ if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
     if(minZ_Tvalues.size() != 1)
     {
         std::cout <<  "Error, cannot perform function generateExampleMinZ if " <<
                       "the Tprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
-    } else
-    {
-        //this resets all the values before doing what really needs to be filled
-        for(double j = 0; j < dx*dy; j++)
-        {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+j);
-        }
+    }
 
-        //this how to fill in the points breaking it out into multiple loops
-        for(double j = 0; j < dy; j++)
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dx*dy; j++)
+    {
+        minZ_defaultTvalue[0].addCellIndex(minZstartFace+j);
+    }
+
+    //this how to fill in the points breaking it out into multiple loops
+    for(double j = 0; j < dy; j++)
+    {
+        for(double i = 0; i < dx; i++)
         {
-            for(double i = 0; i < dx; i++)
-            {
-                minZ_Tvalues[0].addCellIndex(minZstartFace+dx*j+i);
-            }
+            minZ_Tvalues[0].addCellIndex(minZstartFace+dx*j+i);
         }
     }
 }
@@ -250,30 +196,36 @@ void generateLinesToAdd::generateExampleMinZ()
 void generateLinesToAdd::generateAdjustableMinZ_topToBot()
 {
 //This section is for filling in minZ from top to bottom with methods that are structured.
-//This supports having multiple values for the Tprofile
-    if(minZ_Tvalues.size() <= 0)
+//This supports having multiple values for the Tprofile, but the number of Tprofile values has to be
+//a divisor of dy, or stuff gets placed out of order
+    if(minZ_defaultTvalue.size() != 1)
     {
-        std::cout <<  "Error, cannot perform function generateAdjustableMinZ_topToBot if " <<
-                      "the Tprofile is size <= 0!\n";
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_topToBot if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
-    } else
+    }
+    if(minZ_Tvalues.size() <= 0 || fmod(dy,minZ_Tvalues.size()) != 0)
     {
-        //this resets all the values before doing what really needs to be filled
-        for(double j = 0; j < dx*dy; j++)
-        {
-                minZ_defaultTvalue.addCellIndex(minZstartFace+j);
-        }
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_topToBot if " <<
+                     "the Tprofile doesn't have size that can evenly divide dy!\n";
+        std::exit(EXIT_FAILURE);
+    }
 
-        double divisor = minZ_Tvalues.size();
-        for(size_t t = 0; t < divisor; t++)
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dx*dy; j++)
+    {
+            minZ_defaultTvalue[0].addCellIndex(minZstartFace+j);
+    }
+
+    double divisor = minZ_Tvalues.size();
+    for(size_t t = 0; t < divisor; t++)
+    {
+        //this how to fill in the points breaking it out into multiple loops
+        for(double i = 0; i < dx; i++)
         {
-            //this how to fill in the points breaking it out into multiple loops
-            for(double i = 0; i < dx; i++)
+            for(double j = t*dy/divisor; j < (t+1)*dy/divisor; j++)
             {
-                for(double j = t*dy/divisor; j < (t+1)*dy/divisor; j++)
-                {
-                    minZ_Tvalues[t].addCellIndex(minZstartFace+dy*i+j);
-                }
+                minZ_Tvalues[t].addCellIndex(minZstartFace+dy*i+j);
             }
         }
     }
@@ -282,30 +234,36 @@ void generateLinesToAdd::generateAdjustableMinZ_topToBot()
 void generateLinesToAdd::generateAdjustableMinZ_leftToRight()
 {
 //This section is for filling in minZ from left to right with methods that are structured.
-//This supports having multiple values for the Tprofile
-    if(minZ_Tvalues.size() <= 0)
+//This supports having multiple values for the Tprofile, but the number of Tprofile values has to be
+//a divisor of dx, or stuff gets placed out of order
+    if(minZ_defaultTvalue.size() != 1)
     {
-        std::cout <<  "Error, cannot perform function generateAdjustableMinZ_leftToRight if " <<
-                      "the Tprofile is size <= 0!\n";
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_leftToRight if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
-    } else
+    }
+    if(minZ_Tvalues.size() <= 0 || fmod(dx,minZ_Tvalues.size()))
     {
-        //this resets all the values before doing what really needs to be filled
-        for(double j = 0; j < dx*dy; j++)
-        {
-            minZ_defaultTvalue.addCellIndex(minZstartFace+j);
-        }
+        std::cout << "Error, cannot perform function generateAdjustableMinZ_leftToRight if " <<
+                     "the Tprofile doesn't have size that can evenly divide dx!\n";
+        std::exit(EXIT_FAILURE);
+    }
 
-        double divisor = minZ_Tvalues.size();
-        for(size_t t = 0; t < divisor; t++)
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dx*dy; j++)
+    {
+        minZ_defaultTvalue[0].addCellIndex(minZstartFace+j);
+    }
+
+    double divisor = minZ_Tvalues.size();
+    for(size_t t = 0; t < divisor; t++)
+    {
+        //this how to fill in the points breaking it out into multiple loops
+        for(double i = t*dx/divisor; i < (t+1)*dx/divisor; i++)
         {
-            //this how to fill in the points breaking it out into multiple loops
-            for(double i = t*dx/divisor; i < (t+1)*dx/divisor; i++)
+            for(double j = 0; j < dy; j++)
             {
-                for(double j = 0; j < dy; j++)
-                {
-                    minZ_Tvalues[t].addCellIndex(minZstartFace+dy*i+j);
-                }
+                minZ_Tvalues[t].addCellIndex(minZstartFace+dy*i+j);
             }
         }
     }
@@ -315,26 +273,31 @@ void generateLinesToAdd::generateExampleNorthFace()
 {
 //This section is for filling in north_face with methods that aren't as structured. These are more easily
 //manipulated to look at how each individual point is filled in.
+    if(minZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleNorthFace if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
     if(northFace_Tvalues.size() != 1)
     {
         std::cout <<  "Error, cannot perform function generateExampleNorthFace if " <<
                       "the Tprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
-    } else
-    {
-        //this resets all the values before doing what really needs to be filled
-        for(double i = 0; i < dx*dz; i++)
-        {
-            northFace_defaultTvalue.addCellIndex(northFaceStartFace+i);
-        }
+    }
 
-        //this how to fill in the points breaking it out into multiple loops
-        for(double i = 0; i < dx; i++)
+    //this resets all the values before doing what really needs to be filled
+    for(double i = 0; i < dx*dz; i++)
+    {
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+i);
+    }
+
+    //this how to fill in the points breaking it out into multiple loops
+    for(double i = 0; i < dx; i++)
+    {
+        for(double k = 0; k < dz; k++)
         {
-            for(double k = 0; k < dz; k++)
-            {
-                northFace_Tvalues[0].addCellIndex(northFaceStartFace+dz*i+k);
-            }
+            northFace_Tvalues[0].addCellIndex(northFaceStartFace+dz*i+k);
         }
     }
 }
@@ -342,29 +305,34 @@ void generateLinesToAdd::generateExampleNorthFace()
 void generateLinesToAdd::generateAdjustableNorthFace()
 {
 //This section is for filling in north_face from bottom to top with methods that are structured.
-    if(northFace_Tvalues.size() <= 0)
+    if(minZ_defaultTvalue.size() != 1)
     {
         std::cout << "Error, cannot perform function generateAdjustableNorthFace if " <<
-                     "the Tprofile is size <= 0!\n";
+                     "the defaultTprofile doesn't have size 1!\n";
         std::exit(EXIT_FAILURE);
-    } else
+    }
+    if(northFace_Tvalues.size() <= 0 || fmod(dz,northFace_Tvalues.size()))
     {
-        //this resets all the values before doing what really needs to be filled
-        for(double i = 0; i < dx*dz; i++)
-        {
-            northFace_defaultTvalue.addCellIndex(northFaceStartFace+i);
-        }
+        std::cout << "Error, cannot perform function generateAdjustableNorthFace if " <<
+                     "the Tprofile doesn't have size that can evenly divide dz!\n";
+        std::exit(EXIT_FAILURE);
+    }
 
-        double divisor = northFace_Tvalues.size();
-        for(size_t t = 0; t < divisor; t++)
+    //this resets all the values before doing what really needs to be filled
+    for(double i = 0; i < dx*dz; i++)
+    {
+        northFace_defaultTvalue[0].addCellIndex(northFaceStartFace+i);
+    }
+
+    double divisor = northFace_Tvalues.size();
+    for(size_t t = 0; t < divisor; t++)
+    {
+        //this how to fill in the points breaking it out into multiple loops
+        for(double i = 0; i < dx; i++)
         {
-            //this how to fill in the points breaking it out into multiple loops
-            for(double i = 0; i < dx; i++)
+            for(double k = t*dz/divisor; k < (t+1)*dz/divisor; k++)
             {
-                for(double k = t*dz/divisor; k < (t+1)*dz/divisor; k++)
-                {
-                    northFace_Tvalues[t].addCellIndex(northFaceStartFace+dz*i+k);
-                }
+                northFace_Tvalues[t].addCellIndex(northFaceStartFace+dz*i+k);
             }
         }
     }

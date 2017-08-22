@@ -21,10 +21,8 @@ public:
      * The right container for all the work is a separate vector of Tvalues for each patch
      */
 
-    Tvalue();
     Tvalue(std::string Tvalue_value);
 
-    void addTvalue(std::string Tvalue_value);
     void addCellIndex(double cellIndexValue);
 
     std::string getValue();
