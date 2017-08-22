@@ -1,14 +1,14 @@
 #command to run this program (includes the current file location)
-#source('/home/latwood/Documents/smokeTransportVisualization/changePictureNames.R')
+#source('/home/latwood/src/fireLabWork/R/smokeTransportVisualization/changePictureNames.R')
 
 ###import libraries
 library(gtools)
 
 ###variables you can change
 
-mainOriginalPictureDirectory <- "/home/latwood/Documents/smokeTransportVisualization/newPics"
+mainOriginalPictureDirectory <- "/home/latwood/Documents/missoulaFireVideos/loloPeakPlume"
 
-pictureDirectoryName <- "/SmokeTracer/vshapedValley_tilt_flatbottom39.71mRes/NativeSolver_DomainAvg/diurnal/6-15-2016_21hr00min_72F/bothValleys"
+pictureDirectoryName <- "/allTogetherWithoutTanner"
 
 OriginalPictureDirectory <- paste(mainOriginalPictureDirectory,pictureDirectoryName,sep="")
 
@@ -215,76 +215,79 @@ OriginalPictureDirectory <- paste(mainOriginalPictureDirectory,pictureDirectoryN
 # pictureFileNames[74] <- "15300"
 # pictureFileNames[75] <- "16200"
 
-numberOfPictures <- 55
-pictureFileNames <- matrix(nrow=numberOfPictures)
-#set up the array of new picture names
-pictureFileNames[1] <- "0"
-pictureFileNames[2] <- "300"
-pictureFileNames[3] <- "600"
-pictureFileNames[4] <- "900"
-pictureFileNames[5] <- "1200"
-pictureFileNames[6] <- "1500"
-pictureFileNames[7] <- "1800"
-pictureFileNames[8] <- "2100"
-pictureFileNames[9] <- "2400"
-pictureFileNames[10] <- "2700"
-pictureFileNames[11] <- "3000"
-pictureFileNames[12] <- "3300"
-pictureFileNames[13] <- "3600"
-pictureFileNames[14] <- "3900"
-pictureFileNames[15] <- "4200"
-pictureFileNames[16] <- "4500"
-pictureFileNames[17] <- "4800"
-pictureFileNames[18] <- "5100"
-pictureFileNames[19] <- "5400"
-pictureFileNames[20] <- "5700"
-pictureFileNames[21] <- "6000"
-pictureFileNames[22] <- "6300"
-pictureFileNames[23] <- "6600"
-pictureFileNames[24] <- "6900"
-pictureFileNames[25] <- "7200"
-pictureFileNames[26] <- "7500"
-pictureFileNames[27] <- "7800"
-pictureFileNames[28] <- "8100"
-pictureFileNames[29] <- "8400"
-pictureFileNames[30] <- "8700"
-pictureFileNames[31] <- "9000"
-pictureFileNames[32] <- "9300"
-pictureFileNames[33] <- "9600"
-pictureFileNames[34] <- "9900"
-pictureFileNames[35] <- "10200"
-pictureFileNames[36] <- "10500"
-pictureFileNames[37] <- "10800"
-pictureFileNames[38] <- "11100"
-pictureFileNames[39] <- "11400"
-pictureFileNames[40] <- "11700"
-pictureFileNames[41] <- "12000"
-pictureFileNames[42] <- "12300"
-pictureFileNames[43] <- "12600"
-pictureFileNames[44] <- "12900"
-pictureFileNames[45] <- "13200"
-pictureFileNames[46] <- "13500"
-pictureFileNames[47] <- "13800"
-pictureFileNames[48] <- "14100"
-pictureFileNames[49] <- "14400"
-pictureFileNames[50] <- "14700"
-pictureFileNames[51] <- "15000"
-pictureFileNames[52] <- "15300"
-pictureFileNames[53] <- "15600"
-pictureFileNames[54] <- "15900"
-pictureFileNames[55] <- "16200"
+# numberOfPictures <- 55
+# pictureFileNames <- matrix(nrow=numberOfPictures)
+# #set up the array of new picture names
+# pictureFileNames[1] <- "0"
+# pictureFileNames[2] <- "300"
+# pictureFileNames[3] <- "600"
+# pictureFileNames[4] <- "900"
+# pictureFileNames[5] <- "1200"
+# pictureFileNames[6] <- "1500"
+# pictureFileNames[7] <- "1800"
+# pictureFileNames[8] <- "2100"
+# pictureFileNames[9] <- "2400"
+# pictureFileNames[10] <- "2700"
+# pictureFileNames[11] <- "3000"
+# pictureFileNames[12] <- "3300"
+# pictureFileNames[13] <- "3600"
+# pictureFileNames[14] <- "3900"
+# pictureFileNames[15] <- "4200"
+# pictureFileNames[16] <- "4500"
+# pictureFileNames[17] <- "4800"
+# pictureFileNames[18] <- "5100"
+# pictureFileNames[19] <- "5400"
+# pictureFileNames[20] <- "5700"
+# pictureFileNames[21] <- "6000"
+# pictureFileNames[22] <- "6300"
+# pictureFileNames[23] <- "6600"
+# pictureFileNames[24] <- "6900"
+# pictureFileNames[25] <- "7200"
+# pictureFileNames[26] <- "7500"
+# pictureFileNames[27] <- "7800"
+# pictureFileNames[28] <- "8100"
+# pictureFileNames[29] <- "8400"
+# pictureFileNames[30] <- "8700"
+# pictureFileNames[31] <- "9000"
+# pictureFileNames[32] <- "9300"
+# pictureFileNames[33] <- "9600"
+# pictureFileNames[34] <- "9900"
+# pictureFileNames[35] <- "10200"
+# pictureFileNames[36] <- "10500"
+# pictureFileNames[37] <- "10800"
+# pictureFileNames[38] <- "11100"
+# pictureFileNames[39] <- "11400"
+# pictureFileNames[40] <- "11700"
+# pictureFileNames[41] <- "12000"
+# pictureFileNames[42] <- "12300"
+# pictureFileNames[43] <- "12600"
+# pictureFileNames[44] <- "12900"
+# pictureFileNames[45] <- "13200"
+# pictureFileNames[46] <- "13500"
+# pictureFileNames[47] <- "13800"
+# pictureFileNames[48] <- "14100"
+# pictureFileNames[49] <- "14400"
+# pictureFileNames[50] <- "14700"
+# pictureFileNames[51] <- "15000"
+# pictureFileNames[52] <- "15300"
+# pictureFileNames[53] <- "15600"
+# pictureFileNames[54] <- "15900"
+# pictureFileNames[55] <- "16200"
+
+numberOfPictures <- 1313
+pictureFileNames <- matrix(c(1:numberOfPictures),nrow=numberOfPictures)
 
 ### for multiple folders in a single directory
-foldersOfPics <- list.dirs(OriginalPictureDirectory,full.names=TRUE,recursive=FALSE)
-for(i in 1:length(foldersOfPics))
-{
-  pics <- list.files(foldersOfPics[i],full.names=TRUE,recursive=FALSE,pattern="png")
-  pics <- mixedsort(pics)
-  file.rename(pics,paste(foldersOfPics[i],"/",pictureFileNames,".png",sep=""))
-}
+# foldersOfPics <- list.dirs(OriginalPictureDirectory,full.names=TRUE,recursive=FALSE)
+# for(i in 1:length(foldersOfPics))
+# {
+#   pics <- list.files(foldersOfPics[i],full.names=TRUE,recursive=FALSE,pattern="png")
+#   pics <- mixedsort(pics)
+#   file.rename(pics,paste(foldersOfPics[i],"/",pictureFileNames,".png",sep=""))
+# }
 
-# ### for a single folder, not searching for more folders in the directory
-# pics <- list.files(OriginalPictureDirectory,full.names=TRUE,recursive=FALSE,pattern="jpg")
-# pics <- mixedsort(pics)
-# file.rename(pics,paste(OriginalPictureDirectory,"/",pictureFileNames,".jpg",sep=""))
+### for a single folder, not searching for more folders in the directory
+pics <- list.files(OriginalPictureDirectory,full.names=TRUE,recursive=FALSE,pattern="JPG")
+pics <- mixedsort(pics)
+file.rename(pics,paste(OriginalPictureDirectory,"/",pictureFileNames,".jpg",sep=""))
 
