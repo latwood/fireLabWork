@@ -1,0 +1,8 @@
+
+#OpenFOAM alias
+#Eventually probably want this to be a function, where you can do multiple cases as the arguments
+#And it needs updated to make it not always need the password each time, though that is just
+#out of convenience
+alias paraFoamNew="paraFoam -touch && find . -name '*.OpenFOAM' -exec sh -c 'mv \"\$0\" \"\${0%.OpenFOAM}.foam\"' {} \; && sudo /usr/bin/paraview \$(find . -name '*.foam')"
+
+
