@@ -1,0 +1,38 @@
+
+	To get a standard video from images, name the images 0, 1, 2, 3 or 1, 2, 3, 4 (probably 0 starting is better), then use the following command:
+ffmpeg -framerate 25 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b 800k test.mp4
+	where framerate determines the speed of the video and -c:v mpeg4 makes the format work for windows and linux. -q:v 1 forces it to use the full quality of the images! and -b 800k forces it to use a higher bitrate so the video won't lag
+	%d means 0, 1, 2, 3, 4 where %1d means 00, 01, 02, 03 and image%03d means image0000, image0001, image0002 . . .
+
+	To add text use the following
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf: text='Stack Overflow': fontcolor=yellow: fontsize=112: box=1: boxcolor=black@0.000001: boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+	where -vf lets you use the drawtext stuff, fontfile is a path to a font, text is the words to be shown, color is the text color, fontsize is the size which depends on the resolution to get the right size, boxcolor @0.00001 is a very transparent box, x and y are the coordinates.
+
+	To put the text in the top middle for a header
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf: text='Stack Overflow': fontcolor=black: fontsize=96: box=1: boxcolor=black@0.000001: boxborderw=5: x=(w-text_w)/2: y=text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+	To put text in the bottom right, as if it were to be a timestamp
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf: text='Stack Overflow': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+	now put text in the bottom right, but this time it is a timestamp that follows your current time on the computer
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf: text='%{gmtime}': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-tw-tw/8: y=h-lh-2*lh" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+	Now to create timestamps particular to the file, use the following command to get the timestamp for an image file:
+exiv2 print 1.jpg | grep "Image timestamp" | cut -f2- -d:
+	The same command adjusted to create a text file of all the jpg files would be:
+find -maxdepth 1 -name "*.jpg" -exec exiv2 print {} \; | grep "Image timestamp" | cut -f2- -d: | sort -n | cat > timestamps.txt
+	Now add text to each line
+	To add to the beginning use this command:
+sed 's/^/drawtext=fontfile=usr\/share\/fonts\/truetype\/freefont\/FreeMonoBold.tff\: text='\''/' timestamps.txt > timestamps-drawtextfile.txt
+	To add to the end use this command:
+sed -i 's/$/'\''\: fontcolor=yellow\: fontsize=60\: box=1\: boxcolor=black@0.000001\: boxborderw=5\: x=w-tw-tw\/8\: y=h-lh-2*lh/' timestamps-drawtextfile.txt
+	Now get rid of new lines and replace them with a comma (before the comma was a space, if need to google the function)
+sed -i ':a;N;$!ba;s/\n/,/g' timestamps-drawtextfile.txt
+	Now run ffmpeg where it uses these timestamps for the different files
+
+having trouble with this. Here's the best I've got so far. Looks like I need to do man find and figure out how it all works, then I should be good.
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "$$$" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+find $drawtext -name 'timestamps-drawtextfile.txt' -exec 'ffmpeg -framerate 25 -f image2 -i %d.jpg -vf $drawtext -c:v mpeg4 -q:v 1 -b 800k test.mp4' {} \;
+
+find . -name 'timestamps-drawtextfile.txt' -print0 | ffmpeg -framerate 25 -f image2 -i %d.jpg -vf $0 -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
