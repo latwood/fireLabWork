@@ -1,11 +1,17 @@
 #include "generateLinesToAdd.h"
 
-generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northFaceStartFace_value,
+generateLinesToAdd::generateLinesToAdd(double minZstartFace_value,double northFaceStartFace_value,
+                                       double westFaceStartFace_value,double eastFaceStartFace_value,
+                                       double southFaceStartFace_value,double maxZstartFace_value,
                                        double dx_value, double dy_value, double dz_value)
 {
     //now create the stuff that will need to be added in to replace this deleted/ignored stuff
     minZstartFace = minZstartFace_value;
     northFaceStartFace = northFaceStartFace_value;
+    westFaceStartFace = westFaceStartFace_value;
+    eastFaceStartFace = eastFaceStartFace_value;
+    southFaceStartFace = southFaceStartFace_value;
+    maxZstartFace = maxZstartFace_value;
     dx = dx_value;
     dy = dy_value;
     dz = dz_value;
@@ -20,30 +26,16 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
     minZ_desiredTvalues.push_back("310");
     minZ_Tvalues.generateLinearTprofile(minZ_desiredTvalues);
     */
-    //minZ_Tvalues.generateTprofile("310");
-    minZ_Tvalues.generateLinearTprofile(310,300,67);
+    minZ_Tvalues.generateTprofile("300");
+    //minZ_Tvalues.generateLinearTprofile(310,300,5);
 
     northFace_defaultTvalue.generateTprofile("300");
-    /*
-    std::vector<std::string> northFace_desiredTvalues;
-    northFace_desiredTvalues.push_back("310");
-    northFace_desiredTvalues.push_back("305");
-    northFace_desiredTvalues.push_back("300");
-    northFace_Tvalues.generateLinearTprofile(northFace_desiredTvalues);
-    */
-    //northFace_Tvalues.generateTprofile("310");
-    northFace_Tvalues.generateLinearTprofile(310,300,dz);
+    northFace_Tvalues.generateTprofile("300");
+    //northFace_Tvalues.generateLinearTprofile(310,300,2);
 
     westFace_defaultTvalue.generateTprofile("300");
     //westFace_Tvalues.generateTprofile("310");
-    /*
-    std::vector<std::string> westFace_desiredTvalues;
-    westFace_desiredTvalues.push_back("310");
-    westFace_desiredTvalues.push_back("305");
-    westFace_desiredTvalues.push_back("300");
-    westFace_Tvalues.generateLinearTprofile(westFace_desiredTvalues);
-    */
-    westFace_Tvalues.generateLinearTprofile(305,300,6);
+    westFace_Tvalues.generateLinearTprofile(305,300,5);
 
     eastFace_defaultTvalue.generateTprofile("300");
     //eastFace_Tvalues.generateTprofile("310");
@@ -91,12 +83,22 @@ generateLinesToAdd::generateLinesToAdd(double minZstartFace_value, double northF
 
     //generateExampleMinZ();
     //generateAdjustableMinZ_topToBot();
-    generateAdjustableMinZ_leftToRight();
+    //generateAdjustableMinZ_leftToRight();
     //generateExampleNorthFace();
-    generateAdjustableNorthFace();
+    //generateAdjustableNorthFace();
+    //generateExampleWestFace();
+    generateAdjustableWestFace();
+    //generateExampleEastFace();
+    //generateAdjustableEastFace();
+    //generateExampleSouthFace();
+    //generateAdjustableSouthFace();
 
     fillLinesToAdd(minZ_defaultTvalue,minZ_Tvalues);
     fillLinesToAdd(northFace_defaultTvalue,northFace_Tvalues);
+    fillLinesToAdd(westFace_defaultTvalue,westFace_Tvalues);
+    fillLinesToAdd(eastFace_defaultTvalue,eastFace_Tvalues);
+    fillLinesToAdd(southFace_defaultTvalue,southFace_Tvalues);
+    fillLinesToAdd(maxZ_defaultTvalue,maxZ_Tvalues);
 
 }
 
@@ -273,7 +275,7 @@ void generateLinesToAdd::generateExampleNorthFace()
 {
 //This section is for filling in north_face with methods that aren't as structured. These are more easily
 //manipulated to look at how each individual point is filled in.
-    if(minZ_defaultTvalue.size() != 1)
+    if(northFace_defaultTvalue.size() != 1)
     {
         std::cout << "Error, cannot perform function generateExampleNorthFace if " <<
                      "the defaultTprofile doesn't have size 1!\n";
@@ -305,7 +307,7 @@ void generateLinesToAdd::generateExampleNorthFace()
 void generateLinesToAdd::generateAdjustableNorthFace()
 {
 //This section is for filling in north_face from bottom to top with methods that are structured.
-    if(minZ_defaultTvalue.size() != 1)
+    if(northFace_defaultTvalue.size() != 1)
     {
         std::cout << "Error, cannot perform function generateAdjustableNorthFace if " <<
                      "the defaultTprofile doesn't have size 1!\n";
@@ -333,6 +335,75 @@ void generateLinesToAdd::generateAdjustableNorthFace()
             for(double k = t*dz/divisor; k < (t+1)*dz/divisor; k++)
             {
                 northFace_Tvalues[t].addCellIndex(northFaceStartFace+dz*i+k);
+            }
+        }
+    }
+}
+
+void generateLinesToAdd::generateExampleWestFace()
+{
+//This section is for filling in north_face with methods that aren't as structured. These are more easily
+//manipulated to look at how each individual point is filled in.
+    if(westFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleWestFace if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(westFace_Tvalues.size() != 1)
+    {
+        std::cout <<  "Error, cannot perform function generateExampleWestFace if " <<
+                      "the Tprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dy*dz; j++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+j);
+    }
+
+    //this how to fill in the points breaking it out into multiple loops
+    for(double k = 0; k < dz; k++)
+    {
+        for(double j = 0; j < dy; j++)
+        {
+            westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*k+j);
+        }
+    }
+}
+
+void generateLinesToAdd::generateAdjustableWestFace()
+{
+//This section is for filling in north_face from bottom to top with methods that are structured.
+    if(westFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(westFace_Tvalues.size() <= 0 || fmod(dz,westFace_Tvalues.size()))
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace if " <<
+                     "the Tprofile doesn't have size that can evenly divide dz!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dy*dz; j++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+j);
+    }
+
+    double divisor = westFace_Tvalues.size();
+    for(size_t t = 0; t < divisor; t++)
+    {
+        //this how to fill in the points breaking it out into multiple loops
+        for(double k = t*dz/divisor; k < (t+1)*dz/divisor; k++)
+        {
+            for(double j = 0; j < dy; j++)
+            {
+                westFace_Tvalues[t].addCellIndex(westFaceStartFace+dy*k+j);
             }
         }
     }

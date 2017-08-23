@@ -13,7 +13,8 @@ class generateLinesToAdd
 {
 public:
 
-    generateLinesToAdd(double minZstartFace_value, double northFaceStartFace_value,
+    generateLinesToAdd(double minZstartFace_value,double northFaceStartFace_value,double westFaceStartFace_value,
+                       double eastFaceStartFace_value,double southFaceStartFace_value,double maxZstartFace_value,
                        double dx_value, double dy_value, double dz_value);
 
     std::vector<std::string> getLines();
@@ -27,6 +28,12 @@ private:
     void generateAdjustableMinZ_leftToRight();
     void generateExampleNorthFace();
     void generateAdjustableNorthFace();
+    void generateExampleWestFace();
+    void generateAdjustableWestFace();
+    void generateExampleEastFace();
+    void generateAdjustableEastFace();
+    void generateExampleSouthFace();
+    void generateAdjustableSouthFace();
 
     /*
      * maybe someday the problem is that adjusting one set of values means a need to adjust another set
@@ -40,6 +47,10 @@ private:
     std::vector<std::string> linesToAdd;
     double minZstartFace;
     double northFaceStartFace;
+    double westFaceStartFace;
+    double eastFaceStartFace;
+    double southFaceStartFace;
+    double maxZstartFace;
     double dx;  //number of cells in the x direction before refine mesh
     double dy;  //number of cells in the y direction before refine mesh
     double dz;  //number of cells in the z direction before refine mesh
