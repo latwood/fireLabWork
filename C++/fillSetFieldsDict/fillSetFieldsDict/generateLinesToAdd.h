@@ -21,7 +21,22 @@ public:
 
 private:
 
-    void fillLinesToAdd(Tprofile defaultValue,Tprofile theValues);
+    void fillLinesToAdd(Tprofile defaultValue,Tprofile theValues,std::string fillType);
+
+    /*
+     * so all the minZ and maxZ functions were the same, just switching between the two variables
+     * all the north_face and south_face functions were the same, just switching between the two variables
+     * all the west_face and south_face functions were the same, just switching between the two variables
+     *
+     * If this symmetry or same style exists for the refined meshes, should group these functions!
+     *
+     * I almost thought about setting up a separate class for each face, but it seems like a lot
+     * of repeatable work. This way, I just have to go through and read a bunch and be careful I've
+     * not made mistakes.
+     *
+     * That being said, there are a ton of parts to this that seem to be repeated over and over. I can
+     * group them into functions and classes, but naming and file organization is getting tough
+     */
 
     void generateExampleMinZ();
     void generateAdjustableMinZ_topToBot();
@@ -34,6 +49,26 @@ private:
     void generateAdjustableEastFace();
     void generateExampleSouthFace();
     void generateAdjustableSouthFace();
+    void generateExampleMaxZ();
+    void generateAdjustableMaxZ_topToBot();
+    void generateAdjustableMaxZ_leftToRight();
+
+    /*
+     * So the internal field has great implications!!!
+     * If we create another scalar that isn't used read and written,
+     * but not used in simulations, we can now edit this scalar by the
+     * internal field and faces.
+     *
+     * The idea is that you can filter by set values of this scalar to get
+     * different regions of the mesh for whatever you want!
+     * Should make it easy to split the mesh however you want to get pictures
+     * of the vectors!!!
+     */
+
+    void generateExampleInternalField();
+    void generateAdjustableInternalField_botToTop();
+    void generateAdjustableInternalField_northToSouth();
+    void generateAdjustableInternalField_westToEast();
 
     /*
      * maybe someday the problem is that adjusting one set of values means a need to adjust another set
