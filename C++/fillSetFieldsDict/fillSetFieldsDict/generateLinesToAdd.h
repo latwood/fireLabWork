@@ -36,6 +36,11 @@ private:
      *
      * That being said, there are a ton of parts to this that seem to be repeated over and over. I can
      * group them into functions and classes, but naming and file organization is getting tough
+     *
+     * even so, some of the other ones only really differ by switching all x's and y's stuff
+     * like east vs north, is dx and x vs dy and y If I remember correctly
+     * Probably not that simple to carry over some of the refined mesh stuff,
+     * but maybe I'm wrong since the order of splitting cells seems pretty consistent
      */
 
     void generateExampleMinZ();

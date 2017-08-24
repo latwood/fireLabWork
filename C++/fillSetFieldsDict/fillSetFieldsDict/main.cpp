@@ -91,7 +91,8 @@ int main()
      */
 
     //std::string setFieldsDictPath = "/home/latwood/Documents/energyEqn-old/recreateImprovedForMeeting/fillSetFieldsDict/notRefined-native/case/system/setFieldsDict";
-    std::string setFieldsDictPath = "/home/latwood/Documents/energyEqn-old/recreateImprovedForMeeting/fillSetFieldsDict/notRefined-adapted/system/setFieldsDict";
+    //std::string setFieldsDictPath = "/home/latwood/Documents/energyEqn-old/recreateImprovedForMeeting/fillSetFieldsDict/notRefined-adapted/system/setFieldsDict";
+    std::string setFieldsDictPath = "/home/latwood/Documents/energyEqn-old/recreateImprovedForMeeting/fillSetFieldsDict/twiceRefined/system/setFieldsDict";
 
     editSetFieldsDict fillSetFieldsDict(setFieldsDictPath);
 

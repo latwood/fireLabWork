@@ -1,11 +1,21 @@
 #include "generateLinesToAddRefinedMesh.h"
 
-generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFace_value, double northFaceStartFace_value,
-                                       double dx_value, double dy_value, double dz_value, double timesRefined_value)
+generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFace_value,
+                                                             double northFaceStartFace_value,
+                                                             double westFaceStartFace_value,
+                                                             double eastFaceStartFace_value,
+                                                             double southFaceStartFace_value,
+                                                             double maxZstartFace_value,
+                                                             double dx_value, double dy_value,
+                                                             double dz_value, double timesRefined_value)
 {
     //now create the stuff that will need to be added in to replace this deleted/ignored stuff
     minZstartFace = minZstartFace_value;
     northFaceStartFace = northFaceStartFace_value;
+    westFaceStartFace = westFaceStartFace_value;
+    eastFaceStartFace = eastFaceStartFace_value;
+    southFaceStartFace = southFaceStartFace_value;
+    maxZstartFace = maxZstartFace_value;
     dx = dx_value;
     dy = dy_value;
     dz = dz_value;
@@ -23,15 +33,8 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     //northFace_Tvalues.generateLinearTprofile(310,300,dz);
 
     westFace_defaultTvalue.generateTprofile("300");
-    //westFace_Tvalues.generateTprofile("310");
-    /*
-    std::vector<std::string> westFace_desiredTvalues;
-    westFace_desiredTvalues.push_back("310");
-    westFace_desiredTvalues.push_back("305");
-    westFace_desiredTvalues.push_back("300");
-    westFace_Tvalues.generateLinearTprofile(westFace_desiredTvalues);
-    */
-    westFace_Tvalues.generateLinearTprofile(305,300,6);
+    westFace_Tvalues.generateTprofile("310");
+    //westFace_Tvalues.generateLinearTprofile(305,300,6);
 
     eastFace_defaultTvalue.generateTprofile("300");
     //eastFace_Tvalues.generateTprofile("310");
@@ -79,19 +82,27 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
 
     //could have an input checker function here before getting into the execution
 
-    generateExampleMinZ();
+    //generateExampleMinZ();
     //generateAdjustableMinZ_topToBot();
     //generateAdjustableMinZ_simplest_topToBot();
     //generateAdjustableMinZ_refineCells_topToBot();
     //generateAdjustableMinZ_leftToRight();
     //generateAdjustableMinZ_simplest_leftToRight();
     //generateAdjustableMinZ_refineCells_leftToRight();
-    generateExampleNorthFace();
+    //generateExampleNorthFace();
     //generateAdjustableNorthFace_simplest();
     //generateAdjustableNorthFace_refineCells();
+    generateExampleWestFace();
+    //generateAdjustableWestFace_simplest();
+    //generateAdjustableWestFace_refineCells();
 
-    fillLinesToAdd(minZ_defaultTvalue,minZ_Tvalues);
-    fillLinesToAdd(northFace_defaultTvalue,northFace_Tvalues);
+    fillLinesToAdd(minZ_defaultTvalue,minZ_Tvalues,"labelToFace");
+    fillLinesToAdd(northFace_defaultTvalue,northFace_Tvalues,"labelToFace");
+    fillLinesToAdd(westFace_defaultTvalue,westFace_Tvalues,"labelToFace");
+    fillLinesToAdd(eastFace_defaultTvalue,eastFace_Tvalues,"labelToFace");
+    fillLinesToAdd(southFace_defaultTvalue,southFace_Tvalues,"labelToFace");
+    fillLinesToAdd(maxZ_defaultTvalue,maxZ_Tvalues,"labelToFace");
+    fillLinesToAdd(internalField_defaultTvalue,internalField_Tvalues,"labelToCell");
 
 }
 
@@ -100,15 +111,20 @@ std::vector<std::string> generateLinesToAddRefinedMesh::getLines()
     return linesToAdd;
 }
 
-void generateLinesToAddRefinedMesh::fillLinesToAdd(Tprofile defaultValue,Tprofile theValues)
+void generateLinesToAddRefinedMesh::fillLinesToAdd(Tprofile defaultValue,Tprofile theValues,std::string fillType)
 {
+    if(fillType != "labelToFace" && fillType != "labelToCell")
+    {
+        std::cout << "Error! setFieldsFillType not valid! Given type is \"" << fillType << "\"!\n";
+        std::exit(EXIT_FAILURE);
+    }
     //default values reset all the values before doing what really needs to be filled
     for(size_t t = 0; t < defaultValue.size(); t++)
     {
         std::vector<double> cellIndices = defaultValue[t].getCellIndices();
         if(cellIndices.size() != 0)
         {
-            linesToAdd.push_back("	labelToFace");
+            linesToAdd.push_back("	" + fillType);
             linesToAdd.push_back("	{");
             linesToAdd.push_back("		value");
             linesToAdd.push_back("		(");
@@ -134,7 +150,7 @@ void generateLinesToAddRefinedMesh::fillLinesToAdd(Tprofile defaultValue,Tprofil
         std::vector<double> cellIndices = theValues[t].getCellIndices();
         if(cellIndices.size() != 0)
         {
-            linesToAdd.push_back("	labelToFace");
+            linesToAdd.push_back("	"+fillType);
             linesToAdd.push_back("	{");
             linesToAdd.push_back("		value");
             linesToAdd.push_back("		(");
@@ -765,7 +781,7 @@ void generateLinesToAddRefinedMesh::generateExampleNorthFace()
 {
 //This section is for filling in north_face with methods that aren't as structured. These are more easily
 //manipulated to look at how each individual point is filled in.
-    if(minZ_defaultTvalue.size() != 1)
+    if(northFace_defaultTvalue.size() != 1)
     {
         std::cout << "Error, cannot perform function generateExampleNorthFace if " <<
                      "the defaultTprofile doesn't have size 1!\n";
@@ -841,7 +857,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableNorthFace_simplest()
                      "timesRefined == 0! Use generateExampleNorthFace instead!\n";
         std::exit(EXIT_FAILURE);
     }
-    if(minZ_defaultTvalue.size() != 1)
+    if(northFace_defaultTvalue.size() != 1)
     {
         std::cout << "Error, cannot perform function generateAdjustableNorthFace_simplest if " <<
                      "the defaultTprofile doesn't have size 1!\n";
@@ -929,7 +945,7 @@ void generateLinesToAddRefinedMesh::generateAdjustableNorthFace_refineCells()
                      "timesRefined == 0! Use generateExampleNorthFace instead!\n";
         std::exit(EXIT_FAILURE);
     }
-    if(minZ_defaultTvalue.size() != 1)
+    if(northFace_defaultTvalue.size() != 1)
     {
         std::cout << "Error, cannot perform function generateAdjustableNorthFace_refineCells if " <<
                      "the defaultTprofile doesn't have size 1!\n";
@@ -1005,6 +1021,254 @@ void generateLinesToAddRefinedMesh::generateAdjustableNorthFace_refineCells()
             northFace_Tvalues[timesRefined-2].addCellIndex(northFaceStartFace+dx*dz+dx*6+3*3*i+6);
             northFace_Tvalues[timesRefined-1].addCellIndex(northFaceStartFace+dx*dz+dx*6+3*3*i+7);
             northFace_Tvalues[timesRefined-1].addCellIndex(northFaceStartFace+dx*dz+dx*6+3*3*i+8);
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateExampleWestFace()
+{
+//This section is for filling in west_face with methods that aren't as structured. These are more easily
+//manipulated to look at how each individual point is filled in.
+    if(westFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleWestFace if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(westFace_Tvalues.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleWestFace if " <<
+                     "the Tprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double j = 0; j < dy*dz; j++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+j);
+    }
+    //now fill in the refined cells. Notice that 2^0 = 1, so this becomes dx*0
+    //and the loop isn't entered if timesRefined = 0.
+    for(double j = 0; j < dy*(dy_refined*dz_refined-1); j++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dy*dz+j);
+    }
+
+    //fill the first set of points, the cells from before refine mesh
+    for(double j = 0; j < dy*dz; j++)
+    {
+        westFace_Tvalues[0].addCellIndex(westFaceStartFace+j);
+    }
+
+    if(timesRefined != 0)   //only needed to fill out the above points if timesRefined == 0
+    {
+        //fill in the first set of split cells from refine mesh
+        //fills rest of the outer corners of the box first
+        //starts at top right, then top left, then bot left
+        for(double j = 0; j < 3*dy; j++)
+        {
+            westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*dz+j);
+        }
+
+        if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+        {
+            //fill in the second part of split cells from refine mesh
+            //fills bot right corner
+            //starts by going out in the z direction from the point, then goes out in the x direction
+            //from the point, then fills in the cell between these two just filled cells
+            for(double j = 0; j < 3*dy; j++)
+            {
+                westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*dz+dy*3+j);
+            }
+
+            //fill in the third part of split cells from refine mesh
+            //fills rest of the corners
+            //starts at top right, then top left, then bot left
+            for(double j = 0; j < 9*dy; j++)
+            {
+                westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*dz+dy*6+j);
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableWestFace_simplest()
+{
+//This section is for filling in west_face from bottom to top with methods that are structured.
+//This assumes that all the refined cells have the same value as the bottom cell from before refine mesh
+//This means that the Tprofile has to be of size dz to work, regardless of the value of timesRefined
+//If you want a single value for the west_face, use generateExampleWestFace
+    if(timesRefined == 0)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace_simplest if " <<
+                     "timesRefined == 0! Use generateExampleWestFace instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(westFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace_simplest if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(westFace_Tvalues.size() != dz)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace_simplest if " <<
+                     "the Tprofile doesn't have the same size as the dz of the mesh!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double i = 0; i < dx*dz; i++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+i);
+    }
+    //now fill in the refined cells
+    for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dx*dz+i);
+    }
+
+    //fill the first set of points, the cells from before refine mesh
+    for(double i = 0; i < dx; i++)
+    {
+        for(double t = 0; t < westFace_Tvalues.size(); t++)
+        {
+            westFace_Tvalues[t].addCellIndex(westFaceStartFace+dz*i+t);
+        }
+    }
+
+    //fill in the first set of split cells from refine mesh
+    //fills rest of the outer corners of the box first
+    //starts at top right, then top left, then bot left
+    for(double i = 0; i < dx; i++)
+    {//fill in the original cells first
+        for(double r = 0; r < 3; r++)
+        {
+            westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+3*i+r);
+        }
+    }
+
+    if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+    {
+        //fill in the second part of split cells from refine mesh
+        //fills bot right corner
+        //starts by going out in the z direction from the point, then goes out in the x direction
+        //from the point, then fills in the cell between these two just filled cells
+        for(double i = 0; i < dx; i++)
+        {
+            for(double r = 0; r < 3; r++)
+            {
+                westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i+r);
+            }
+        }
+
+        //fill in the third part of split cells from refine mesh
+        //fills rest of the corners
+        //starts at top right, then top left, then bot left
+        for(double i = 0; i < dx; i++)
+        {
+            for(double r = 0; r < 3; r++)
+            {
+                for(double p = 0; p < 3; p++)
+                {
+                    westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+3*r+p);
+                }
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableWestFace_refineCells()
+{
+//This section is for filling in west_face from bottom to top with methods that are structured.
+//This also fills in the refined cell layers separately from the other layers
+//The Tprofile has to be of the same size as the number of cells in the z direction
+//This includes the cells from before refine mesh as well as the cells after refine mesh
+//If you want a single value for the west_face, use generateExampleWestFace
+    if(timesRefined == 0)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace_refineCells if " <<
+                     "timesRefined == 0! Use generateExampleWestFace instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(westFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace_refineCells if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(westFace_Tvalues.size() != dz+dz_refined-1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableWestFace_refineCells if " <<
+                     "the Tprofile doesn't have the same size as dz+dz_refined-1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double i = 0; i < dx*dz; i++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+i);
+    }
+    //now fill in the refined cells
+    for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
+    {
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dx*dz+i);
+    }
+
+    for(double i = 0; i < dx; i++)
+    {
+        for(double t = 0; t < dz; t++)
+        {
+            if(t == 0)
+            {
+                westFace_Tvalues[t].addCellIndex(westFaceStartFace+dz*i+t);
+            } else
+            {
+                westFace_Tvalues[t+dz_refined-1].addCellIndex(westFaceStartFace+dz*i+t);
+            }
+        }
+    }
+
+    //fill in the first set of split cells from refine mesh
+    //fills rest of the outer corners of the box first
+    //starts at top right, then top left, then bot left
+    for(double i = 0; i < dx; i++)
+    {
+        westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+3*i);   //top right face
+        westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+3*i+1);   //top left face
+        westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+3*i+2);              //bottom left face
+    }
+
+    if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+    {
+        //fill in the second part of split cells from refine mesh
+        //fills bot right corner
+        //starts by going out in the z direction from the point, then goes out in the x direction
+        //from the point, then fills in the cell between these two just filled cells
+        for(double i = 0; i < dx; i++)
+        {
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i);
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i+1);
+            westFace_Tvalues[timesRefined-2].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i+2);
+        }
+
+        //fill in the third part of split cells from refine mesh
+        //fills rest of the corners
+        //starts at top right, then top left, then bot left
+        for(double i = 0; i < dx; i++)
+        {
+            westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+1);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+2);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+3);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+4);
+            westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+5);
+            westFace_Tvalues[timesRefined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+6);
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+7);
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+8);
         }
     }
 }
