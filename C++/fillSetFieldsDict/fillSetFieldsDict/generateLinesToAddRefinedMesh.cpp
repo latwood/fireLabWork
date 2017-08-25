@@ -37,19 +37,12 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     //westFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     eastFace_defaultTvalue.generateTprofile("300");
-    //eastFace_Tvalues.generateTprofile("310");
-    eastFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
+    eastFace_Tvalues.generateTprofile("300");
+    //eastFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     southFace_defaultTvalue.generateTprofile("300");
     //southFace_Tvalues.generateTprofile("310");
-    /*
-    std::vector<std::string> southFace_desiredTvalues;
-    southFace_desiredTvalues.push_back("310");
-    southFace_desiredTvalues.push_back("305");
-    southFace_desiredTvalues.push_back("300");
-    southFace_Tvalues.generateLinearTprofile(southFace_desiredTvalues);
-    */
-    southFace_Tvalues.generateLinearTprofile(305,300,6);
+    southFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     maxZ_defaultTvalue.generateTprofile("300");
     //maxZ_Tvalues.generateTprofile("310");
@@ -90,10 +83,10 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     //generateAdjustableWestFace_refineCells();
     //generateExampleEastFace();
     //generateAdjustableEastFace_simplest();
-    generateAdjustableEastFace_refineCells();
+    //generateAdjustableEastFace_refineCells();
     //generateExampleSouthFace();
     //generateAdjustableSouthFace_simplest();
-    //generateAdjustableSouthFace_refineCells();
+    generateAdjustableSouthFace_refineCells();
     //generateExampleMaxZ();
     //generateAdjustableMaxZ_topToBot();
     //generateAdjustableMaxZ_simplest_topToBot();
@@ -1543,5 +1536,253 @@ void generateLinesToAddRefinedMesh::generateAdjustableEastFace_refineCells()
             eastFace_Tvalues[dz_refined-2].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+7);
             eastFace_Tvalues[dz_refined-1].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+8);
         }
-    }*/
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateExampleSouthFace()
+{
+//This section is for filling in south_face with methods that aren't as structured. These are more easily
+//manipulated to look at how each individual point is filled in.
+    if(southFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleSouthFace if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(southFace_Tvalues.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleSouthFace if " <<
+                     "the Tprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double i = 0; i < dx*dz; i++)
+    {
+        southFace_defaultTvalue[0].addCellIndex(southFaceStartFace+i);
+    }
+    //now fill in the refined cells. Notice that 2^0 = 1, so this becomes dx*0
+    //and the loop isn't entered if timesRefined = 0.
+    for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
+    {
+        southFace_defaultTvalue[0].addCellIndex(southFaceStartFace+dx*dz+i);
+    }
+
+    //fill the first set of points, the cells from before refine mesh
+    for(double i = 0; i < dx*dz; i++)
+    {
+        southFace_Tvalues[0].addCellIndex(southFaceStartFace+i);
+    }
+
+    if(timesRefined != 0)   //only needed to fill out the above points if timesRefined == 0
+    {
+        //fill in the first set of split cells from refine mesh
+        //fills rest of the outer corners of the box first
+        //starts at top right, then top left, then bot left
+        for(double i = 0; i < 3*dx; i++)
+        {
+            southFace_Tvalues[0].addCellIndex(southFaceStartFace+dx*dz+i);
+        }
+
+        if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+        {
+            //fill in the second part of split cells from refine mesh
+            //fills bot right corner
+            //starts by going out in the z direction from the point, then goes out in the x direction
+            //from the point, then fills in the cell between these two just filled cells
+            for(double i = 0; i < 3*dx; i++)
+            {
+                southFace_Tvalues[0].addCellIndex(southFaceStartFace+dx*dz+dx*3+i);
+            }
+
+            //fill in the third part of split cells from refine mesh
+            //fills rest of the corners
+            //starts at top right, then top left, then bot left
+            for(double i = 0; i < 9*dx; i++)
+            {
+                southFace_Tvalues[0].addCellIndex(southFaceStartFace+dx*dz+dx*6+i);
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableSouthFace_simplest()
+{
+//This section is for filling in south_face from bottom to top with methods that are structured.
+//This assumes that all the refined cells have the same value as the bottom cell from before refine mesh
+//This means that the Tprofile has to be of size dz to work, regardless of the value of timesRefined
+//If you want a single value for the north_face, use generateExamplesouthFace
+    if(timesRefined == 0)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableSouthFace_simplest if " <<
+                     "timesRefined == 0! Use generateExampleSouthFace instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(southFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableSouthFace_simplest if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(southFace_Tvalues.size() != dz)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableSouthFace_simplest if " <<
+                     "the Tprofile doesn't have the same size as the dz of the mesh!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double i = 0; i < dx*dz; i++)
+    {
+        southFace_defaultTvalue[0].addCellIndex(southFaceStartFace+i);
+    }
+    //now fill in the refined cells
+    for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
+    {
+        southFace_defaultTvalue[0].addCellIndex(southFaceStartFace+dx*dz+i);
+    }
+
+    //fill the first set of points, the cells from before refine mesh
+    for(double i = 0; i < dx; i++)
+    {
+        for(double t = 0; t < southFace_Tvalues.size(); t++)
+        {
+            southFace_Tvalues[t].addCellIndex(southFaceStartFace+dz*i+t);
+        }
+    }
+
+    //fill in the first set of split cells from refine mesh
+    //fills rest of the outer corners of the box first
+    //starts at top right, then top left, then bot left
+    for(double i = 0; i < dx; i++)
+    {//fill in the original cells first
+        for(double r = 0; r < 3; r++)
+        {
+            southFace_Tvalues[0].addCellIndex(southFaceStartFace+dx*dz+3*i+r);
+        }
+    }
+
+    if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+    {
+        //fill in the second part of split cells from refine mesh
+        //fills bot right corner
+        //starts by going out in the z direction from the point, then goes out in the x direction
+        //from the point, then fills in the cell between these two just filled cells
+        for(double i = 0; i < dx; i++)
+        {
+            for(double r = 0; r < 3; r++)
+            {
+                southFace_Tvalues[0].addCellIndex(southFaceStartFace+dx*dz+dx*3+3*i+r);
+            }
+        }
+
+        //fill in the third part of split cells from refine mesh
+        //fills rest of the corners
+        //starts at top right, then top left, then bot left
+        for(double i = 0; i < dx; i++)
+        {
+            for(double r = 0; r < 3; r++)
+            {
+                for(double p = 0; p < 3; p++)
+                {
+                    southFace_Tvalues[0].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+3*r+p);
+                }
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableSouthFace_refineCells()
+{
+//This section is for filling in south_face from bottom to top with methods that are structured.
+//This also fills in the refined cell layers separately from the other layers
+//The Tprofile has to be of the same size as the number of cells in the z direction
+//This includes the cells from before refine mesh as well as the cells after refine mesh
+//If you want a single value for the north_face, use generateExampleSouthFace
+    if(timesRefined == 0)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableSouthFace_refineCells if " <<
+                     "timesRefined == 0! Use generateExampleSouthFace instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(southFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableSouthFace_refineCells if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(southFace_Tvalues.size() != dz+dz_refined-1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableSouthFace_refineCells if " <<
+                     "the Tprofile doesn't have the same size as dz+dz_refined-1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double i = 0; i < dx*dz; i++)
+    {
+        southFace_defaultTvalue[0].addCellIndex(southFaceStartFace+i);
+    }
+    //now fill in the refined cells
+    for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
+    {
+        southFace_defaultTvalue[0].addCellIndex(southFaceStartFace+dx*dz+i);
+    }
+
+    for(double i = 0; i < dx; i++)
+    {
+        for(double t = 0; t < dz; t++)
+        {
+            if(t == 0)
+            {
+                southFace_Tvalues[t].addCellIndex(southFaceStartFace+dz*i+t);
+            } else
+            {
+                southFace_Tvalues[t+dz_refined-1].addCellIndex(southFaceStartFace+dz*i+t);
+            }
+        }
+    }
+
+    //fill in the first set of split cells from refine mesh
+    //fills rest of the outer corners of the box first
+    //starts at bot right, then top right, then top left
+    for(double i = 0; i < dx; i++)
+    {
+        southFace_Tvalues[0].addCellIndex(southFaceStartFace+dx*dz+3*i);                  //bot right face
+        southFace_Tvalues[dz_refined-1].addCellIndex(southFaceStartFace+dx*dz+3*i+1);     //top right face
+        southFace_Tvalues[dz_refined-1].addCellIndex(southFaceStartFace+dx*dz+3*i+2);     //top left face
+    }
+
+    if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+    {
+        //fill in the second part of split cells from refine mesh
+        //fills bot left corner
+        //starts by going out in the y direction from the point, then goes out in the z direction
+        //from the point, then fills in the cell between these two just filled cells
+        for(double i = 0; i < dx; i++)
+        {
+            southFace_Tvalues[timesRefined-2].addCellIndex(southFaceStartFace+dx*dz+dx*3+3*i);
+            southFace_Tvalues[timesRefined-1].addCellIndex(southFaceStartFace+dx*dz+dx*3+3*i+1);
+            southFace_Tvalues[timesRefined-1].addCellIndex(southFaceStartFace+dx*dz+dx*3+3*i+2);
+        }
+
+        //fill in the third part of split cells from refine mesh
+        //fills rest of the corners
+        //starts at bot right, then top right, then top left
+        for(double i = 0; i < dx; i++)
+        {
+            southFace_Tvalues[timesRefined-1].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i);
+            southFace_Tvalues[timesRefined-1].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+1);
+            southFace_Tvalues[timesRefined-2].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+2);
+            southFace_Tvalues[dz_refined-1].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+3);
+            southFace_Tvalues[dz_refined-2].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+4);
+            southFace_Tvalues[dz_refined-2].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+5);
+            southFace_Tvalues[dz_refined-2].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+6);
+            southFace_Tvalues[dz_refined-2].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+7);
+            southFace_Tvalues[dz_refined-1].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+8);
+        }
+    }
 }

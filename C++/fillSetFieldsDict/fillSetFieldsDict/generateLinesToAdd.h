@@ -65,7 +65,7 @@ private:
      * Hm, still not the worst thing. Have functions for filling from left to right for the native cells
      * and separate functions to be called for the refined cells, building from left to right or top to bot
      * Or do some from left to right, some from right to left, and the call usage will show which faces follow
-     * which style
+     * which style. Still need to have as inputs whether to vary x, y, or z depending on which patch
      *
      * Hopefully when I write the new program, it will be able to create the setFieldsDict in such a way that
      * I don't have to get annoyed when I forget to stop the values of a patch from being zeroGradient.
