@@ -80,3 +80,13 @@ ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "sendcmd=f=timestamps.cmd,drawtext=
 		ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='2017\:08\:18 16\:40\:33': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h,drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='2017\:08\:18 16\:41\:03': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
 
 
+currently used for videos!!!
+ffmpeg -framerate 5 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b 800k 159GOPRO.mp4 | tee 159GOPRO.ffmpegLog
+just realized that besides the timestamp, it might be nice to display the image number, so that it is easy to know which ones to go back and delete!
+Would have to modify the R script to output the names, or do a bash script before the R script.
+
+Important Warning! Gpro-15/EastHill/157GOPRO died while writing, so it created a text jpeg file! Gets renamed with the rest by R, and causes ffmpeg to not complete the video to the full part. Threw out G0017016.JPG and the next file because of this problem.
+Somehow properties says it is a plain text document, so maybe there's a way to use that for error handling
+For now, the best way to handle it is to watch the ffmpeg logs and make sure the last frame matches the last picture number.
+
+

@@ -6,9 +6,9 @@ library(gtools)
 
 ###variables you can change
 
-mainOriginalPictureDirectory <- "/home/latwood/Documents/missoulaFireVideos/loloPeakPlume"
+mainOriginalPictureDirectory <- "/home/latwood/Documents/missoulaFireVideos/missoulaEmber-UsedImages-Aug2017"
 
-pictureDirectoryName <- "/allTogetherWithoutTanner"
+pictureDirectoryName <- "/Gpro-21/107GOPRO-108GOPRO"
 
 OriginalPictureDirectory <- paste(mainOriginalPictureDirectory,pictureDirectoryName,sep="")
 
@@ -274,9 +274,6 @@ OriginalPictureDirectory <- paste(mainOriginalPictureDirectory,pictureDirectoryN
 # pictureFileNames[54] <- "15900"
 # pictureFileNames[55] <- "16200"
 
-numberOfPictures <- 1313
-pictureFileNames <- matrix(c(1:numberOfPictures),nrow=numberOfPictures)
-
 ### for multiple folders in a single directory
 # foldersOfPics <- list.dirs(OriginalPictureDirectory,full.names=TRUE,recursive=FALSE)
 # for(i in 1:length(foldersOfPics))
@@ -289,5 +286,7 @@ pictureFileNames <- matrix(c(1:numberOfPictures),nrow=numberOfPictures)
 ### for a single folder, not searching for more folders in the directory
 pics <- list.files(OriginalPictureDirectory,full.names=TRUE,recursive=FALSE,pattern="JPG")
 pics <- mixedsort(pics)
+numberOfPictures <- length(pics)
+pictureFileNames <- matrix(c(0:(numberOfPictures-1)),nrow=numberOfPictures)
 file.rename(pics,paste(OriginalPictureDirectory,"/",pictureFileNames,".jpg",sep=""))
 
