@@ -30,22 +30,15 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
 
     northFace_defaultTvalue.generateTprofile("300");
     northFace_Tvalues.generateTprofile("310");
-    //northFace_Tvalues.generateLinearTprofile(310,300,dz);
+    //northFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     westFace_defaultTvalue.generateTprofile("300");
     westFace_Tvalues.generateTprofile("310");
-    //westFace_Tvalues.generateLinearTprofile(305,300,6);
+    //westFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     eastFace_defaultTvalue.generateTprofile("300");
     //eastFace_Tvalues.generateTprofile("310");
-    /*
-    std::vector<std::string> eastFace_desiredTvalues;
-    eastFace_desiredTvalues.push_back("310");
-    eastFace_desiredTvalues.push_back("305");
-    eastFace_desiredTvalues.push_back("300");
-    eastFace_Tvalues.generateLinearTprofile(eastFace_desiredTvalues);
-    */
-    eastFace_Tvalues.generateLinearTprofile(305,300,6);
+    eastFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     southFace_defaultTvalue.generateTprofile("300");
     //southFace_Tvalues.generateTprofile("310");
@@ -92,9 +85,22 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     //generateExampleNorthFace();
     //generateAdjustableNorthFace_simplest();
     //generateAdjustableNorthFace_refineCells();
-    generateExampleWestFace();
+    //generateExampleWestFace();
     //generateAdjustableWestFace_simplest();
     //generateAdjustableWestFace_refineCells();
+    //generateExampleEastFace();
+    //generateAdjustableEastFace_simplest();
+    generateAdjustableEastFace_refineCells();
+    //generateExampleSouthFace();
+    //generateAdjustableSouthFace_simplest();
+    //generateAdjustableSouthFace_refineCells();
+    //generateExampleMaxZ();
+    //generateAdjustableMaxZ_topToBot();
+    //generateAdjustableMaxZ_simplest_topToBot();
+    //generateAdjustableMaxZ_refineCells_topToBot();
+    //generateAdjustableMaxZ_leftToRight();
+    //generateAdjustableMaxZ_simplest_leftToRight();
+    //generateAdjustableMaxZ_refineCells_leftToRight();
 
     fillLinesToAdd(minZ_defaultTvalue,minZ_Tvalues,"labelToFace");
     fillLinesToAdd(northFace_defaultTvalue,northFace_Tvalues,"labelToFace");
@@ -1048,7 +1054,7 @@ void generateLinesToAddRefinedMesh::generateExampleWestFace()
     {
         westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+j);
     }
-    //now fill in the refined cells. Notice that 2^0 = 1, so this becomes dx*0
+    //now fill in the refined cells. Notice that 2^0 = 1, so this becomes dy*0
     //and the loop isn't entered if timesRefined = 0.
     for(double j = 0; j < dy*(dy_refined*dz_refined-1); j++)
     {
@@ -1056,9 +1062,12 @@ void generateLinesToAddRefinedMesh::generateExampleWestFace()
     }
 
     //fill the first set of points, the cells from before refine mesh
-    for(double j = 0; j < dy*dz; j++)
+    for(double k = 0; k < dz; k++)
     {
-        westFace_Tvalues[0].addCellIndex(westFaceStartFace+j);
+        for(double j = 0; j < dy; j++)
+        {
+            westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*k+j);
+        }
     }
 
     if(timesRefined != 0)   //only needed to fill out the above points if timesRefined == 0
@@ -1075,7 +1084,7 @@ void generateLinesToAddRefinedMesh::generateExampleWestFace()
         {
             //fill in the second part of split cells from refine mesh
             //fills bot right corner
-            //starts by going out in the z direction from the point, then goes out in the x direction
+            //starts by going out in the z direction from the point, then goes out in the y direction
             //from the point, then fills in the cell between these two just filled cells
             for(double j = 0; j < 3*dy; j++)
             {
@@ -1120,33 +1129,36 @@ void generateLinesToAddRefinedMesh::generateAdjustableWestFace_simplest()
 
     //this resets all the values before doing what really needs to be filled
     //fill in the original cells first
-    for(double i = 0; i < dx*dz; i++)
+    for(double k = 0; k < dz; k++)
     {
-        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+i);
+        for(double j = 0; j < dy; j++)
+        {
+            westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dy*k+j);
+        }
     }
     //now fill in the refined cells
-    for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
+    for(double j = 0; j < dy*(dy_refined*dz_refined-1); j++)
     {
-        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dx*dz+i);
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dy*dz+j);
     }
 
     //fill the first set of points, the cells from before refine mesh
-    for(double i = 0; i < dx; i++)
+    for(double t = 0; t < westFace_Tvalues.size(); t++)
     {
-        for(double t = 0; t < westFace_Tvalues.size(); t++)
+        for(double j = 0; j < dy; j++)
         {
-            westFace_Tvalues[t].addCellIndex(westFaceStartFace+dz*i+t);
+            westFace_Tvalues[t].addCellIndex(westFaceStartFace+dy*t+j);
         }
     }
 
     //fill in the first set of split cells from refine mesh
     //fills rest of the outer corners of the box first
     //starts at top right, then top left, then bot left
-    for(double i = 0; i < dx; i++)
-    {//fill in the original cells first
+    for(double j = 0; j < dy; j++)
+    {
         for(double r = 0; r < 3; r++)
         {
-            westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+3*i+r);
+            westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*dz+3*j+r);
         }
     }
 
@@ -1154,26 +1166,26 @@ void generateLinesToAddRefinedMesh::generateAdjustableWestFace_simplest()
     {
         //fill in the second part of split cells from refine mesh
         //fills bot right corner
-        //starts by going out in the z direction from the point, then goes out in the x direction
+        //starts by going out in the z direction from the point, then goes out in the y direction
         //from the point, then fills in the cell between these two just filled cells
-        for(double i = 0; i < dx; i++)
+        for(double j = 0; j < dy; j++)
         {
             for(double r = 0; r < 3; r++)
             {
-                westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i+r);
+                westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*dz+dy*3+3*j+r);
             }
         }
 
         //fill in the third part of split cells from refine mesh
         //fills rest of the corners
         //starts at top right, then top left, then bot left
-        for(double i = 0; i < dx; i++)
+        for(double j = 0; j < dy; j++)
         {
             for(double r = 0; r < 3; r++)
             {
                 for(double p = 0; p < 3; p++)
                 {
-                    westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+3*r+p);
+                    westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+3*r+p);
                 }
             }
         }
@@ -1208,26 +1220,29 @@ void generateLinesToAddRefinedMesh::generateAdjustableWestFace_refineCells()
 
     //this resets all the values before doing what really needs to be filled
     //fill in the original cells first
-    for(double i = 0; i < dx*dz; i++)
+    for(double k = 0; k < dz; k++)
     {
-        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+i);
+        for(double j = 0; j < dy; j++)
+        {
+            westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dy*k+j);
+        }
     }
     //now fill in the refined cells
-    for(double i = 0; i < dx*(dx_refined*dz_refined-1); i++)
+    for(double j = 0; j < dy*(dy_refined*dz_refined-1); j++)
     {
-        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dx*dz+i);
+        westFace_defaultTvalue[0].addCellIndex(westFaceStartFace+dy*dz+j);
     }
 
-    for(double i = 0; i < dx; i++)
+    for(double t = 0; t < dz; t++)
     {
-        for(double t = 0; t < dz; t++)
+        for(double j = 0; j < dy; j++)
         {
             if(t == 0)
             {
-                westFace_Tvalues[t].addCellIndex(westFaceStartFace+dz*i+t);
+                westFace_Tvalues[t].addCellIndex(westFaceStartFace+dy*t+j);
             } else
             {
-                westFace_Tvalues[t+dz_refined-1].addCellIndex(westFaceStartFace+dz*i+t);
+                westFace_Tvalues[t+dz_refined-1].addCellIndex(westFaceStartFace+dy*t+j);
             }
         }
     }
@@ -1235,40 +1250,298 @@ void generateLinesToAddRefinedMesh::generateAdjustableWestFace_refineCells()
     //fill in the first set of split cells from refine mesh
     //fills rest of the outer corners of the box first
     //starts at top right, then top left, then bot left
-    for(double i = 0; i < dx; i++)
+    for(double j = 0; j < dy; j++)
     {
-        westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+3*i);   //top right face
-        westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+3*i+1);   //top left face
-        westFace_Tvalues[0].addCellIndex(westFaceStartFace+dx*dz+3*i+2);              //bottom left face
+        westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dy*dz+3*j);   //top right face
+        westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dy*dz+3*j+1);   //top left face
+        westFace_Tvalues[0].addCellIndex(westFaceStartFace+dy*dz+3*j+2);              //bottom left face
     }
 
     if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
     {
         //fill in the second part of split cells from refine mesh
         //fills bot right corner
-        //starts by going out in the z direction from the point, then goes out in the x direction
+        //starts by going out in the z direction from the point, then goes out in the y direction
         //from the point, then fills in the cell between these two just filled cells
-        for(double i = 0; i < dx; i++)
+        for(double j = 0; j < dy; j++)
         {
-            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i);
-            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i+1);
-            westFace_Tvalues[timesRefined-2].addCellIndex(westFaceStartFace+dx*dz+dx*3+3*i+2);
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dy*dz+dy*3+3*j);
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dy*dz+dy*3+3*j+1);
+            westFace_Tvalues[timesRefined-2].addCellIndex(westFaceStartFace+dy*dz+dy*3+3*j+2);
         }
 
         //fill in the third part of split cells from refine mesh
         //fills rest of the corners
         //starts at top right, then top left, then bot left
-        for(double i = 0; i < dx; i++)
+        for(double j = 0; j < dy; j++)
         {
-            westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i);
-            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+1);
-            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+2);
-            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+3);
-            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+4);
-            westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+5);
-            westFace_Tvalues[timesRefined-2].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+6);
-            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+7);
-            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dx*dz+dx*6+3*3*i+8);
+            westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+1);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+2);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+3);
+            westFace_Tvalues[dz_refined-2].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+4);
+            westFace_Tvalues[dz_refined-1].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+5);
+            westFace_Tvalues[timesRefined-2].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+6);
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+7);
+            westFace_Tvalues[timesRefined-1].addCellIndex(westFaceStartFace+dy*dz+dy*6+3*3*j+8);
         }
     }
+}
+
+void generateLinesToAddRefinedMesh::generateExampleEastFace()
+{
+//This section is for filling in east_face with methods that aren't as structured. These are more easily
+//manipulated to look at how each individual point is filled in.
+    if(eastFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleEastFace if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(eastFace_Tvalues.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleEastFace if " <<
+                     "the Tprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double j = 0; j < dy*dz; j++)
+    {
+        eastFace_defaultTvalue[0].addCellIndex(eastFaceStartFace+j);
+    }
+    //now fill in the refined cells. Notice that 2^0 = 1, so this becomes dy*0
+    //and the loop isn't entered if timesRefined = 0.
+    for(double j = 0; j < dy*(dy_refined*dz_refined-1); j++)
+    {
+        eastFace_defaultTvalue[0].addCellIndex(eastFaceStartFace+dy*dz+j);
+    }
+
+    //fill the first set of points, the cells from before refine mesh
+    for(double k = 0; k < dz; k++)
+    {
+        for(double j = 0; j < dy; j++)
+        {
+            eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*k+j);
+        }
+    }
+
+    if(timesRefined != 0)   //only needed to fill out the above points if timesRefined == 0
+    {
+        //fill in the first set of split cells from refine mesh
+        //fills rest of the outer corners of the box first
+        //starts at top right, then top left, then bot left
+        for(double j = 0; j < 3*dy; j++)
+        {
+            eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*dz+j);
+        }
+
+        if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+        {
+            //fill in the second part of split cells from refine mesh
+            //fills bot right corner
+            //starts by going out in the z direction from the point, then goes out in the y direction
+            //from the point, then fills in the cell between these two just filled cells
+            for(double j = 0; j < 3*dy; j++)
+            {
+                eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*dz+dy*3+j);
+            }
+
+            //fill in the third part of split cells from refine mesh
+            //fills rest of the corners
+            //starts at top right, then top left, then bot left
+            for(double j = 0; j < 9*dy; j++)
+            {
+                eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*dz+dy*6+j);
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableEastFace_simplest()
+{
+//This section is for filling in east_face from bottom to top with methods that are structured.
+//This assumes that all the refined cells have the same value as the bottom cell from before refine mesh
+//This means that the Tprofile has to be of size dz to work, regardless of the value of timesRefined
+//If you want a single value for the west_face, use generateExampleEastFace
+    if(timesRefined == 0)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableEastFace_simplest if " <<
+                     "timesRefined == 0! Use generateExampleEastFace instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(eastFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableEastFace_simplest if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(eastFace_Tvalues.size() != dz)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableEastFace_simplest if " <<
+                     "the Tprofile doesn't have the same size as the dz of the mesh!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double k = 0; k < dz; k++)
+    {
+        for(double j = 0; j < dy; j++)
+        {
+            eastFace_defaultTvalue[0].addCellIndex(eastFaceStartFace+dy*k+j);
+        }
+    }
+    //now fill in the refined cells
+    for(double j = 0; j < dy*(dy_refined*dz_refined-1); j++)
+    {
+        eastFace_defaultTvalue[0].addCellIndex(eastFaceStartFace+dy*dz+j);
+    }
+
+    //fill the first set of points, the cells from before refine mesh
+    for(double t = 0; t < eastFace_Tvalues.size(); t++)
+    {
+        for(double j = 0; j < dy; j++)
+        {
+            eastFace_Tvalues[t].addCellIndex(eastFaceStartFace+dy*t+j);
+        }
+    }
+
+    //fill in the first set of split cells from refine mesh
+    //fills rest of the outer corners of the box first
+    //starts at bot right, then top right, then top left
+    for(double j = 0; j < dy; j++)
+    {
+        for(double r = 0; r < 3; r++)
+        {
+            eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*dz+3*j+r);
+        }
+    }
+
+    if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+    {
+        //fill in the second part of split cells from refine mesh
+        //fills bot left corner
+        //starts by going out in the y direction from the point, then goes out in the z direction
+        //from the point, then fills in the cell between these two just filled cells
+        for(double j = 0; j < dy; j++)
+        {
+            for(double r = 0; r < 3; r++)
+            {
+                eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*dz+dy*3+3*j+r);
+            }
+        }
+
+        //fill in the third part of split cells from refine mesh
+        //fills rest of the corners
+        //starts at bot right, then top right, then top left
+        for(double j = 0; j < dy; j++)
+        {
+            for(double r = 0; r < 3; r++)
+            {
+                for(double p = 0; p < 3; p++)
+                {
+                    eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+3*r+p);
+                }
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableEastFace_refineCells()
+{
+//This section is for filling in east_face from bottom to top with methods that are structured.
+//This also fills in the refined cell layers separately from the other layers
+//The Tprofile has to be of the same size as the number of cells in the z direction
+//This includes the cells from before refine mesh as well as the cells after refine mesh
+//If you want a single value for the west_face, use generateExampleEastFace
+    if(timesRefined == 0)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableEastFace_refineCells if " <<
+                     "timesRefined == 0! Use generateExampleEastFace instead!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(eastFace_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableEastFace_refineCells if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(eastFace_Tvalues.size() != dz+dz_refined-1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableEastFace_refineCells if " <<
+                     "the Tprofile doesn't have the same size as dz+dz_refined-1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    //fill in the original cells first
+    for(double k = 0; k < dz; k++)
+    {
+        for(double j = 0; j < dy; j++)
+        {
+            eastFace_defaultTvalue[0].addCellIndex(eastFaceStartFace+dy*k+j);
+        }
+    }
+    //now fill in the refined cells
+    for(double j = 0; j < dy*(dy_refined*dz_refined-1); j++)
+    {
+        eastFace_defaultTvalue[0].addCellIndex(eastFaceStartFace+dy*dz+j);
+    }
+
+    //now fill in what is wanted
+    for(double t = 0; t < dz; t++)
+    {
+        for(double j = 0; j < dy; j++)
+        {
+            if(t == 0)
+            {
+                eastFace_Tvalues[t].addCellIndex(eastFaceStartFace+dy*t+j);
+            } else
+            {
+                eastFace_Tvalues[t+dz_refined-1].addCellIndex(eastFaceStartFace+dy*t+j);
+            }
+        }
+    }
+
+    //fill in the first set of split cells from refine mesh
+    //fills rest of the outer corners of the box first
+    //starts at bot right, then top right, then top left
+    for(double j = 0; j < dy; j++)
+    {
+        eastFace_Tvalues[0].addCellIndex(eastFaceStartFace+dy*dz+3*j);                  //bot right face
+        eastFace_Tvalues[dz_refined-1].addCellIndex(eastFaceStartFace+dy*dz+3*j+1);     //top right face
+        eastFace_Tvalues[dz_refined-1].addCellIndex(eastFaceStartFace+dy*dz+3*j+2);     //top left face
+    }
+
+    if(timesRefined == 2)   //would do != 1, but this might need changed for timesRefined > 2.
+    {
+        //fill in the second part of split cells from refine mesh
+        //fills bot left corner
+        //starts by going out in the y direction from the point, then goes out in the z direction
+        //from the point, then fills in the cell between these two just filled cells
+        for(double j = 0; j < dy; j++)
+        {
+            eastFace_Tvalues[timesRefined-2].addCellIndex(eastFaceStartFace+dy*dz+dy*3+3*j);
+            eastFace_Tvalues[timesRefined-1].addCellIndex(eastFaceStartFace+dy*dz+dy*3+3*j+1);
+            eastFace_Tvalues[timesRefined-1].addCellIndex(eastFaceStartFace+dy*dz+dy*3+3*j+2);
+        }
+
+        //fill in the third part of split cells from refine mesh
+        //fills rest of the corners
+        //starts at bot right, then top right, then top left
+        for(double j = 0; j < dy; j++)
+        {
+            eastFace_Tvalues[timesRefined-1].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j);
+            eastFace_Tvalues[timesRefined-1].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+1);
+            eastFace_Tvalues[timesRefined-2].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+2);
+            eastFace_Tvalues[dz_refined-1].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+3);
+            eastFace_Tvalues[dz_refined-2].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+4);
+            eastFace_Tvalues[dz_refined-2].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+5);
+            eastFace_Tvalues[dz_refined-2].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+6);
+            eastFace_Tvalues[dz_refined-2].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+7);
+            eastFace_Tvalues[dz_refined-1].addCellIndex(eastFaceStartFace+dy*dz+dy*6+3*3*j+8);
+        }
+    }*/
 }

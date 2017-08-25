@@ -37,6 +37,19 @@ private:
     void generateExampleWestFace();
     void generateAdjustableWestFace_simplest();
     void generateAdjustableWestFace_refineCells();
+    void generateExampleEastFace();
+    void generateAdjustableEastFace_simplest();
+    void generateAdjustableEastFace_refineCells();
+    void generateExampleSouthFace();
+    void generateAdjustableSouthFace_simplest();
+    void generateAdjustableSouthFace_refineCells();
+    void generateExampleMaxZ();
+    void generateAdjustableMaxZ_topToBot();
+    void generateAdjustableMaxZ_simplest_topToBot();
+    void generateAdjustableMaxZ_refineCells_topToBot();
+    void generateAdjustableMaxZ_leftToRight();
+    void generateAdjustableMaxZ_simplest_leftToRight();
+    void generateAdjustableMaxZ_refineCells_leftToRight();
 
     /*
      * maybe someday the problem is that adjusting one set of values means a need to adjust another set

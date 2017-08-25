@@ -41,6 +41,43 @@ private:
      * like east vs north, is dx and x vs dy and y If I remember correctly
      * Probably not that simple to carry over some of the refined mesh stuff,
      * but maybe I'm wrong since the order of splitting cells seems pretty consistent
+     *
+     * Hm, not quite a switch of x and y stuff! I forgot that it also fills from right to left
+     * for the west and east faces instead of from bot to top like the north and south faces!
+     *
+     * So far it's looking like refined mesh acts the same as native, other than that the refined cells
+     * part is actually the same for all patches! So maybe could do a refined cell filling function,
+     * then do the separate functions for the different directions they are filled, depending on
+     * if the cells are refined or not, or maybe even not caring so long as the Tprofile is the same
+     * size as the mesh. The idea is to always put the profile values as they come in, to the appropriate
+     * locations, which can be done using the mesh size (refined or not) and the filling direction
+     *
+     * Hm, except that the east vs west face needed slight order changes of the cells for refine mesh. Finally
+     * changed order a bit! Got a vertical band for the refined cells instead of a horizontal one.
+     * Looks like it is because it is the same order, but has to do with how directions vs location are
+     * The outside direction for each is slightly different depending on what side you're on.
+     * So probably going to have to make this small adjustment for the south face too.
+     * NVM the order changes just slightly to be going the other rotation around. Not sure why, other than
+     * that filling in from left to right instead of from right to left for the native cells?
+     * Yup, the order is reversed where it fills from left to right instead of right to left, just
+     * cause of the orientation
+     *
+     * Hm, still not the worst thing. Have functions for filling from left to right for the native cells
+     * and separate functions to be called for the refined cells, building from left to right or top to bot
+     * Or do some from left to right, some from right to left, and the call usage will show which faces follow
+     * which style
+     *
+     * Hopefully when I write the new program, it will be able to create the setFieldsDict in such a way that
+     * I don't have to get annoyed when I forget to stop the values of a patch from being zeroGradient.
+     *
+     * See, zeroGradient instead of fixed value makes set fields run, but not change anything.
+     *
+     * This should hopefully make it easier to be more flexible with the refined mesh stuff
+     * so that it can have the interesting profiles like the native mesh using something similar to the divisor
+     * (this will end up not needing the divisor thing since the profile will always have the size as the mesh)
+     * So it will cut this whole set of text for everything down a ton and get it more organizable
+     *
+     * After we got it doing the same thing, but as the new stuff, need to completely replace this program with the other!
      */
 
     void generateExampleMinZ();
