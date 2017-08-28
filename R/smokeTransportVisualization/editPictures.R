@@ -1,5 +1,5 @@
 #command to run this program (includes the current file location)
-#source('/home/latwood/Documents/smokeTransportVisualization/editPictures.R')
+#source('/home/latwood/src/fireLabWork/R/smokeTransportVisualization/editPictures.R')
 
 ###import libraries
 library(png)

@@ -1,0 +1,144 @@
+
+	To get a standard video from images, name the images 0, 1, 2, 3 or 1, 2, 3, 4 (probably 0 starting is better), then use the following command:
+ffmpeg -framerate 25 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4
+	where framerate determines the speed of the video and -c:v mpeg4 makes the format work for windows and linux. -q:v 1 forces it to use the full quality of the images! and -b:a 800k -b:v 800k forces it to use a higher bitrate so the video won't lag
+	%d means 0, 1, 2, 3, 4 where %1d means 00, 01, 02, 03 and image%03d means image0000, image0001, image0002 . . .
+
+
+	currently used for videos!!!
+ffmpeg -framerate 5 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k 159GOPRO.mp4 2>&1 | tee 159GOPRO.ffmpegLog
+	for some odd reason this makes the log file separate what we want using the ^M single character. 	Turn this character into newlines!!!
+sed -i 's/\o015/\n/g' ffmpeg.log
+
+Important Warning! Gpro-15/EastHill/157GOPRO died while writing, so it created a text jpeg file! Gets renamed with the rest by R, and causes ffmpeg to not complete the video to the full part. Threw out G0017016.JPG and the next file because of this problem.
+Somehow properties says it is a plain text document, so maybe there's a way to use that for error handling
+For now, the best way to handle it is to watch the ffmpeg logs and make sure the last frame matches the last picture number.
+
+
+	To add text use the following
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf: text='Stack Overflow': fontcolor=yellow: fontsize=112: box=1: boxcolor=black@0.000001: boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+	where -vf lets you use the drawtext stuff, fontfile is a path to a font, text is the words to be shown, color is the text color, fontsize is the size which depends on the resolution to get the right size, boxcolor @0.00001 is a very transparent box, x and y are the coordinates.
+
+	To put the text in the top middle for a header
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf: text='Stack Overflow': fontcolor=black: fontsize=96: box=1: boxcolor=black@0.000001: boxborderw=5: x=(w-text_w)/2: y=text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+	To put text in the bottom right, as if it were to be a timestamp
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf: text='Stack Overflow': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+	now put text in the bottom right, but this time it is a timestamp that follows your current time on the computer
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf: text='%{gmtime}': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-tw-tw/8: y=h-lh-2*lh" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+	another way to do current time from the computer
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='%{localtime\:%T}': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+
+
+		This next method doesn't really work. Creates a file that is way too big to work with as it is one long string. Probably use alternative method with a for loop is better. Try putting two timestamps to see why.
+		The idea of this came from this suggestion:
+ ' You can make a linear chain of multiple filters by separating them
+ ' with a comma:
+ ' 
+ '   -vf "drawtext,drawtext"
+			Now add text to each line
+			To add to the beginning use this command:
+		sed 's/^/drawtext=fontfile=usr\/share\/fonts\/truetype\/freefont\/FreeMonoBold.tff\: text='\''/' timestamps.txt > timestamps-drawtextfile.txt
+			To add to the end use this command:
+		sed -i 's/$/'\''\: fontcolor=yellow\: fontsize=60\: box=1\: boxcolor=black@0.000001\: boxborderw=5\: x=w-tw-tw\/8\: y=h-lh-2*lh/' timestamps-drawtextfile.txt
+			Now get rid of new lines and replace them with a comma (before the comma was a space, if need to google the function)
+		sed -i ':a;N;$!ba;s/\n/,/g' timestamps-drawtextfile.txt
+			Now run ffmpeg where it uses these timestamps for the different files
+		having trouble with this. Here's the best I've got so far. Looks like I need to do man find and figure out how it all works, then I should be good.
+		ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "$$$" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+		find $drawtext -name 'timestamps-drawtextfile.txt' -exec 'ffmpeg -framerate 25 -f image2 -i %d.jpg -vf $drawtext -c:v mpeg4 -q:v 1 -b 800k test.mp4' {} \;
+		find . -name 'timestamps-drawtextfile.txt' -print0 | ffmpeg -framerate 25 -f image2 -i %d.jpg -vf $0 -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+			now output text for one time at the bottom right, assuming it is the same time for all the video
+		ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text=' 2017\:08\:18 16\:40\:33': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+			now use two timestamps, see what happens
+		ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='2017\:08\:18 16\:40\:33': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h","drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='2017\:08\:18 16\:41\:03': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+			try other two timestamps method, see what happens
+		ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='2017\:08\:18 16\:40\:33': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h,drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='2017\:08\:18 16\:41\:03': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b 800k test.mp4
+
+
+		This suggestion will probably work better than the "drawtext,drawtext" idea:
+ ' -vf "sendcmd=f=send.cmd,drawtext=fontsize=20:fontcolor=white:x=100:y=100:text='Hello World'"
+ ' send.cmd file:
+ ' 5.0  drawtext reinit 'text=foo';
+ ' 10.0 drawtext reinit 'text=bar';
+ ' 20.0 drawtext reinit 'text=';
+	Make a timestamps file that holds all the timestamps of each of the images for use in functions that can add text at differing times
+	Now to create timestamps particular to the file, use the following command to get the timestamp for an image file:
+find -maxdepth 1 -name "*.jpg" -exec exiv2 print {} \; | grep "Image timestamp" | cut -f2- -d: | sort -n | cat > timestamps.txt
+	now format the time so that it is useful
+add colons
+sed -i 's/\:/\\\:/g' timestamps.txt
+get rid of first space
+sed -i 's/ //' timestamps.txt
+
+	generate command file using timestamps of the time pictures are taken, as created above
+change the for loop so that the number value at the beginning of each line follows the delta frames found when generating the video without drawtext.
+A better way would be to make the first video, saving the output, and parsing out the frame numbers used to a frames file. Then you have exact frame numbers (I think)
+	so first make the video but saving information to a log file
+ffmpeg -framerate 25 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4 2>&1 | tee ffmpeg.log
+	for some odd reason this makes the log file separate what we want using the ^M single character. Turn this character into newlines!!!
+sed -i 's/\o015/\n/g' ffmpeg.log
+	now pull out the information of interest and save it into a frames file
+grep "^frame= " ffmpeg.log | cut -d '=' -f 2 | cat > frames.txt
+	remove fps
+sed -i 's/fps//g' frames.txt
+	remove spaces
+sed -i 's/ //g' frames.txt
+
+	now all the inputs are ready, just need to put them together to make the cmd file
+	start to add part of the information
+sed 's/$/ drawtext reinit '\''text=/' frames.txt > timestamps.cmd
+	now add on the timestamps. Note that it has to be a separate output file!
+paste --delimiter='' timestamps.cmd timestamps.txt > temp.cmd
+	now add on the end of the file part
+sed 's/$/'\'';/' temp.cmd > timestamps.cmd
+	remove temp file
+rm temp.cmd
+
+		This suggestion will probably work better than the "drawtext,drawtext" idea:
+ ' -vf "sendcmd=f=send.cmd,drawtext=fontsize=20:fontcolor=white:x=100:y=100:text='Hello World'"
+ ' commandFile1
+ ' 00:00:00.000-00:00:01.000 [enter] drawtext reinit 'text=Note A';
+ ' 00:00:01.000-00:00:01.958 [enter] drawtext reinit 'text=Note B';
+	Make a timestamps file that holds all the timestamps of each of the images for use in functions that can add text at differing times
+	Now to create timestamps particular to the file, use the following command to get the timestamp for an image file:
+find -maxdepth 1 -name "*.jpg" -exec exiv2 print {} \; | grep "Image timestamp" | cut -f2- -d: | sort -n | cat > timestamps.txt
+	now format the time so that it is useful
+get rid of first space
+sed -i 's/ //' timestamps.txt
+
+	so first make the video but saving information to a log file. Do this at 1 framerate, to get the right number of stuff
+ffmpeg -framerate 1 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4 2>&1 | tee ffmpeg.log
+	for some odd reason this makes the log file separate what we want using the ^M single character. Turn this character into newlines!!!
+sed -i 's/\o015/\n/g' ffmpeg.log
+	now pull out the information of interest (the times) and save it into a videoTimes file
+grep "^frame= " ffmpeg.log | cut -d '=' -f 6 | cat > videoTimes.txt
+	remove bitrate text
+sed -i 's/bitrate//g' videoTimes.txt
+	remove spaces
+sed -i 's/ //g' videoTimes.txt
+	
+	now generate videoTimesStart and videoTimesEnd files for the cmd file
+sed '$ d' videoTimes.txt > videoTimesStart.txt
+sed '1d' videoTimes.txt > videoTimesEnd.txt
+
+	now all the inputs are ready, just need to put them together to make the cmd file
+	stitch together the videoTimesStart and videoTimesEnd
+paste --delimiter='-' videoTimesStart.txt videoTimesEnd.txt > timestamps.cmd
+	now add the text that goes before the time to initialize with
+sed -i 's/$/ [enter] drawtext reinit '\''text=/' timestamps.cmd
+	now add the timestamps. Note that it has to be a separate output file!
+paste --delimiter='' timestamps.cmd timestamps.txt > temp.cmd
+	now add on the end of the file part
+sed 's/$/'\'';/' temp.cmd > timestamps.cmd
+	remove temp file
+rm temp.cmd
+
+	run with the command file to generate times at each timestep using the time pictures are taken
+use the first time in this command, as found as the first time of the first picture
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "sendcmd=f=timestamps.cmd,drawtext=fontfile=usr/share/fonts/truetype/freefont/FreeMonoBold.tff: text='start': fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4
+
+
