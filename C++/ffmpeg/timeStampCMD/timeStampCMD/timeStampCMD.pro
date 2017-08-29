@@ -9,7 +9,8 @@ SOURCES += main.cpp \
     readTimeStampsFile.cpp \
     outputCMDfileForAllTimeStamps.cpp \
     outputCMDfileForOriginalVideoFrames.cpp \
-    readVideoTimesFile.cpp
+    readVideoTimesFile.cpp \
+    adjustTimeStamps.cpp
 
 HEADERS += \
     generateVideoTimes.h \
@@ -17,4 +18,5 @@ HEADERS += \
     readTimeStampsFile.h \
     outputCMDfileForAllTimeStamps.h \
     outputCMDfileForOriginalVideoFrames.h \
-    readVideoTimesFile.h
+    readVideoTimesFile.h \
+    adjustTimeStamps.h

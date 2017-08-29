@@ -7,6 +7,7 @@
 #include "readFramesFile.h"
 #include "readVideoTimesFile.h"
 #include "generateVideoTimes.h"
+#include "adjustTimeStamps.h"
 #include "outputCMDfileForAllTimeStamps.h"
 #include "outputCMDfileForOriginalVideoFrames.h"
 
@@ -39,6 +40,11 @@ int main()
     std::string timeStampsFile = "timestamps.txt";
     std::string framesFile = "frames.txt";
     std::string videoTimesFile = "videoTimes.txt";
+    //number of years,months,days,hours,minutes,seconds to add or subtract from all the timestamps
+    //the first character is + or - to signify adding or subtracting the time
+    //an example is: "-01:00:10 06:30:00" where this means to subtract six hours, thirty minutes,
+    //ten days, and one year from all the timestamps.
+    std::string timeCorrector = "-00:00:00 06:00:00";
 
     std::vector<std::string> timeStamps;
     std::vector<std::string> frames_str;
@@ -50,6 +56,7 @@ int main()
     readFramesFile toReadFramesFile;
     readVideoTimesFile toReadVideoTimesFile;
     generateVideoTimes toGenerateVideoTimes;
+    adjustTimeStamps toAdjustTimeStamps;
     outputCMDfileForAllTimeStamps toOutputCMDfileForAllTimeStamps;
     outputCMDfileForOriginalVideoFrames toOutputCMDfileForOriginalVideoFrames;
 
@@ -71,6 +78,9 @@ int main()
     //generate video times
     toGenerateVideoTimes.fillVideoTimes(frames_dbl[1],frames_dbl[0],videoTimes[1],videoTimes[0],frames_dbl[frames_dbl.size()-1]);
     generatedVideoTimes = toGenerateVideoTimes.getVideoTimes();
+
+    //adjust time if it is in the wrong timezone
+    timeStamps = toAdjustTimeStamps.adjustTime(timeCorrector,timeStamps);
 
     //output cmd files
     std::string outputCMDfile_allTimeStamps = "timestamps-all.cmd";

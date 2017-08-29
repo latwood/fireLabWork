@@ -33,6 +33,14 @@ public:
     void outputCMDfile(std::string filePath,std::vector<double> videoFrames,
                        std::vector<std::string> videoTimes,std::vector<std::string> timeStamps);
 
+    /*
+     * okay currently, it works, but opening it in vlc on windows makes it strange to watch
+     * speeds up and slows down. The important thing is that you can pause and see the first
+     * and last frames. It looks like using this class's output results in it beginning
+     * and ending with the right timestamps. It almost looks better because you can see it change
+     * in a nice manner. Wasn't expecting this to be the better video lol.
+     */
+
 private:
 
     void checkInputs(std::vector<double> videoFrames,std::vector<std::string> videoTimes);
