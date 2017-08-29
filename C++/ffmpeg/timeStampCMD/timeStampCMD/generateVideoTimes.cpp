@@ -11,20 +11,25 @@ generateVideoTimes::generateVideoTimes()
 
 void generateVideoTimes::fillVideoTimes(double secondFrame, double firstFrame, std::string secondTime, std::string firstTime, double lastFrame)
 {
+    std::cout << "generating video times for timestamps\n";
     checkFillVideoTimesInput(secondFrame,firstFrame,secondTime,firstTime,lastFrame);
     std::string timeDifference = subtractTime(secondTime,firstTime);
     timeInterval = divideTimeByDouble(timeDifference,(secondFrame-firstFrame));
     //fill first one with the firstTime variable before the loop
-    generatedVideoTimes.push_back(firstTime);
+     //so this is 0 time plus time interval. there is no 0 frame, which would be 0 time,
+     //so frame 1 is 0 time plus time interval, which is the time interval
+    generatedVideoTimes.push_back(timeInterval);
     for(double i = 1; i < lastFrame; i++)   //notice that this starts one later to avoid problems with the addTime function call in the loop
     {
         std::string generatedTime = addTime(generatedVideoTimes[i-1],timeInterval);
         generatedVideoTimes.push_back(generatedTime);
     }
+    std::cout << "finished generating video times for timestamps\n";
 }
 
 void generateVideoTimes::checkFillVideoTimesInput(double secondFrame, double firstFrame, std::string secondTime, std::string firstTime, double lastFrame)
 {
+    std::cout << "checking inputs for fillVideoTimes in generateVideoTimes class\n";
     bool failed = false;
     if(firstFrame < 0)
     {
@@ -62,29 +67,61 @@ void generateVideoTimes::checkFillVideoTimesInput(double secondFrame, double fir
         failed = true;
     }
 
-    std::string hours_firstTime = firstTime.substr(0,2);
-    std::string mins_firstTime = firstTime.substr(3,2);
-    std::string secs_firstTime = firstTime.substr(6,2);
-    std::string microsecs_firstTime = firstTime.substr(9,2);
-    if(firstTime.at(3) != ":" || firstTime.at(6) != ":" || firstTime.at(9) != "."
-            || isdigit(hours_firstTime) != 0 || isdigit(mins_firstTime) != 0
-            || isdigit(secs_firstTime) != 0 || isdigit(microsecs_firstTime) != 0)
+    for(double i = 0; i < firstTime.length(); i++)
     {
-        std::cout << "Error in fillVideoTimes function in generateVideoTimes class! firstTime is wrong format!\n";
-        failed = true;
-    }
-    std::string hours_secondTime = secondTime.substr(0,2);
-    std::string mins_secondTime = secondTime.substr(3,2);
-    std::string secs_secondTime = secondTime.substr(6,2);
-    std::string microsecs_secondTime = secondTime.substr(9,2);
-    if(secondTime.at(3) != ":" || secondTime.at(6) != ":" || secondTime.at(9) != "."
-            || isdigit(hours_secondTime) != 0 || isdigit(mins_secondTime) != 0
-            || isdigit(secs_secondTime) != 0 || isdigit(microsecs_secondTime) != 0)
-    {
-        std::cout << "Error in fillVideoTimes function in generateVideoTimes class! secondTime is wrong format!\n";
-        failed = true;
+        std::string chr = firstTime.substr(i,1);
+        if(i == 2 || i == 5)
+        {
+            if(chr != ":")
+            {
+                std::cout << "Error in fillVideoTimes function in generateVideoTimes class! firstTime is wrong format!\n";
+                failed = true;
+            }
+        } else if(i == 8)
+        {
+            if(chr != ".")
+            {
+                std::cout << "Error in fillVideoTimes function in generateVideoTimes class! firstTime is wrong format!\n";
+                failed = true;
+            }
+        } else
+        {
+            if(is_numeric(chr.c_str()) != true)
+            {
+                std::cout << "Error in fillVideoTimes function in generateVideoTimes class! firstTime is wrong format!\n";
+                failed = true;
+            }
+        }
     }
 
+    for(double i = 0; i < secondTime.length(); i++)
+    {
+        std::string chr = secondTime.substr(i,1);
+        if(i == 2 || i == 5)
+        {
+            if(chr != ":")
+            {
+                std::cout << "Error in fillVideoTimes function in generateVideoTimes class! secondTime is wrong format!\n";
+                failed = true;
+            }
+        } else if(i == 8)
+        {
+            if(chr != ".")
+            {
+                std::cout << "Error in fillVideoTimes function in generateVideoTimes class! secondTime is wrong format!\n";
+                failed = true;
+            }
+        } else
+        {
+            if(is_numeric(chr.c_str()) != true)
+            {
+                std::cout << "Error in fillVideoTimes function in generateVideoTimes class! secondTime is wrong format!\n";
+                failed = true;
+            }
+        }
+    }
+
+    std::cout << "finished checking inputs\n";
     if(failed == true)
     {
         std::cout << "Failed Inputs for fillVideoTimes function in generateVideoTimes class\n";
@@ -94,9 +131,12 @@ void generateVideoTimes::checkFillVideoTimesInput(double secondFrame, double fir
 
 std::string generateVideoTimes::subtractTime(std::string timeBase, std::string timeToSubtract)
 {
+    std::cout << "subtracting time\n";
     //set up needed variables
     std::string calculatedTime;
 
+    std::cout << "timeBase = " << timeBase << "\n";
+    std::cout << "timeToSubtract = " << timeToSubtract << "\n";
     std::string hours_base_string = timeBase.substr(0,2);
     std::string mins_base_string = timeBase.substr(3,2);
     std::string secs_base_string = timeBase.substr(6,2);
@@ -155,15 +195,20 @@ std::string generateVideoTimes::subtractTime(std::string timeBase, std::string t
 
     calculatedTime = dblToString(hours_sum_int) + ":" + dblToString(mins_sum_int) + ":"
             + dblToString(secs_sum_int) + "." + dblToString(microsecs_sum_int);
+    std::cout << "calculatedTime = " << calculatedTime << "\n";
 
+    std::cout << "finished subtracting time\n";
     return calculatedTime;
 }
 
 std::string generateVideoTimes::divideTimeByDouble(std::string timevalue, double doublevalue)
 {
+    std::cout << "dividing time by double\n";
     //set up needed variables
     std::string calculatedTime;
 
+    std::cout << "time value = " << timevalue << "\n";
+    std::cout << "double value = " << doublevalue << "\n";
     std::string hours_string = timevalue.substr(0,2);
     std::string mins_string = timevalue.substr(3,2);
     std::string secs_string = timevalue.substr(6,2);
@@ -173,10 +218,10 @@ std::string generateVideoTimes::divideTimeByDouble(std::string timevalue, double
     int secs_int = stringToInt(secs_string);
     int microsecs_int = stringToInt(microsecs_string);
 
-    double hours_sum_int = 0;
-    double mins_sum_int = 0;
-    double secs_sum_int = 0;
-    double microsecs_sum_int = 0;
+    int hours_sum_int = 0;
+    int mins_sum_int = 0;
+    int secs_sum_int = 0;
+    int microsecs_sum_int = 0;
 
     //now compute the time
     if(doublevalue == 0)
@@ -185,23 +230,41 @@ std::string generateVideoTimes::divideTimeByDouble(std::string timevalue, double
         std::exit(EXIT_FAILURE);
     }
 
-    double sum = hours_int*24+mins_int*60+secs_int*60+microsecs_int*100;
-    hours_sum_int = hours_int / doublevalue;
-    mins_sum_int = hours_int % doublevalue + mins_int;
-    mins_sum_int = mins_sum_int / doublevalue;
-    secs_sum_int = mins_sum_int ;
+    double sum = hours_int*24.0+mins_int*60.0+secs_int*60.0+microsecs_int/100.0;
+    std::cout << "sum of all seconds in time = " << sum << "\n";
+    sum = sum / doublevalue;
+    std::cout << "sum after dividing by double value = " << sum << "\n";
+    hours_sum_int = sum / 24.0;
+    std::cout << "hours calculated = " << hours_sum_int << "\n";
+    sum = sum - hours_sum_int * 60.0;
+    std::cout << "sum after subtracting hours in seconds = " << sum << "\n";
+    mins_sum_int = sum / 60.0;
+    std::cout << "mins calculated = " << mins_sum_int << "\n";
+    sum = sum - mins_sum_int * 60.0;
+    std::cout << "sum after subtracting mins in seconds = " << sum << "\n";
+    secs_sum_int = sum / 60.0;
+    std::cout << "seconds calculated = " << secs_sum_int << "\n";
+    sum = sum - secs_sum_int * 60.0;
+    std::cout << "sum after subtracting seconds in seconds = " << sum << "\n";
+    microsecs_sum_int = sum * 100.0;
+    std::cout << "microseconds calculated = " << microsecs_sum_int << "\n";
 
-    calculatedTime = dblToString(hours_sum_dbl) + ":" + dblToString(mins_sum_dbl) + ":"
-            + dblToString(secs_sum_dbl) + "." + dblToString(microsecs_sum_dbl);
+    calculatedTime = dblToString(hours_sum_int) + ":" + dblToString(mins_sum_int) + ":"
+            + dblToString(secs_sum_int) + "." + dblToString(microsecs_sum_int);
+    std::cout << "calculatedTime = " << calculatedTime << "\n";
 
+    std::cout << "finished dividing time by double\n";
     return calculatedTime;
 }
 
 std::string generateVideoTimes::addTime(std::string timeBase, std::string timeToAdd)
 {
+    std::cout << "adding time\n";
     //set up needed variables
     std::string calculatedTime;
 
+    std::cout << "time base = " << timeBase << "\n";
+    std::cout << "timeToAdd = " << timeToAdd << "\n";
     std::string hours_base_string = timeBase.substr(0,2);
     std::string mins_base_string = timeBase.substr(3,2);
     std::string secs_base_string = timeBase.substr(6,2);
@@ -268,11 +331,13 @@ std::string generateVideoTimes::addTime(std::string timeBase, std::string timeTo
 
     calculatedTime = dblToString(hours_sum_int) + ":" + dblToString(mins_sum_int) + ":"
             + dblToString(secs_sum_int) + "." + dblToString(microsecs_sum_int);
+    std::cout << "calculatedTime = " << calculatedTime << "\n";
 
+    std::cout << "finished adding time\n";
     return calculatedTime;
 }
 
-std::vector<std::string> generateVideoTimes::getVideoTime()
+std::vector<std::string> generateVideoTimes::getVideoTimes()
 {
     if(generatedVideoTimes.size() == 0)
     {
@@ -283,6 +348,27 @@ std::vector<std::string> generateVideoTimes::getVideoTime()
     return generatedVideoTimes;
 }
 
+bool generateVideoTimes::is_numeric(char const *string)
+{
+    int sizeOfString = strlen(string);
+        int iteration = 0;
+        bool isNumeric = true;
+
+        while(iteration < sizeOfString)
+        {
+            if(!isdigit(string[iteration]))
+            {
+                isNumeric = false;
+                break;
+            }
+
+            iteration++;
+
+        }
+
+        return isNumeric;
+}
+
 int generateVideoTimes::stringToInt(std::string value)
 {
     int Int = boost::lexical_cast<int>(value);
@@ -291,6 +377,12 @@ int generateVideoTimes::stringToInt(std::string value)
 
 std::string generateVideoTimes::dblToString(double value)
 {
-    std::string str = boost::lexical_cast<std::string>(value);
+    std::string str;
+    if(value < 10)
+    {
+        str = "0";
+    }
+    str = str + boost::lexical_cast<std::string>(value);
+
     return str;
 }

@@ -50,7 +50,8 @@ sed -i 's/ //g' videoTimes.txt
 
 	now all the inputs are ready. Use the C++ script timeStampCMD to create the cmd file from these inputs.
 	With the cmd file, can now run the command to make it all happen to generate the video with the timestamps! Make sure you use the same frame rate as the log file!
-ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "sendcmd=filename=timestamps.cmd,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf: text=: fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "sendcmd=filename=timestamps-all.cmd,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf: text=: fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test-timestamps-all.mp4
+ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "sendcmd=filename=timestamps-toVideoFrames.cmd,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf: text=: fontcolor=yellow: fontsize=60: box=1: boxcolor=black@0.000001: boxborderw=5: x=w-text_w-text_w/8: y=h-text_h-2*text_h" -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test-timestamps-toVideoFrames.mp4
 
 
 	now need to figure out the right commands to stitch two videos together

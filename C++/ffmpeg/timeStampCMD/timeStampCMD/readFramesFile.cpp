@@ -11,7 +11,8 @@ readFramesFile::readFramesFile()
 
 void readFramesFile::readFile(std::string framesFile)
 {
-    std::ifstream is_file(framesFile);
+    std::cout << "reading frames file\n";
+    std::ifstream is_file(framesFile.c_str());
 
     std::string currentFrame;
 
@@ -22,12 +23,13 @@ void readFramesFile::readFile(std::string framesFile)
             frames.push_back(currentFrame);
         }
     }
+    std::cout << "finished reading frames file\n";
 }
 
 bool readFramesFile::checkFrame(std::string frame)
 {
     bool failed = false;
-    if(isdigit(frame) != 0)
+    if(is_numeric(frame.c_str()) != true)
     {
         std::cout << "Error in readFile function in readFramesFile class! frame is not a digit!\n";
         failed = true;
@@ -45,4 +47,25 @@ std::vector<std::string> readFramesFile::getFrames()
         std::exit(EXIT_FAILURE);
     }
     return frames;
+}
+
+bool readFramesFile::is_numeric(char const *string)
+{
+    int sizeOfString = strlen(string);
+        int iteration = 0;
+        bool isNumeric = true;
+
+        while(iteration < sizeOfString)
+        {
+            if(!isdigit(string[iteration]))
+            {
+                isNumeric = false;
+                break;
+            }
+
+            iteration++;
+
+        }
+
+        return isNumeric;
 }

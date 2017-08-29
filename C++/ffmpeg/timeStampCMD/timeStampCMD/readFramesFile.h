@@ -1,7 +1,13 @@
 #ifndef READFRAMESFILE_H
 #define READFRAMESFILE_H
 
+#include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <boost/lexical_cast.hpp>
+#include <string>
+#include <fstream>
+#include <istream>
 
 class readFramesFile
 {
@@ -25,6 +31,7 @@ private:
 
     std::vector<std::string> frames;
     bool checkFrame(std::string frame);
+    bool is_numeric(char const *string);
 
 };
 

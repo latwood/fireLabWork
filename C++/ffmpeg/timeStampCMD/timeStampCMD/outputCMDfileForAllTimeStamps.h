@@ -1,6 +1,13 @@
 #ifndef OUTPUTCMDFILEFORALLTIMESTAMPS_H
 #define OUTPUTCMDFILEFORALLTIMESTAMPS_H
 
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <boost/lexical_cast.hpp>
+#include <string>
+#include <fstream>
+#include <istream>
 
 class outputCMDfileForAllTimeStamps
 {
@@ -8,7 +15,7 @@ class outputCMDfileForAllTimeStamps
 public:
 
     /*
-     * This class is for generating outputting the cmd file that uses all the timestamps
+     * This class is for outputting the cmd file that uses all the timestamps
      * with the generatedVideoTimes. Shouldn't need much, probably not even too much error handling,
      * since the timestamps and generatedVideoTimes should be the same size.
      *
@@ -21,8 +28,12 @@ public:
 
     outputCMDfileForAllTimeStamps();
 
+    void outputCMDfile(std::string filePath,std::vector<std::string> videoTimes,
+                  std::vector<std::string> timeStamps);
+
 private:
 
+    void checkInputs(std::vector<std::string> videoTimes,std::vector<std::string> timeStamps);
 
 };
 

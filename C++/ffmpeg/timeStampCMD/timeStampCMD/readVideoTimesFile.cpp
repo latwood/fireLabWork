@@ -11,7 +11,8 @@ readVideoTimesFile::readVideoTimesFile()
 
 void readVideoTimesFile::readFile(std::string videoTimesFile)
 {
-    std::ifstream is_file(videoTimesFile);
+    std::cout << "reading videoTimesFile\n";
+    std::ifstream is_file(videoTimesFile.c_str());
 
     std::string currentVideoTime;
 
@@ -22,6 +23,7 @@ void readVideoTimesFile::readFile(std::string videoTimesFile)
             videoTimes.push_back(currentVideoTime);
         }
     }
+    std::cout << "finished reading videoTimesFile\n";
 }
 
 bool readVideoTimesFile::checkVideoTime(std::string videoTime)
@@ -33,16 +35,31 @@ bool readVideoTimesFile::checkVideoTime(std::string videoTime)
         failed = true;
     }
 
-    std::string hours = videoTime.substr(0,2);
-    std::string mins = videoTime.substr(3,2);
-    std::string secs = videoTime.substr(6,2);
-    std::string microsecs = videoTime.substr(9,2);
-    if(videoTime.at(3) != ":" || videoTime.at(6) != ":" || videoTime.at(9) != "."
-            || isdigit(hours) != 0 || isdigit(mins) != 0
-            || isdigit(secs) != 0 || isdigit(microsecs) != 0)
+    for(double i = 0; i < videoTime.length(); i++)
     {
-        std::cout << "Error in readFile function in readVideoTimes class! videoTime is wrong format!\n";
-        failed = true;
+        std::string chr = videoTime.substr(i,1);
+        if(i == 2 || i == 5)
+        {
+            if(chr != ":")
+            {
+                std::cout << "Error in readFile function in readVideoTimes class! videoTime is wrong format!\n";
+                failed = true;
+            }
+        } else if(i == 8)
+        {
+            if(chr != ".")
+            {
+                std::cout << "Error in readFile function in readVideoTimes class! videoTime is wrong format!\n";
+                failed = true;
+            }
+        } else
+        {
+            if(is_numeric(chr.c_str()) != true)
+            {
+                std::cout << "Error in readFile function in readVideoTimes class! videoTime is wrong format!\n";
+                failed = true;
+            }
+        }
     }
 
     return failed;
@@ -57,4 +74,25 @@ std::vector<std::string> readVideoTimesFile::getVideoTimes()
         std::exit(EXIT_FAILURE);
     }
     return videoTimes;
+}
+
+bool readVideoTimesFile::is_numeric(char const *string)
+{
+    int sizeOfString = strlen(string);
+        int iteration = 0;
+        bool isNumeric = true;
+
+        while(iteration < sizeOfString)
+        {
+            if(!isdigit(string[iteration]))
+            {
+                isNumeric = false;
+                break;
+            }
+
+            iteration++;
+
+        }
+
+        return isNumeric;
 }

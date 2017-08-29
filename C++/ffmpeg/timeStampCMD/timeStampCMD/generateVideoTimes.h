@@ -5,6 +5,9 @@
 #include <vector>
 #include <cstdlib>
 #include <boost/lexical_cast.hpp>
+#include <string>
+#include <fstream>
+#include <istream>
 
 class generateVideoTimes
 {
@@ -36,6 +39,7 @@ private:
     std::string subtractTime(std::string timeBase, std::string timeToSubtract);
     std::string divideTimeByDouble(std::string timevalue, double doublevalue);
     std::string addTime(std::string timeBase, std::string timeToAdd);
+    bool is_numeric(char const *string);
     int stringToInt(std::string value);
     std::string dblToString(double value);
 

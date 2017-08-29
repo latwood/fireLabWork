@@ -1,9 +1,13 @@
 #ifndef READTIMESTAMPSFILE_H
 #define READTIMESTAMPSFILE_H
 
+#include <iostream>
 #include <vector>
-//#include <istream>
-//#include <fstream>
+#include <cstdlib>
+#include <boost/lexical_cast.hpp>
+#include <string>
+#include <fstream>
+#include <istream>
 
 class readTimeStampsFile
 {
@@ -23,6 +27,7 @@ private:
 
     std::vector<std::string> timeStamps;
     bool checkTimeStamp(std::string timeStamp);
+    bool is_numeric(char const *string);
 
 };
 

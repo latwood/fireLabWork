@@ -1,9 +1,13 @@
 #ifndef READVIDEOTIMESFILE_H
 #define READVIDEOTIMESFILE_H
 
+#include <iostream>
 #include <vector>
-//#include <istream>
-//#include <fstream>
+#include <cstdlib>
+#include <boost/lexical_cast.hpp>
+#include <string>
+#include <fstream>
+#include <istream>
 
 class readVideoTimesFile
 {
@@ -23,6 +27,7 @@ private:
 
     std::vector<std::string> videoTimes;
     bool checkVideoTime(std::string videoTime);
+    bool is_numeric(char const *string);
 
 };
 

@@ -74,9 +74,10 @@ int main()
 
     //output cmd files
     std::string outputCMDfile_allTimeStamps = "timestamps-all.cmd";
+    toOutputCMDfileForAllTimeStamps.outputCMDfile(mainDirectory+outputCMDfile_allTimeStamps,generatedVideoTimes,timeStamps);
+
     std::string outputCMDfile_toVideoFrames = "timestamps-toVideoFrames.cmd";
-
-
+    toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames,frames_dbl,videoTimes,timeStamps);
 
     cout << "Finished generating timestamp cmd file!" << endl;
     return 0;
