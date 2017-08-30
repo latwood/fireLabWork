@@ -80,13 +80,13 @@ int main()
     generatedVideoTimes = toGenerateVideoTimes.getVideoTimes();
 
     //adjust time if it is in the wrong timezone
-    timeStamps = toAdjustTimeStamps.adjustTime(timeCorrector,timeStamps);
+    //timeStamps = toAdjustTimeStamps.adjustTime(timeCorrector,timeStamps);
 
     //output cmd files
-    std::string outputCMDfile_allTimeStamps = "timestamps-all.cmd";
+    std::string outputCMDfile_allTimeStamps = "timestamps-all-adjustedTime.cmd";
     toOutputCMDfileForAllTimeStamps.outputCMDfile(mainDirectory+outputCMDfile_allTimeStamps,generatedVideoTimes,timeStamps);
 
-    std::string outputCMDfile_toVideoFrames = "timestamps-toVideoFrames.cmd";
+    std::string outputCMDfile_toVideoFrames = "timestamps-toVideoFrames-adjustedTime.cmd";
     toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames,frames_dbl,videoTimes,timeStamps);
 
     cout << "Finished generating timestamp cmd file!" << endl;

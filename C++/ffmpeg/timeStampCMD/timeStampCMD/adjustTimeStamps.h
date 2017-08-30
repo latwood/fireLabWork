@@ -45,9 +45,11 @@ private:
     int timeCorrector_min_int;
     int timeCorrector_sec_int;
 
+    std::vector<std::string> correctedTimeStamps;
+
     void checkInputs(std::string timeCorrector,std::vector<std::string> timeStamps);
-    std::string subtractTime(std::string originalTime);
-    std::string addTime(std::string originalTime);
+    std::string subtractTime(std::string timeCorrector,std::string originalTime);
+    std::string addTime(std::string timeCorrector,std::string originalTime);
     bool is_numeric(char const *string);
     int stringToInt(std::string value);
     std::string dblToString(double value);

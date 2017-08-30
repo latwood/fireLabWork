@@ -17,15 +17,15 @@ std::vector<std::string> adjustTimeStamps::adjustTime(std::string timeCorrector,
     {
         for(double i = 0; i < timeStamps.size(); i++)
         {
-            std::string generatedTime = subtractTime(timeStamps[i]);
-            generatedVideoTimes.push_back(generatedTime);
+            std::string generatedTime = subtractTime(timeCorrector,timeStamps[i]);
+            correctedTimeStamps.push_back(generatedTime);
         }
     } else if (timeCorrector.substr(0,1) == "+")
     {
         for(double i = 0; i < timeStamps.size(); i++)
         {
-            std::string generatedTime = addTime(timeStamps[i]);
-            generatedVideoTimes.push_back(generatedTime);
+            std::string generatedTime = addTime(timeCorrector,timeStamps[i]);
+            correctedTimeStamps.push_back(generatedTime);
         }
     } else
     {
@@ -33,10 +33,13 @@ std::vector<std::string> adjustTimeStamps::adjustTime(std::string timeCorrector,
         std::exit(EXIT_FAILURE);
     }
     std::cout << "finished adjusting timestamps to correct timezone";
+    return correctedTimeStamps;
 }
 
 void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::string> timeStamps)
 {
+    std::cout << "checking inputs for adjustTime in adjustTimeStamps class\n";
+    bool failed = false;
     if(timeCorrector.length() != 18)
     {
         std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector.length() != 18!\n";
@@ -45,6 +48,7 @@ void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::st
 
     for(double i = 0; i < timeCorrector.length(); i++)
     {
+        std::string chr = timeCorrector.substr(i,1);
         if(i == 1)
         {
             if(chr != "+" || chr != "-")
@@ -96,7 +100,7 @@ void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::st
         std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector day out of range!\n";
         failed = true;
     }
-    timeCorrector_hour_int = timeCorrector.substr(10,2);
+    timeCorrector_hour_string = timeCorrector.substr(10,2);
     timeCorrector_hour_int = stringToInt(timeCorrector_hour_string);
     if(timeCorrector_hour_int < 0 || timeCorrector_hour_int > 23)
     {
@@ -130,6 +134,7 @@ void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::st
 
         for(double i = 0; i < currentTimeStamp.length(); i++)
         {
+            std::string chr = currentTimeStamp.substr(i,1);
             if(i == 4 || i == 8 || i == 15 || i == 19)
             {
                 if(chr != "\\")
@@ -161,9 +166,16 @@ void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::st
             }
         }
     }
+
+    std::cout << "finished checking inputs\n";
+    if(failed == true)
+    {
+        std::cout << "Failed Inputs for fillVideoTimes function in generateVideoTimes class\n";
+        std::exit(EXIT_FAILURE);
+    }
 }
 
-std::string adjustTimeStamps::subtractTime(std::string originalTime)
+std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string originalTime)
 {
     std::cout << "subtracting time\n";
     //set up needed variables
@@ -193,7 +205,7 @@ std::string adjustTimeStamps::subtractTime(std::string originalTime)
 
     //now compute the time
     //notice that the input checker makes sure there can't be more than 24 hours time change
-    if(sec_int - timeCorrector_sec_int < 0)
+    if(secs_int - timeCorrector_sec_int < 0)
     {
         secs_sum_int = secs_int - timeCorrector_sec_int + 60;
         mins_sum_int = mins_sum_int - 1;
@@ -205,11 +217,11 @@ std::string adjustTimeStamps::subtractTime(std::string originalTime)
 
     if(mins_int - timeCorrector_min_int + mins_sum_int < 0)
     {
-        min_sum_int = mins_int - timeCorrector_min_int + mins_sum_int + 60;
+        mins_sum_int = mins_int - timeCorrector_min_int + mins_sum_int + 60;
         hours_sum_int = hours_sum_int - 1;
     } else
     {
-        min_sum_int = mins_int - timeCorrector_min_int + mins_sum_int;
+        mins_sum_int = mins_int - timeCorrector_min_int + mins_sum_int;
     }
 
     if(hours_int - timeCorrector_hour_int + hours_sum_int < 0)
@@ -300,7 +312,7 @@ std::string adjustTimeStamps::subtractTime(std::string originalTime)
     return calculatedTime;
 }
 
-std::string adjustTimeStamps::addTime(std::string originalTime)
+std::string adjustTimeStamps::addTime(std::string timeCorrector,std::string originalTime)
 {
     std::cout << "adding time\n";
     //set up needed variables
@@ -330,7 +342,7 @@ std::string adjustTimeStamps::addTime(std::string originalTime)
 
     //now compute the time
     //notice that the input checker makes sure there can't be more than 24 hours time change
-    if(sec_int + timeCorrector_sec_int >= 60)
+    if(secs_int + timeCorrector_sec_int >= 60)
     {
         secs_sum_int = secs_int + timeCorrector_sec_int - 60;
         mins_sum_int = mins_sum_int + 1;
@@ -342,11 +354,11 @@ std::string adjustTimeStamps::addTime(std::string originalTime)
 
     if(mins_int + timeCorrector_min_int + mins_sum_int >= 60)
     {
-        min_sum_int = mins_int + timeCorrector_min_int + mins_sum_int - 60;
+        mins_sum_int = mins_int + timeCorrector_min_int + mins_sum_int - 60;
         hours_sum_int = hours_sum_int + 1;
     } else
     {
-        min_sum_int = mins_int + timeCorrector_min_int + mins_sum_int;
+        mins_sum_int = mins_int + timeCorrector_min_int + mins_sum_int;
     }
 
     if(hours_int + timeCorrector_hour_int + hours_sum_int >= 24)
@@ -396,7 +408,7 @@ std::string adjustTimeStamps::addTime(std::string originalTime)
             {
                 month_sum_int = month_sum_int + 1;
                 day_sum_int = daycount - 30;
-            } else if(month_sum_init == 7)  //august is the only 31 day month with a 31 day month after it
+            } else if(month_sum_int == 7)  //august is the only 31 day month with a 31 day month after it
             {
                 month_sum_int = month_sum_int + 1;
                 day_sum_int = daycount - 31;
