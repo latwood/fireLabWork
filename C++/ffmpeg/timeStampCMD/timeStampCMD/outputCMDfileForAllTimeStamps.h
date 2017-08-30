@@ -44,6 +44,11 @@ public:
      * so we want to end with time end to later, this thing. So not from time 0 to time 1 use time 1,
      * but from time 0 to time 2 use time 1, from time 2 to time 3 use time 2, from time 3 to time 4 use time 3
      * . . . from time end to later use time end
+     *
+     * Hm, tried this out, and while it got another time at the end, it didn't end on the right timestamp.
+     * So I'm thinking that the original method of 0 to 1 use time 1, 1 to 2 use time 2 and so on is the
+     * best way to deal with this problem. It is probably the more accurate time. Would have to ask
+     * for preferences from others that know better.
      */
 
 private:
