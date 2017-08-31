@@ -392,50 +392,135 @@ std::string adjustTimeStamps::addTime(std::string timeCorrector,std::string orig
     //do an if statement breaking up what to do depending on which set of months have which one behind them
     int daycount = day_int + timeCorrector_day_int + day_sum_int;
 
-    if(month_sum_int == 1 || month_sum_int == 3 || month_sum_int == 5 || month_sum_int == 7
-            || month_sum_int == 8 || month_sum_int == 10 || month_sum_int == 12)
+    //so the days, months, and years are technically already calculated,
+    //so they are already set unless they need adjusted
+    if(month_sum_int == 1)
     {
         if(daycount > 31)
         {
-            //did this one first because it is the only way to do any more increase to the year count
-            if(month_sum_int == 12)
-            {
-                year_sum_int = year_sum_int + 1;
-                month_sum_int = 1;
-                day_sum_int = daycount - 31;    //january has 31 days
-            } else if(month_sum_int == 3 || month_sum_int == 5 || month_sum_int == 8
-                      || month_sum_int == 10)   //the month after these months have 30 days
-            {
-                month_sum_int = month_sum_int + 1;
-                day_sum_int = daycount - 30;
-            } else if(month_sum_int == 7)  //august is the only 31 day month with a 31 day month after it
-            {
-                month_sum_int = month_sum_int + 1;
-                day_sum_int = daycount - 31;
-            } else if(month_sum_int == 1)   //oh boy, February
-            {
-
-            } else
-            {
-                std::cout << "Error in subtractTime function in adjustTimeStamps class! "
-                          << "Month is somehow out of range of 1 to 12!\n";
-                std::exit(EXIT_FAILURE);
-            }
-        } else if(daycount > 30)    //might not be good enough for the rest of the months without getting other stuff. Especially if adding on an idea to do February
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 31;
+        } else
         {
-
+            day_sum_int = daycount;
         }
-    } else if(month_sum_int == 4 || month_sum_int == 6 || month_sum_int == 9 || month_sum_int == 11)
-    {
-        day_sum_int = day_int - timeCorrector_day_int + day_sum_int + 30;
-    } else if(month_int - 1 == 2)
+    } else if(month_sum_int == 2)
     {
         if(year_sum_int % 4 == 0)
         {
-            day_sum_int = day_int - timeCorrector_day_int + day_sum_int + 29;
+            if(daycount > 29)
+            {
+                month_sum_int = month_sum_int + 1;
+                day_sum_int = daycount - 29;
+            } else if(daycount > 28)
+            {
+                month_sum_int = month_sum_int + 1;
+                day_sum_int = daycount - 28;
+            } else
+            {
+                day_sum_int = daycount;
+            }
+        }
+    } else if(month_sum_int == 3)
+    {
+        if(daycount > 31)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 31;
         } else
         {
-            day_sum_int = day_int - timeCorrector_day_int + day_sum_int + 28;
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 4)
+    {
+        if(daycount > 30)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 30;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 5)
+    {
+        if(daycount > 31)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 31;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 6)
+    {
+        if(daycount > 30)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 30;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 7)
+    {
+        if(daycount > 31)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 31;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 8)
+    {
+        if(daycount > 31)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 31;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 9)
+    {
+        if(daycount > 30)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 30;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 10)
+    {
+        if(daycount > 31)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 31;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 11)
+    {
+        if(daycount > 30)
+        {
+            month_sum_int = month_sum_int + 1;
+            day_sum_int = daycount - 30;
+        } else
+        {
+            day_sum_int = daycount;
+        }
+    } else if(month_sum_int == 12)
+    {
+        if(daycount > 31)
+        {
+            year_sum_int = year_sum_int + 1;
+            month_sum_int = 1;  //notice this is not +1, resetting for the year
+            day_sum_int = daycount - 31;
+        } else
+        {
+            day_sum_int = daycount;
         }
     } else
     {

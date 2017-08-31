@@ -49,6 +49,9 @@ public:
      * So I'm thinking that the original method of 0 to 1 use time 1, 1 to 2 use time 2 and so on is the
      * best way to deal with this problem. It is probably the more accurate time. Would have to ask
      * for preferences from others that know better.
+     * I'm not sure which is the correct method, but if the second method is correct, it didn't work because
+     * ffmpeg only updated the time at 3 frames before, so using the second to last time as the update time
+     * for the final picture still gets cut out, because it isn't the third to last time.
      */
 
 private:
