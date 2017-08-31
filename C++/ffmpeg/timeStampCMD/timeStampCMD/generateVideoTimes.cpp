@@ -51,11 +51,6 @@ void generateVideoTimes::checkFillVideoTimesInput(double secondFrame, double fir
         std::cout << "Error in fillVideoTimes function in generateVideoTimes class! lastFrame <= firstFrame!\n";
         failed = true;
     }
-    if(lastFrame <= secondFrame)
-    {
-        std::cout << "Error in fillVideoTimes function in generateVideoTimes class! lastFrame <= secondFrame!\n";
-        failed = true;
-    }
     if(firstTime.length() != 11)
     {
         std::cout << "Error in fillVideoTimes function in generateVideoTimes class! firstTime.length() != 11!\n";

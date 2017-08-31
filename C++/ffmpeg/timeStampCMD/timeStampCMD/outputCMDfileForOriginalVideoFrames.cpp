@@ -21,16 +21,21 @@ void outputCMDfileForOriginalVideoFrames::outputCMDfile(std::string filePath,std
     //now write the file
     FILE *fzout = fopen(filePath.c_str(),"w");
     //write first line without loop
-    fprintf(fzout,"00:00:00.00-%s [enter] drawtext reinit 'text=%s';\n",videoTimes[0].c_str(),timeStamps[0].c_str());
-    double framesCounter = 1;
+    double framesCounter = 0;
     for (double timeStampsCounter = 0; timeStampsCounter < timeStamps.size(); timeStampsCounter++)
     {
-        std::cout << "timeStampsCounter = " << timeStampsCounter << "\n";
+        std::cout << "timeStampsCounter+1 = " << timeStampsCounter+1 << "\n";
         std::cout << "framesCounter = " << framesCounter << "\n";
-        std::cout << "videoFrames[framesCounter-1] = " << videoFrames[framesCounter-1] << "\n";
-        if(timeStampsCounter == videoFrames[framesCounter-1])
+        std::cout << "videoFrames[framesCounter] = " << videoFrames[framesCounter] << "\n";
+        if(timeStampsCounter+1 == videoFrames[framesCounter])
         {
-            fprintf(fzout,"%s-%s [enter] drawtext reinit 'text=%s';\n",videoTimes[framesCounter-1].c_str(),videoTimes[framesCounter].c_str(),timeStamps[timeStampsCounter].c_str());
+            if(framesCounter == 0)
+            {
+                fprintf(fzout,"00:00:00.00-%s [enter] drawtext reinit 'text=%s';\n",videoTimes[framesCounter].c_str(),timeStamps[timeStampsCounter].c_str());
+            } else
+            {
+                fprintf(fzout,"%s-%s [enter] drawtext reinit 'text=%s';\n",videoTimes[framesCounter-1].c_str(),videoTimes[framesCounter].c_str(),timeStamps[timeStampsCounter].c_str());
+            }
             framesCounter++;
         }
     }

@@ -12,7 +12,9 @@ adjustTimeStamps::adjustTimeStamps()
 std::vector<std::string> adjustTimeStamps::adjustTime(std::string timeCorrector,std::vector<std::string> timeStamps)
 {
     std::cout << "adjusting timestamps to correct timezone\n";
+    std::cout << "timeCorrector = " << timeCorrector << "\n";
     checkInputs(timeCorrector,timeStamps);  //notice this assigns timeCorrector variables
+    std::cout << "timeCorrector.substr(0,1) = " << timeCorrector.substr(0,1) << "\n";
     if(timeCorrector.substr(0,1) == "-")
     {
         for(double i = 0; i < timeStamps.size(); i++)
@@ -40,30 +42,30 @@ void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::st
 {
     std::cout << "checking inputs for adjustTime in adjustTimeStamps class\n";
     bool failed = false;
-    if(timeCorrector.length() != 18)
+    if(timeCorrector.length() != 20)
     {
-        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector.length() != 18!\n";
+        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector.length() != 20!\n";
         failed = true;
     }
 
     for(double i = 0; i < timeCorrector.length(); i++)
     {
         std::string chr = timeCorrector.substr(i,1);
-        if(i == 1)
+        if(i == 0)
         {
-            if(chr != "+" || chr != "-")
+            if(chr != "+" && chr != "-")
             {
                 std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector not \"+\" or \"-\"!\n";
                 failed = true;
             }
-        } else if(i == 3 || i == 6 || i == 12 || i == 15)
+        } else if(i == 5 || i == 8 || i == 14 || i == 17)
         {
             if(chr != ":")
             {
                 std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector is wrong format!\n";
                 failed = true;
             }
-        } else if(i == 9)
+        } else if(i == 11)
         {
             if(chr != " ")
             {
@@ -79,46 +81,46 @@ void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::st
             }
         }
     }
-    timeCorrector_year_string = timeCorrector.substr(1,2);
+    timeCorrector_year_string = timeCorrector.substr(1,4);
     timeCorrector_year_int = stringToInt(timeCorrector_year_string);
-    if(timeCorrector_year_int < 1)
+    if(timeCorrector_year_int < 0 || timeCorrector_year_int > 9999) //hmm, technically this is already done by limiting the format to 4 digits. And does a negative sign fail the isnumeric? And this won't catch if the addition of the year adds too many, so that will only be caught in the addition or subtraction stuff
     {
-        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector year is negative!\n";
+        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector year out of range!\n";
         failed = true;
     }
-    timeCorrector_month_string = timeCorrector.substr(4,2);
+    timeCorrector_month_string = timeCorrector.substr(6,2);
     timeCorrector_month_int = stringToInt(timeCorrector_month_string);
-    if(timeCorrector_month_int < 0 || timeCorrector_month_int > 12)
+    if(timeCorrector_month_int < 0 || timeCorrector_month_int >= 12 )
     {
-        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector month out of range!\n";
+        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector month out of range! Use a value less than 12!\n";
         failed = true;
     }
-    timeCorrector_day_string = timeCorrector.substr(7,2);
+    timeCorrector_day_string = timeCorrector.substr(9,2);
     timeCorrector_day_int = stringToInt(timeCorrector_day_string);
-    if(timeCorrector_day_int < 0 || timeCorrector_day_int > 365)
+    if(timeCorrector_day_int < 0 || timeCorrector_day_int >= 31)
     {
-        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector day out of range!\n";
+        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector day out of range! Use a value less than 31!\n";
         failed = true;
     }
-    timeCorrector_hour_string = timeCorrector.substr(10,2);
+    timeCorrector_hour_string = timeCorrector.substr(12,2);
     timeCorrector_hour_int = stringToInt(timeCorrector_hour_string);
-    if(timeCorrector_hour_int < 0 || timeCorrector_hour_int > 23)
+    if(timeCorrector_hour_int < 0 || timeCorrector_hour_int >= 24)
     {
-        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector hour out of range!\n";
+        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector hour out of range! Use a value less than 24!\n";
         failed = true;
     }
-    timeCorrector_min_string = timeCorrector.substr(13,2);
+    timeCorrector_min_string = timeCorrector.substr(15,2);
     timeCorrector_min_int = stringToInt(timeCorrector_min_string);
-    if(timeCorrector_min_int < 0 || timeCorrector_min_int > 60)
+    if(timeCorrector_min_int < 0 || timeCorrector_min_int >= 60)
     {
-        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector min out of range!\n";
+        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector min out of range! Use a value less than 60!\n";
         failed = true;
     }
-    timeCorrector_sec_string = timeCorrector.substr(16,2);
+    timeCorrector_sec_string = timeCorrector.substr(18,2);
     timeCorrector_sec_int = stringToInt(timeCorrector_sec_string);
-    if(timeCorrector_sec_int < 0 || timeCorrector_sec_int > 60)
+    if(timeCorrector_sec_int < 0 || timeCorrector_sec_int >= 60)
     {
-        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector sec out of range!\n";
+        std::cout << "Error in adjustTime function in adjustTimeStamps class! timeCorrector sec out of range! Use a value less than 60!\n";
         failed = true;
     }
     //hmm, haven't done this kind of error checking for the other functions. Need to add this at some point in time
@@ -205,6 +207,24 @@ std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string
 
     //now compute the time
     //notice that the input checker makes sure there can't be more than 24 hours time change
+    /*
+     * while this is true, the problem I'm seeing is the difficulty of handling the seconds adding up to affect the minutes,
+     * the minutes adding up to affect the hours, and so on. The subtract time in generateVideoTimes doesn't do that,
+     * so each of the different parts are independent. minutes, seconds, and hours are independent there, but not here
+     * and this makes it a heck of a ton more complicated. In fact, it should be independent, since the corrector
+     * should not be able to go more than a given amount of change for each part.
+     *
+     * So should rewrite this to make sure that the seconds only affect the seconds,
+     * the minutes only affect the minutes, and so on.
+     *
+     * there have to be error checking to allow the months to affect the days, in the sense that
+     * if a month is changed, you don't want to have too many days now with the date.
+     *
+     * hm, even if the idea is to only affect the first timestamp by a maximum ammount, still need to do rollover
+     * effects from each type of time to the next part. Man dates are a pain lol.
+     *
+     * for now, this at least works, it just needs checked to make sure it worked every time
+     */
     if(secs_int - timeCorrector_sec_int < 0)
     {
         secs_sum_int = secs_int - timeCorrector_sec_int + 60;
@@ -251,7 +271,7 @@ std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string
 
         if(year_int - timeCorrector_year_int + year_sum_int < 1)
         {
-            std::cout << "Error in subtractTime function in adjustTimeStamps class! timeCorrector bigger than originalTime!\n";
+            std::cout << "Error in subtractTime function in adjustTimeStamps class! timeCorrector bigger than originalTime! Can't go earlier than 1 A.D.!\n";
             std::exit(EXIT_FAILURE);
         } else
         {
@@ -295,7 +315,7 @@ std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string
 
         if(year_int - timeCorrector_year_int + year_sum_int < 1)
         {
-            std::cout << "Error in subtractTime function in adjustTimeStamps class! timeCorrector bigger than originalTime!\n";
+            std::cout << "Error in subtractTime function in adjustTimeStamps class! timeCorrector bigger than originalTime! Can't go earlier than 1 A.D.!\n";
             std::exit(EXIT_FAILURE);
         } else
         {
@@ -303,9 +323,22 @@ std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string
         }
     }
 
-    calculatedTime = dblToString(year_sum_int) + "\\:" + dblToString(month_sum_int) + "\\:"
+    if(year_sum_int < 100)
+    {
+        calculatedTime = "00" + dblToString(year_sum_int) + "\\:" + dblToString(month_sum_int) + "\\:"
             + dblToString(day_sum_int) + " " + dblToString(hours_sum_int) + "\\:"
             + dblToString(mins_sum_int) + "\\:" + dblToString(secs_sum_int);
+    } else if(year_sum_int < 1000)
+    {
+        calculatedTime = "0" + dblToString(year_sum_int) + "\\:" + dblToString(month_sum_int) + "\\:"
+            + dblToString(day_sum_int) + " " + dblToString(hours_sum_int) + "\\:"
+            + dblToString(mins_sum_int) + "\\:" + dblToString(secs_sum_int);
+    } else
+    {
+        calculatedTime = dblToString(year_sum_int) + "\\:" + dblToString(month_sum_int) + "\\:"
+            + dblToString(day_sum_int) + " " + dblToString(hours_sum_int) + "\\:"
+            + dblToString(mins_sum_int) + "\\:" + dblToString(secs_sum_int);
+    }
     std::cout << "calculatedTime = " << calculatedTime << "\n";
 
     std::cout << "finished subtracting time\n";

@@ -36,15 +36,20 @@ int main()
      *
      */
 
-    std::string mainDirectory = "/home/latwood/Documents/missoulaFireVideos/loloPeakPlume/allTogetherWithoutTanner/";
+    std::string mainDirectory = "/home/latwood/Documents/ffmpegFireVideos/";
     std::string timeStampsFile = "timestamps.txt";
     std::string framesFile = "frames.txt";
     std::string videoTimesFile = "videoTimes.txt";
     //number of years,months,days,hours,minutes,seconds to add or subtract from all the timestamps
     //the first character is + or - to signify adding or subtracting the time
-    //an example is: "-01:00:10 06:30:00" where this means to subtract six hours, thirty minutes,
+    //an example is: "-0001:00:10 06:30:00" where this means to subtract six hours, thirty minutes,
     //ten days, and one year from all the timestamps.
-    std::string timeCorrector = "-00:00:00 06:00:00";
+    std::string timeCorrector = "-0000:00:00 06:00:00";
+    /*
+     * realizing it would have been simpler to say, add each part separate and make sure it can't increment the next part
+     * for now, can probably get away with it, just watch to make sure the incrementation went correctly for stuff.
+     * Probably going to have to watch to make sure it worked every time
+    */
 
     std::vector<std::string> timeStamps;
     std::vector<std::string> frames_str;
@@ -79,14 +84,21 @@ int main()
     toGenerateVideoTimes.fillVideoTimes(frames_dbl[1],frames_dbl[0],videoTimes[1],videoTimes[0],frames_dbl[frames_dbl.size()-1]);
     generatedVideoTimes = toGenerateVideoTimes.getVideoTimes();
 
-    //adjust time if it is in the wrong timezone
-    //timeStamps = toAdjustTimeStamps.adjustTime(timeCorrector,timeStamps);
-
     //output cmd files
-    std::string outputCMDfile_allTimeStamps = "timestamps-all-adjustedTime.cmd";
+    std::string outputCMDfile_allTimeStamps = "timestamps-all.cmd";
     toOutputCMDfileForAllTimeStamps.outputCMDfile(mainDirectory+outputCMDfile_allTimeStamps,generatedVideoTimes,timeStamps);
 
-    std::string outputCMDfile_toVideoFrames = "timestamps-toVideoFrames-adjustedTime.cmd";
+    std::string outputCMDfile_toVideoFrames = "timestamps-toVideoFrames.cmd";
+    toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames,frames_dbl,videoTimes,timeStamps);
+
+    //adjust time if it is in the wrong timezone
+    timeStamps = toAdjustTimeStamps.adjustTime(timeCorrector,timeStamps);
+
+    //output cmd files
+    outputCMDfile_allTimeStamps = "timestamps-all-adjustedTime.cmd";
+    toOutputCMDfileForAllTimeStamps.outputCMDfile(mainDirectory+outputCMDfile_allTimeStamps,generatedVideoTimes,timeStamps);
+
+    outputCMDfile_toVideoFrames = "timestamps-toVideoFrames-adjustedTime.cmd";
     toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames,frames_dbl,videoTimes,timeStamps);
 
     cout << "Finished generating timestamp cmd file!" << endl;
