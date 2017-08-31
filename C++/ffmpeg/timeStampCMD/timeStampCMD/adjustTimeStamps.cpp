@@ -224,6 +224,22 @@ std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string
      * effects from each type of time to the next part. Man dates are a pain lol.
      *
      * for now, this at least works, it just needs checked to make sure it worked every time
+     *
+     *
+     * Okay, I have a separate git repository with the old one for just in case. I'm thinking, allow
+     * maximum values like 9999 years, 99 months, 99 days, 99 hours, 99 mins, 99 seconds. However,
+     * a warning will be given that it only increments a given type of time, ie hours affect hours, mins affect mins
+     * but there is zero roll over. While the user is allowed to specify values bigger than the amount
+     * before rollover for each given time unit, if when adding or subtracting rollover is found, the
+     * adjustment will cap out at the min and max values possible for a given adjustment that avoids rollover.
+     * This means that if the time is 0 hours, and a time of 24 hours or greater is specified,
+     * the hours will become 23 hours, which is the max value possible for hours. Seconds max is 59, same with mins
+     * the max for years is 9999. The min for all is 0. The max month is 12.
+     *
+     * The max days depends on the month and year that is calculated, not the original month or year value.
+     * So if the original time has february 2000, 0 days; if the corrector is to add 3 months, 3 years, and 40 days
+     * the result will be may 31st, 2003. Not something like february 28 2003 or may 29 2003.
+     *
      */
     if(secs_int - timeCorrector_sec_int < 0)
     {
