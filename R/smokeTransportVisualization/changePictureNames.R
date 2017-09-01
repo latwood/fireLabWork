@@ -6,9 +6,9 @@ library(gtools)
 
 ###variables you can change
 
-mainOriginalPictureDirectory <- "/home/latwood/Documents/missoulaFireVideos/missoulaEmber-UsedImages-Aug2017"
+mainOriginalPictureDirectory <- "/home/latwood/Documents/missoulaFireVideos/LorenVideoMake-Videos"
 
-pictureDirectoryName <- "/Gpro-21/107GOPRO-108GOPRO"
+pictureDirectoryName <- "/Video10"
 
 OriginalPictureDirectory <- paste(mainOriginalPictureDirectory,pictureDirectoryName,sep="")
 

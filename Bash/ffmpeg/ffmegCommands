@@ -4,15 +4,17 @@ ffmpeg -framerate 25 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k t
 	where framerate determines the speed of the video and -c:v mpeg4 makes the format work for windows and linux. -q:v 1 forces it to use the full quality of the images! and -b:a 800k -b:v 800k forces it to use a higher bitrate so the video won't lag
 	%d means 0, 1, 2, 3, 4 where %1d means 00, 01, 02, 03 and image%03d means image0000, image0001, image0002 . . .
 
-
-	currently used for videos!!!
-ffmpeg -framerate 5 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k 159GOPRO.mp4 2>&1 | tee 159GOPRO.ffmpegLog
+	currently used for videos!!! But use below!
+ffmpeg -framerate 5 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k Video1-5fps-noTimeStamps.mp4 2>&1 | tee Video1-5fps-noTimeStamps.ffmpegLog
 	for some odd reason this makes the log file separate what we want using the ^M single character. 	Turn this character into newlines!!!
-sed -i 's/\o015/\n/g' ffmpeg.log
+sed -i 's/\o015/\n/g' Video1-5fps-noTimeStamps.ffmpegLog
 
 Important Warning! Gpro-15/EastHill/157GOPRO died while writing, so it created a text jpeg file! Gets renamed with the rest by R, and causes ffmpeg to not complete the video to the full part. Threw out G0017016.JPG and the next file because of this problem.
 Somehow properties says it is a plain text document, so maybe there's a way to use that for error handling
 For now, the best way to handle it is to watch the ffmpeg logs and make sure the last frame matches the last picture number.
+
+
+
 
 
 		This suggestion will probably work better than the "drawtext,drawtext" idea:
@@ -21,32 +23,33 @@ For now, the best way to handle it is to watch the ffmpeg logs and make sure the
  ' 00:00:00.000-00:00:01.000 [enter] drawtext reinit 'text=Note A';
  ' 00:00:01.000-00:00:01.958 [enter] drawtext reinit 'text=Note B';
 	Make a timestamps file that holds all the timestamps of each of the images for use in functions that can add text at differing times
+
 	Now to create timestamps particular to the file, use the following command to get the timestamp for an image file:
-find -maxdepth 1 -name "*.jpg" -exec exiv2 print {} \; | grep "Image timestamp" | cut -f2- -d: | sort -n | cat > timestamps.txt
+find -maxdepth 1 -name "*.jpg" -exec exiv2 print {} \; | grep "Image timestamp" | cut -f2- -d: | sort -n | cat > Video1-timestamps.txt
 	now format the time so that it is useful
 	add colons
-sed -i 's/\:/\\\:/g' timestamps.txt
+sed -i 's/\:/\\\:/g' Video1-timestamps.txt
 	get rid of first space
-sed -i 's/ //' timestamps.txt
+sed -i 's/ //' Video1-timestamps.txt
 
 	so first make the video but saving information to a log file. Do this at the framerate of interest as the log file always outputs the same number of stuff. It is making the whole video, but only displaying information about what it is doing at certain time periods. The framerate changes the fps slightly and the time significantly.
-ffmpeg -framerate 25 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4 2>&1 | tee ffmpeg.log
+ffmpeg -framerate 5 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k Video1-5fps-noTimeStamps.mp4 2>&1 | tee Video1-5fps-noTimeStamps.ffmpegLog
 	for some odd reason this makes the log file separate what we want using the ^M single character. Turn this character into newlines!!!
-sed -i 's/\o015/\n/g' ffmpeg.log
+sed -i 's/\o015/\n/g' Video1-5fps-noTimeStamps.ffmpegLog
 
 	now pull out the information of interest (the frames) and save it into a videoTimes file
-grep "^frame= " ffmpeg.log | cut -d '=' -f 2 | cat > frames.txt
+grep "^frame= " Video1-5fps-noTimeStamps.ffmpegLog | cut -d '=' -f 2 | cat > Video1-5fps-frames.txt
 	remove fps
-sed -i 's/fps//g' frames.txt
+sed -i 's/fps//g' Video1-5fps-frames.txt
 	remove spaces
-sed -i 's/ //g' frames.txt
+sed -i 's/ //g' Video1-5fps-frames.txt
 
 	now pull out the information of interest (the times) and save it into a videoTimes file
-grep "^frame= " ffmpeg.log | cut -d '=' -f 6 | cat > videoTimes.txt
+grep "^frame= " Video1-5fps-noTimeStamps.ffmpegLog | cut -d '=' -f 6 | cat > Video1-5fps-videoTimes.txt
 	remove bitrate text
-sed -i 's/bitrate//g' videoTimes.txt
+sed -i 's/bitrate//g' Video1-5fps-videoTimes.txt
 	remove spaces
-sed -i 's/ //g' videoTimes.txt
+sed -i 's/ //g' Video1-5fps-videoTimes.txt
 
 	now all the inputs are ready. Use the C++ script timeStampCMD to create the cmd file from these inputs.
 	With the cmd file, can now run the command to make it all happen to generate the video with the timestamps! Make sure you use the same frame rate as the log file!
