@@ -136,57 +136,52 @@ std::string generateVideoTimes::subtractTime(std::string timeBase, std::string t
     std::string mins_base_string = timeBase.substr(3,2);
     std::string secs_base_string = timeBase.substr(6,2);
     std::string microsecs_base_string = timeBase.substr(9,2);
-    double hours_base_int = stringToInt(hours_base_string);
-    double mins_base_int = stringToInt(mins_base_string);
-    double secs_base_int = stringToInt(secs_base_string);
-    double microsecs_base_int = stringToInt(microsecs_base_string);
+    int hours_base_int = stringToInt(hours_base_string);
+    int mins_base_int = stringToInt(mins_base_string);
+    int secs_base_int = stringToInt(secs_base_string);
+    int microsecs_base_int = stringToInt(microsecs_base_string);
 
     std::string hours_subtract_string = timeToSubtract.substr(0,2);
     std::string mins_subtract_string = timeToSubtract.substr(3,2);
     std::string secs_subtract_string = timeToSubtract.substr(6,2);
     std::string microsecs_subtract_string = timeToSubtract.substr(9,2);
-    double hours_subtract_int = stringToInt(hours_subtract_string);
-    double mins_subtract_int = stringToInt(mins_subtract_string);
-    double secs_subtract_int = stringToInt(secs_subtract_string);
-    double microsecs_subtract_int = stringToInt(microsecs_subtract_string);
+    int hours_subtract_int = stringToInt(hours_subtract_string);
+    int mins_subtract_int = stringToInt(mins_subtract_string);
+    int secs_subtract_int = stringToInt(secs_subtract_string);
+    int microsecs_subtract_int = stringToInt(microsecs_subtract_string);
 
-    double hours_sum_int = 0;
-    double mins_sum_int = 0;
-    double secs_sum_int = 0;
-    double microsecs_sum_int = 0;
+    int hours_sum_int = 0;
+    int mins_sum_int = 0;
+    int secs_sum_int = 0;
+    int microsecs_sum_int = 0;
 
     //now compute the time
-    if(hours_base_int - hours_subtract_int < 0)
+    //need to convert all types to seconds, and divide out the number in terms of how many there are in seconds
+    double base_sum = hours_base_int*3600.0+mins_base_int*60.0+secs_base_int+microsecs_base_int/100.0;
+    std::cout << "base_sum = " << base_sum << "\n";
+    double subtract_sum = hours_subtract_int*3600.0+mins_subtract_int*60.0+secs_subtract_int+microsecs_subtract_int/100.0;
+    std::cout << "subtract_sum = " << subtract_sum << "\n";
+    double sum = base_sum - subtract_sum;
+    if(sum < 0)
     {
-        hours_sum_int = hours_base_int - hours_subtract_int + 24;
-    } else
-    {
-        hours_sum_int = hours_base_int - hours_subtract_int;
+        std::cout << "Error in fillVideoTimes function in generateVideoTimes class! subtract time is negative!\n";
+        std::exit(EXIT_FAILURE);
     }
-
-    if(mins_base_int - mins_subtract_int < 0)
-    {
-        mins_sum_int = mins_base_int - mins_subtract_int + 60;
-    } else
-    {
-        mins_sum_int = mins_base_int - mins_subtract_int;
-    }
-
-    if(secs_base_int - secs_subtract_int < 0)
-    {
-        secs_sum_int = secs_base_int - secs_subtract_int + 60;
-    } else
-    {
-        secs_sum_int = secs_base_int - secs_subtract_int;
-    }
-
-    if(microsecs_base_int - microsecs_subtract_int < 0)
-    {
-        microsecs_sum_int = microsecs_base_int - microsecs_subtract_int + 100;
-    } else
-    {
-        microsecs_sum_int = microsecs_base_int - microsecs_subtract_int;
-    }
+    std::cout << "sum = " << sum << "\n";
+    hours_sum_int = sum / 3600.0; //divide by number of seconds in an hour
+    std::cout << "hours calculated = " << hours_sum_int << "\n";
+    sum = sum - hours_sum_int * 3600.0;
+    std::cout << "sum after subtracting hours in seconds = " << sum << "\n";
+    mins_sum_int = sum / 60.0;  //number of seconds in a minute
+    std::cout << "mins calculated = " << mins_sum_int << "\n";
+    sum = sum - mins_sum_int * 60.0;
+    std::cout << "sum after subtracting mins in seconds = " << sum << "\n";
+    secs_sum_int = sum;  //divide by number of seconds in a second
+    std::cout << "seconds calculated = " << secs_sum_int << "\n";
+    sum = sum - secs_sum_int;
+    std::cout << "sum after subtracting seconds in seconds = " << sum << "\n";
+    microsecs_sum_int = sum * 100.0+0.5;
+    std::cout << "microseconds calculated = " << microsecs_sum_int << "\n";
 
     calculatedTime = dblToString(hours_sum_int) + ":" + dblToString(mins_sum_int) + ":"
             + dblToString(secs_sum_int) + "." + dblToString(microsecs_sum_int);
@@ -225,21 +220,22 @@ std::string generateVideoTimes::divideTimeByDouble(std::string timevalue, double
         std::exit(EXIT_FAILURE);
     }
 
-    double sum = hours_int*24.0+mins_int*60.0+secs_int*60.0+microsecs_int/100.0;
+    //need to convert all types to seconds, and divide out the number in terms of how many there are in seconds
+    double sum = hours_int*3600.0+mins_int*60.0+secs_int+microsecs_int/100.0;
     std::cout << "sum of all seconds in time = " << sum << "\n";
     sum = sum / doublevalue;
     std::cout << "sum after dividing by double value = " << sum << "\n";
-    hours_sum_int = sum / 24.0;
+    hours_sum_int = sum / 3600.0; //divide by number of seconds in an hour
     std::cout << "hours calculated = " << hours_sum_int << "\n";
-    sum = sum - hours_sum_int * 60.0;
+    sum = sum - hours_sum_int * 3600.0;
     std::cout << "sum after subtracting hours in seconds = " << sum << "\n";
-    mins_sum_int = sum / 60.0;
+    mins_sum_int = sum / 60.0;  //number of seconds in a minute
     std::cout << "mins calculated = " << mins_sum_int << "\n";
     sum = sum - mins_sum_int * 60.0;
     std::cout << "sum after subtracting mins in seconds = " << sum << "\n";
-    secs_sum_int = sum / 60.0;
+    secs_sum_int = sum;  //divide by number of seconds in a second
     std::cout << "seconds calculated = " << secs_sum_int << "\n";
-    sum = sum - secs_sum_int * 60.0;
+    sum = sum - secs_sum_int;
     std::cout << "sum after subtracting seconds in seconds = " << sum << "\n";
     microsecs_sum_int = sum * 100.0;
     std::cout << "microseconds calculated = " << microsecs_sum_int << "\n";
@@ -254,12 +250,9 @@ std::string generateVideoTimes::divideTimeByDouble(std::string timevalue, double
 
 std::string generateVideoTimes::addTime(std::string timeBase, std::string timeToAdd)
 {
-    std::cout << "adding time\n";
     //set up needed variables
     std::string calculatedTime;
 
-    std::cout << "time base = " << timeBase << "\n";
-    std::cout << "timeToAdd = " << timeToAdd << "\n";
     std::string hours_base_string = timeBase.substr(0,2);
     std::string mins_base_string = timeBase.substr(3,2);
     std::string secs_base_string = timeBase.substr(6,2);
@@ -326,9 +319,7 @@ std::string generateVideoTimes::addTime(std::string timeBase, std::string timeTo
 
     calculatedTime = dblToString(hours_sum_int) + ":" + dblToString(mins_sum_int) + ":"
             + dblToString(secs_sum_int) + "." + dblToString(microsecs_sum_int);
-    std::cout << "calculatedTime = " << calculatedTime << "\n";
 
-    std::cout << "finished adding time\n";
     return calculatedTime;
 }
 

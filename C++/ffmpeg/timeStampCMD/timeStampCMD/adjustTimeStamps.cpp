@@ -179,12 +179,9 @@ void adjustTimeStamps::checkInputs(std::string timeCorrector,std::vector<std::st
 
 std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string originalTime)
 {
-    std::cout << "subtracting time\n";
     //set up needed variables
     std::string calculatedTime;
 
-    std::cout << "timeCorrector = " << timeCorrector << "\n";
-    std::cout << "originalTime = " << originalTime << "\n";
     std::string year_string = originalTime.substr(0,4);
     std::string month_string = originalTime.substr(6,2);
     std::string day_string = originalTime.substr(10,2);
@@ -355,20 +352,15 @@ std::string adjustTimeStamps::subtractTime(std::string timeCorrector,std::string
             + dblToString(day_sum_int) + " " + dblToString(hours_sum_int) + "\\:"
             + dblToString(mins_sum_int) + "\\:" + dblToString(secs_sum_int);
     }
-    std::cout << "calculatedTime = " << calculatedTime << "\n";
 
-    std::cout << "finished subtracting time\n";
     return calculatedTime;
 }
 
 std::string adjustTimeStamps::addTime(std::string timeCorrector,std::string originalTime)
 {
-    std::cout << "adding time\n";
     //set up needed variables
     std::string calculatedTime;
 
-    std::cout << "timeCorrector = " << timeCorrector << "\n";
-    std::cout << "originalTime = " << originalTime << "\n";
     std::string year_string = originalTime.substr(0,4);
     std::string month_string = originalTime.substr(6,2);
     std::string day_string = originalTime.substr(10,2);
@@ -581,9 +573,7 @@ std::string adjustTimeStamps::addTime(std::string timeCorrector,std::string orig
     calculatedTime = dblToString(year_sum_int) + "\\:" + dblToString(month_sum_int) + "\\:"
             + dblToString(day_sum_int) + " " + dblToString(hours_sum_int) + "\\:"
             + dblToString(mins_sum_int) + "\\:" + dblToString(secs_sum_int);
-    std::cout << "calculatedTime = " << calculatedTime << "\n";
 
-    std::cout << "finished adding time\n";
     return calculatedTime;
 }
 

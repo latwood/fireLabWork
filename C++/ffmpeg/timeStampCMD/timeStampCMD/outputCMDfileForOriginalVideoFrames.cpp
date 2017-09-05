@@ -24,9 +24,6 @@ void outputCMDfileForOriginalVideoFrames::outputCMDfile(std::string filePath,std
     double framesCounter = 0;
     for (double timeStampsCounter = 0; timeStampsCounter < timeStamps.size(); timeStampsCounter++)
     {
-        std::cout << "timeStampsCounter+1 = " << timeStampsCounter+1 << "\n";
-        std::cout << "framesCounter = " << framesCounter << "\n";
-        std::cout << "videoFrames[framesCounter] = " << videoFrames[framesCounter] << "\n";
         if(timeStampsCounter+1 == videoFrames[framesCounter])
         {
             if(framesCounter == 0)
