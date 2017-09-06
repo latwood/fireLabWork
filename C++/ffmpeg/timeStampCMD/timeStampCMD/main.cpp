@@ -36,25 +36,26 @@ int main()
      *
      */
 
-    std::string mainDirectory = "/home/latwood/Documents/missoulaFireVideos/LorenVideoMake-Videos/Video1/";
-    std::string timeStampsFile = "Video1-timestamps.txt";
-    std::string framesFile = "Video1-1fps-frames.txt";
-    std::string videoTimesFile = "Video1-1fps-videoTimes.txt";
+    std::string mainDirectory = "/home/latwood/Documents/missoulaFireVideos/LorenVideoMake-Videos/Video10/";
+    std::string basename = "Video10";
+    std::string frameratename = "-1fps";
+    std::string timeStampsFile = basename + "-timestamps.txt";
+    std::string framesFile = basename + frameratename + "-frames.txt";
+    std::string videoTimesFile = basename + frameratename + "-videoTimes.txt";
     //number of years,months,days,hours,minutes,seconds to add or subtract from all the timestamps
     //the first character is + or - to signify adding or subtracting the time
     //an example is: "-0001:00:10 06:30:00" where this means to subtract six hours, thirty minutes,
     //ten days, and one year from all the timestamps.
-    std::string timeCorrector = "-0000:00:00 06:00:00";
-    /*
-     * realizing it would have been simpler to say, add each part separate and make sure it can't increment the next part
-     * for now, can probably get away with it, just watch to make sure the incrementation went correctly for stuff.
-     * Probably going to have to watch to make sure it worked every time
-    */
-    std::string outputCMDfile_allTimeStamps = "Video1-1fps-timestamps-all.cmd";
-    std::string outputCMDfile_toVideoFrames = "Video1-1fps-timestamps-toVideoFrames.cmd";
-    std::string outputCMDfile_allTimeStamps_adjustedTime = "Video1-1fps-timestamps-all-adjustedTime.cmd";
-    std::string outputCMDfile_toVideoFrames_adjustedTime = "Video1-1fps-timestamps-toVideoFrames-adjustedTime.cmd";
+    //
+    //realizing it would have been simpler to say, add each part separate and make sure it can't increment the next part
+    //for now, can probably get away with it, just watch to make sure the incrementation went correctly for stuff.
+    //Probably going to have to watch to make sure it worked every time
+    //std::string timeCorrector = "-0000:00:00 06:00:00";
 
+    std::string outputCMDfile_allTimeStamps = basename + frameratename + "-timestamps-all.cmd";
+    //std::string outputCMDfile_toVideoFrames = basename + frameratename + "-timestamps-toVideoFrames.cmd";
+    //std::string outputCMDfile_allTimeStamps_adjustedTime = basename + frameratename + "-timestamps-all-adjustedTime.cmd";
+    //std::string outputCMDfile_toVideoFrames_adjustedTime = basename + frameratename + "-timestamps-toVideoFrames-adjustedTime.cmd";
     std::vector<std::string> timeStamps;
     std::vector<std::string> frames_str;
     std::vector<double> frames_dbl;
@@ -65,9 +66,9 @@ int main()
     readFramesFile toReadFramesFile;
     readVideoTimesFile toReadVideoTimesFile;
     generateVideoTimes toGenerateVideoTimes;
-    adjustTimeStamps toAdjustTimeStamps;
+    //adjustTimeStamps toAdjustTimeStamps;
     outputCMDfileForAllTimeStamps toOutputCMDfileForAllTimeStamps;
-    outputCMDfileForOriginalVideoFrames toOutputCMDfileForOriginalVideoFrames;
+    //outputCMDfileForOriginalVideoFrames toOutputCMDfileForOriginalVideoFrames;
 
     //read in the files with error handling to make sure it's the right format
     toReadTimeStampsFile.readFile(mainDirectory+timeStampsFile);
@@ -91,15 +92,19 @@ int main()
     //output cmd files
     toOutputCMDfileForAllTimeStamps.outputCMDfile(mainDirectory+outputCMDfile_allTimeStamps,generatedVideoTimes,timeStamps);
 
-    toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames,frames_dbl,videoTimes,timeStamps);
+    //toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames,frames_dbl,videoTimes,timeStamps);
 
     //adjust time if it is in the wrong timezone
-    timeStamps = toAdjustTimeStamps.adjustTime(timeCorrector,timeStamps);
+    //timeStamps = toAdjustTimeStamps.adjustTime(timeCorrector,timeStamps);
 
     //output cmd files
-    toOutputCMDfileForAllTimeStamps.outputCMDfile(mainDirectory+outputCMDfile_allTimeStamps_adjustedTime,generatedVideoTimes,timeStamps);
+    //toOutputCMDfileForAllTimeStamps.outputCMDfile(mainDirectory+outputCMDfile_allTimeStamps_adjustedTime,generatedVideoTimes,timeStamps);
 
-    toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames_adjustedTime,frames_dbl,videoTimes,timeStamps);
+    //while this works, the outcome is not as nice as having videos to each video time.
+    //And that is now working correctly most of the time!
+    //Generating more stuff means more work to make sure it is right.
+    //Plus you only want one video in the end, not two
+    //toOutputCMDfileForOriginalVideoFrames.outputCMDfile(mainDirectory+outputCMDfile_toVideoFrames_adjustedTime,frames_dbl,videoTimes,timeStamps);
 
     cout << "Finished generating timestamp cmd file!" << endl;
     return 0;
