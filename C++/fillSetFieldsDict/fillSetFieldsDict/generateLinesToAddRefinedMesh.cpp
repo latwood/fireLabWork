@@ -37,34 +37,25 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     //westFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     eastFace_defaultTvalue.generateTprofile("300");
-    eastFace_Tvalues.generateTprofile("300");
+    eastFace_Tvalues.generateTprofile("310");
     //eastFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     southFace_defaultTvalue.generateTprofile("300");
-    //southFace_Tvalues.generateTprofile("310");
-    southFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
+    southFace_Tvalues.generateTprofile("310");
+    //southFace_Tvalues.generateLinearTprofile(300+dz+dz_refined-1,300,dz+dz_refined-1);
 
     maxZ_defaultTvalue.generateTprofile("300");
-    //maxZ_Tvalues.generateTprofile("310");
-    /*
-    std::vector<std::string> maxZ_desiredTvalues;
+    maxZ_Tvalues.generateTprofile("310");
+    /*std::vector<std::string> maxZ_desiredTvalues;
     maxZ_desiredTvalues.push_back("310");
     maxZ_desiredTvalues.push_back("305");
     maxZ_desiredTvalues.push_back("300");
-    maxZ_Tvalues.generateLinearTprofile(maxZ_desiredTvalues);
-    */
-    maxZ_Tvalues.generateLinearTprofile(305,300,6);
+    maxZ_Tvalues.generateLinearTprofile(maxZ_desiredTvalues);*/
+    //maxZ_Tvalues.generateLinearTprofile(300+dx,300,dx);
 
     internalField_defaultTvalue.generateTprofile("300");
-    //internalField_Tvalues.generateTprofile("310");
-    /*
-    std::vector<std::string> internalField_desiredTvalues;
-    internalField_desiredTvalues.push_back("310");
-    internalField_desiredTvalues.push_back("305");
-    internalField_desiredTvalues.push_back("300");
-    internalField_Tvalues.generateLinearTprofile(internalField_desiredTvalues);
-    */
-    internalField_Tvalues.generateLinearTprofile(305,300,6);
+    internalField_Tvalues.generateTprofile("310");
+    //internalField_Tvalues.generateLinearTprofile(305,300,6);
 
     //could have an input checker function here before getting into the execution
 
@@ -75,25 +66,31 @@ generateLinesToAddRefinedMesh::generateLinesToAddRefinedMesh(double minZstartFac
     //generateAdjustableMinZ_leftToRight();
     //generateAdjustableMinZ_simplest_leftToRight();
     //generateAdjustableMinZ_refineCells_leftToRight();
+
     //generateExampleNorthFace();
     //generateAdjustableNorthFace_simplest();
     //generateAdjustableNorthFace_refineCells();
+
     //generateExampleWestFace();
     //generateAdjustableWestFace_simplest();
     //generateAdjustableWestFace_refineCells();
+
     //generateExampleEastFace();
     //generateAdjustableEastFace_simplest();
     //generateAdjustableEastFace_refineCells();
+
     //generateExampleSouthFace();
     //generateAdjustableSouthFace_simplest();
-    generateAdjustableSouthFace_refineCells();
+    //generateAdjustableSouthFace_refineCells();
+
     //generateExampleMaxZ();
     //generateAdjustableMaxZ_topToBot();
-    //generateAdjustableMaxZ_simplest_topToBot();
-    //generateAdjustableMaxZ_refineCells_topToBot();
     //generateAdjustableMaxZ_leftToRight();
-    //generateAdjustableMaxZ_simplest_leftToRight();
-    //generateAdjustableMaxZ_refineCells_leftToRight();
+
+    generateExampleInternalField();
+    //generateAdjustableInternalField_botToTop();
+    //generateAdjustableInternalField_northToSouth();
+    //generateAdjustableInternalField_westToEast();
 
     fillLinesToAdd(minZ_defaultTvalue,minZ_Tvalues,"labelToFace");
     fillLinesToAdd(northFace_defaultTvalue,northFace_Tvalues,"labelToFace");
@@ -1784,5 +1781,146 @@ void generateLinesToAddRefinedMesh::generateAdjustableSouthFace_refineCells()
             southFace_Tvalues[dz_refined-2].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+7);
             southFace_Tvalues[dz_refined-1].addCellIndex(southFaceStartFace+dx*dz+dx*6+3*3*i+8);
         }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateExampleMaxZ()
+{
+//This section is for filling in maxZ with methods that aren't as structured. These are more easily
+//manipulated to look at how each individual point is filled in.
+    if(maxZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleMaxZ if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(maxZ_Tvalues.size() != 1)
+    {
+        std::cout <<  "Error, cannot perform function generateExampleMaxZ if " <<
+                      "the Tprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dx*dy; j++)
+    {
+        maxZ_defaultTvalue[0].addCellIndex(maxZstartFace+j);
+    }
+
+    //this how to fill in the points breaking it out into multiple loops
+    for(double j = 0; j < dy; j++)
+    {
+        for(double i = 0; i < dx; i++)
+        {
+            maxZ_Tvalues[0].addCellIndex(maxZstartFace+dx*j+i);
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableMaxZ_topToBot()
+{
+//This section is for filling in maxZ from top to bottom with methods that are structured.
+//This supports having multiple values for the Tprofile, but the number of Tprofile values has to be
+//a divisor of dy, or stuff gets placed out of order
+    if(maxZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMaxZ_topToBot if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(maxZ_Tvalues.size() <= 0 || fmod(dy,maxZ_Tvalues.size()) != 0)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMaxZ_topToBot if " <<
+                     "the Tprofile doesn't have size that can evenly divide dy!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dx*dy; j++)
+    {
+            maxZ_defaultTvalue[0].addCellIndex(maxZstartFace+j);
+    }
+
+    double divisor = maxZ_Tvalues.size();
+    for(size_t t = 0; t < divisor; t++)
+    {
+        //this how to fill in the points breaking it out into multiple loops
+        for(double i = 0; i < dx; i++)
+        {
+            for(double j = t*dy/divisor; j < (t+1)*dy/divisor; j++)
+            {
+                maxZ_Tvalues[t].addCellIndex(maxZstartFace+dy*i+j);
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateAdjustableMaxZ_leftToRight()
+{
+//This section is for filling in minZ from left to right with methods that are structured.
+//This supports having multiple values for the Tprofile, but the number of Tprofile values has to be
+//a divisor of dx, or stuff gets placed out of order
+    if(maxZ_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMaxZ_leftToRight if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(maxZ_Tvalues.size() <= 0 || fmod(dx,maxZ_Tvalues.size()))
+    {
+        std::cout << "Error, cannot perform function generateAdjustableMaxZ_leftToRight if " <<
+                     "the Tprofile doesn't have size that can evenly divide dx!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dx*dy; j++)
+    {
+        maxZ_defaultTvalue[0].addCellIndex(maxZstartFace+j);
+    }
+
+    double divisor = maxZ_Tvalues.size();
+    for(size_t t = 0; t < divisor; t++)
+    {
+        //this how to fill in the points breaking it out into multiple loops
+        for(double i = t*dx/divisor; i < (t+1)*dx/divisor; i++)
+        {
+            for(double j = 0; j < dy; j++)
+            {
+                maxZ_Tvalues[t].addCellIndex(maxZstartFace+dy*i+j);
+            }
+        }
+    }
+}
+
+void generateLinesToAddRefinedMesh::generateExampleInternalField()
+{
+//This section is for filling in the internalField with methods that aren't as structured. These are more easily
+//manipulated to look at how each individual point is filled in.
+    if(internalField_defaultTvalue.size() != 1)
+    {
+        std::cout << "Error, cannot perform function generateExampleInternalField if " <<
+                     "the defaultTprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+    if(internalField_Tvalues.size() != 1)
+    {
+        std::cout <<  "Error, cannot perform function generateExampleInternalField if " <<
+                      "the Tprofile doesn't have size 1!\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    //man this order is way messed up! Almost makes me wonder if it will be consistent later or not!
+    //this resets all the values before doing what really needs to be filled
+    for(double j = 0; j < dx_refined*dy_refined*dz_refined*dx*dy+(dz-1)*dx*dy; j++)
+    {
+        internalField_defaultTvalue[0].addCellIndex(j);
+    }
+
+    //I honestly don't see a way to break this out into loops! But this is how it is done with the native mesh
+    //going to try to write it out on a paper!
+    for(double j = 0; j < 126; j++)
+    {
+        internalField_Tvalues[0].addCellIndex(j);
     }
 }

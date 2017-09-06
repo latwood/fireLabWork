@@ -83,14 +83,19 @@ private:
     void generateExampleMinZ();
     void generateAdjustableMinZ_topToBot();
     void generateAdjustableMinZ_leftToRight();
+
     void generateExampleNorthFace();
     void generateAdjustableNorthFace();
+
     void generateExampleWestFace();
     void generateAdjustableWestFace();
+
     void generateExampleEastFace();
     void generateAdjustableEastFace();
+
     void generateExampleSouthFace();
     void generateAdjustableSouthFace();
+
     void generateExampleMaxZ();
     void generateAdjustableMaxZ_topToBot();
     void generateAdjustableMaxZ_leftToRight();

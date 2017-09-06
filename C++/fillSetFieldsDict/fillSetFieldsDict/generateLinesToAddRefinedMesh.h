@@ -31,25 +31,60 @@ private:
     void generateAdjustableMinZ_leftToRight();
     void generateAdjustableMinZ_simplest_leftToRight();
     void generateAdjustableMinZ_refineCells_leftToRight();
+
     void generateExampleNorthFace();
     void generateAdjustableNorthFace_simplest();
     void generateAdjustableNorthFace_refineCells();
+
     void generateExampleWestFace();
     void generateAdjustableWestFace_simplest();
     void generateAdjustableWestFace_refineCells();
+
     void generateExampleEastFace();
     void generateAdjustableEastFace_simplest();
     void generateAdjustableEastFace_refineCells();
+
     void generateExampleSouthFace();
     void generateAdjustableSouthFace_simplest();
     void generateAdjustableSouthFace_refineCells();
+
+    //because maxZ has no refined cells, just going to copy the ones from the native generateLinesToAdd class
     void generateExampleMaxZ();
     void generateAdjustableMaxZ_topToBot();
-    void generateAdjustableMaxZ_simplest_topToBot();
-    void generateAdjustableMaxZ_refineCells_topToBot();
     void generateAdjustableMaxZ_leftToRight();
-    void generateAdjustableMaxZ_simplest_leftToRight();
-    void generateAdjustableMaxZ_refineCells_leftToRight();
+
+    //there kind of is a pattern, but it is even crazier than the other field patterns. And it doesn't seem to
+    //have any guarantee to be the same for every mesh. It looks like the cells of the mesh don't care
+    //about some kind of order. They just need to know based off of the neighbors, faces, points, and everything
+    //else that the mesh is, whether the calculation goes on from one to the next or not. The order matters, but
+    //not as much as I had earlier thought. It would be better to create a mesh class which has indices and values
+    //for every single thing that a normal openfoam mesh normally calculates from the normal given information
+    //variables. Or just borrow the stuff to do work with open foam mesh classes.
+    //basically I've discovered that the mesh is uglier than I thought. I can make it come out in a nice order
+    //but I can't guarantee that I don't have some kind of ugly input!!!
+    //too much work to error stuff, unless I just assume the input will be ugly to begin with
+    //there do seem to be some specifics. The boundaries have to be in a certain order and appear
+    //to always need to be after the internal values. But it looks like the cell indices are somehow
+    //independent of this
+    //Could have this funky grid pattern of order because the equations tend to set up and solve an assymetric
+    //set of matrices
+
+    //hmm, still there does seem to be an overall pattern. Just the individual small part of the pattern is
+    //extremely confusing. Going to have to watch for which areas have the lower numbers each time for the pattern
+    //maybe it fills up one wall to a certain amount from a certain direction, then moves to another wall
+
+    //hmm, pattern stopped being followed once the cells were filled to a few places above the refined cells
+    //pattern switched to seem to finish filling the cube of refined cells
+
+    //yeah, at this point in time, it is a bad idea to keep going. Everything up to this point works
+    //correctly as can be exected, but the internal field for a refined mesh is nasty
+    //need to see how openfoam mesh does stuff, or try to get the windninja bc functions to work for a native mesh
+    //then can start writing a new version of this program that can has all the mesh stuff.
+    //or make a new program called openFoamMesh
+    void generateExampleInternalField();
+    void generateAdjustableInternalField_botToTop();
+    void generateAdjustableInternalField_northToSouth();
+    void generateAdjustableInternalField_westToEast();
 
     /*
      * maybe someday the problem is that adjusting one set of values means a need to adjust another set
