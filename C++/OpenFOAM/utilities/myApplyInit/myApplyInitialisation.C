@@ -73,10 +73,6 @@ int main(int argc, char *argv[])
 	
 	Info<< "Calculating log profile for T" << endl;
 
-	volScalarField z = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ
-	//volScalarField z(mesh.C().component(2)); //z-component of cell center. So height above lowest z point, not height above z0 for each z point.
-	//looks like you can replace wallDist with patchDistMethod for other options
-
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
 	const scalarField& minZTvalues = T.boundaryField()[minZpatchID];
 	scalar TsurfMax = 0;
@@ -99,6 +95,10 @@ int main(int argc, char *argv[])
 	scalar TlapseRate = 0.0098;
 	std::cout << "TlapseRate = " << TlapseRate << "\n";
 
+	volScalarField z = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ
+	//volScalarField z(mesh.C().component(2)); //z-component of cell center. So height above lowest z point, not height above z0 for each z point.
+	//looks like you can replace wallDist with patchDistMethod for other options
+
 	// Loop over all the faces in the patch
 	// and initialize the log profile
 	forAll(z, cellI)
@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
 		Tcalc = TsurfMax - TlapseRate*AGL;
     	T[cellI] = Tcalc;
 	}
-
 	T.write();
+
 	Info<< "End\n" << endl;
 
     return 0;
