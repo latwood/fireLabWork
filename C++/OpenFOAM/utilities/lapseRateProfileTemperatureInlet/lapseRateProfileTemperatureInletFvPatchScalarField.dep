@@ -507,11 +507,8 @@ lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/fi
 lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addToRunTimeSelectionTable.H
 lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/wallFvPatch.H
 lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/wallPolyPatch.H
-lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/turbulenceModels/incompressible/RAS/lnInclude/nutkWallFunctionFvPatchScalarField.H
-lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/turbulenceModels/incompressible/RAS/lnInclude/nutWallFunctionFvPatchScalarField.H
-lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedValueFvPatchFields.H
-lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedValueFvPatchField.H
-lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedValueFvPatchField.C
+lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/createTime.H
+lapseRateProfileTemperatureInletFvPatchScalarField.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/createMesh.H
 $(OBJECTS_DIR)/lapseRateProfileTemperatureInletFvPatchScalarField.o: $(EXE_DEP)
 $(OBJECTS_DIR)/lapseRateProfileTemperatureInletFvPatchScalarField.o:
 	@SOURCE_DIR=.

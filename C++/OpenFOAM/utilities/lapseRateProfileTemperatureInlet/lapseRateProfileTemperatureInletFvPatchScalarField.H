@@ -28,28 +28,25 @@ Group
     grpIcoWallFunctions
 
 Description
-    This boundary condition provides a turbulence dissipation wall function
-    condition for high Reynolds number, turbulent flow cases.
+    This boundary condition provides a temperature profile wall function
 
-    The condition can be applied to wall boundaries, whereby it
-    - calculates \c epsilon and \c G
-    - inserts near wall epsilon values directly into the epsilon equation
+    The condition can be applied to non-wall boundaries, whereby it
+    - calculates \c T and \c 
+    - inserts near temperature values directly into the energy equation
         to act as a constraint
 
     where
 
     \vartable
-        epsilon | turblence dissipation field
-        G       | turblence generation field
+        T 		| temperature field
     \endvartable
 
     \heading Patch usage
 
     \table
         Property     | Description             | Required    | Default value
-        Cmu          | model coefficient       | no          | 0.09
-        kappa        | Von Karman constant     | no          | 0.41
-        E            | model coefficient       | no          | 9.8
+        TsurfMax     | minZ max temperature    | no          | 310
+        TlapseRate   | lapse rate coefficient  | no          | 0.0098
     \endtable
 
     Example of the boundary condition specification:
@@ -92,15 +89,11 @@ protected:
 
     // Protected data
 
-        //- Cmu coefficient
-        scalar Cmu_;
+		//- the maximum temperature of minZ
+        scalar TsurfMax_;
 
-        //- Von Karman constant
-        scalar kappa_;
-
-        //- E coefficient
-        scalar E_;
-
+		//- Lapse rate coefficient
+		scalar TlapseRate_;
 
     // Protected Member Functions
 

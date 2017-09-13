@@ -29,7 +29,6 @@ License
 #include "volFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "wallFvPatch.H"
-#include "nutkWallFunctionFvPatchScalarField.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -57,9 +56,8 @@ void lapseRateProfileTemperatureInletFvPatchScalarField::checkType()
 
 void lapseRateProfileTemperatureInletFvPatchScalarField::writeLocalEntries(Ostream& os) const
 {
-    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
-    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
-    os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
+    os.writeKeyword("TsurfMax") << TsurfMax_ << token::END_STATEMENT << nl;
+    os.writeKeyword("TlapseRate") << TlapseRate_ << token::END_STATEMENT << nl;
 }
 
 
@@ -72,9 +70,8 @@ lapseRateProfileTemperatureInletFvPatchScalarField::lapseRateProfileTemperatureI
 )
 :
     fixedInternalValueFvPatchField<scalar>(p, iF),
-    Cmu_(0.09),
-    kappa_(0.41),
-    E_(9.8)
+    TsurfMax_(310),
+    TlapseRate_(0.0098)
 {
     checkType();
 }
@@ -89,9 +86,8 @@ lapseRateProfileTemperatureInletFvPatchScalarField::lapseRateProfileTemperatureI
 )
 :
     fixedInternalValueFvPatchField<scalar>(ptf, p, iF, mapper),
-    Cmu_(ptf.Cmu_),
-    kappa_(ptf.kappa_),
-    E_(ptf.E_)
+    TsurfMax_(ptf.TsurfMax_),
+    TlapseRate_(ptf.TlapseRate_)
 {
     checkType();
 }
@@ -105,9 +101,8 @@ lapseRateProfileTemperatureInletFvPatchScalarField::lapseRateProfileTemperatureI
 )
 :
     fixedInternalValueFvPatchField<scalar>(p, iF, dict),
-    Cmu_(dict.lookupOrDefault<scalar>("Cmu", 0.09)),
-    kappa_(dict.lookupOrDefault<scalar>("kappa", 0.41)),
-    E_(dict.lookupOrDefault<scalar>("E", 9.8))
+    TsurfMax_(dict.lookupOrDefault<scalar>("TsurfMax", 310)),
+    TlapseRate_(dict.lookupOrDefault<scalar>("TlapseRate", 0.0098))
 {
     checkType();
 }
@@ -119,9 +114,8 @@ lapseRateProfileTemperatureInletFvPatchScalarField::lapseRateProfileTemperatureI
 )
 :
     fixedInternalValueFvPatchField<scalar>(ewfpsf),
-    Cmu_(ewfpsf.Cmu_),
-    kappa_(ewfpsf.kappa_),
-    E_(ewfpsf.E_)
+    TsurfMax_(ewfpsf.TsurfMax_),
+    TlapseRate_(ewfpsf.TlapseRate_)
 {
     checkType();
 }
@@ -134,9 +128,8 @@ lapseRateProfileTemperatureInletFvPatchScalarField::lapseRateProfileTemperatureI
 )
 :
     fixedInternalValueFvPatchField<scalar>(ewfpsf, iF),
-    Cmu_(ewfpsf.Cmu_),
-    kappa_(ewfpsf.kappa_),
-    E_(ewfpsf.E_)
+    TsurfMax_(ewfpsf.TsurfMax_),
+    TlapseRate_(ewfpsf.TlapseRate_)
 {
     checkType();
 }
@@ -153,72 +146,12 @@ void lapseRateProfileTemperatureInletFvPatchScalarField::updateCoeffs()
 
     const label patchI = patch().index();
 
-    const turbulenceModel& turbulence =
-        db().lookupObject<turbulenceModel>("turbulenceModel");
-    const scalarField& y = turbulence.y()[patchI];
-
-    IOdictionary transportProperties
-    (
-        IOobject
-        (
-            "transportProperties",
-            turbulence.U().mesh().time().constant(),
-            turbulence.U().mesh(),
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        )
-    );
-    dimensionedScalar rho(transportProperties.lookup("rho"));
-
-    const scalar Cmu25 = pow025(Cmu_);
-    const scalar Cmu75 = pow(Cmu_, 0.75);
-
-    volScalarField& G =
-        const_cast<volScalarField&>
-        (
-            db().lookupObject<volScalarField>
-            (
-                turbulence.type() + ".G"
-            )
-        );
-
-    DimensionedField<scalar, volMesh>& epsilon =
-        const_cast<DimensionedField<scalar, volMesh>&>
-        (
-            dimensionedInternalField()
-        );
-
-    const tmp<volScalarField> tk = turbulence.k();
-    const volScalarField& k = tk();
-    const scalarField& kw = k.boundaryField()[patchI];
-
-    const tmp<volScalarField> tnu = turbulence.nu();
-    const scalarField& nuw = tnu().boundaryField()[patchI];
-
-    const tmp<volScalarField> tnut = turbulence.nut();
-    const volScalarField& nut = tnut();
-    const scalarField& nutw = nut.boundaryField()[patchI];
-
-    const fvPatchVectorField& Uw = turbulence.U().boundaryField()[patchI];
-
-    const scalarField magGradUw(mag(Uw.snGrad()));
-
-    const scalar rhow(rho.value());
-    const scalarField muw(nuw*rhow);
-    scalarField yStarv(muw.size(),11.24);
-    const scalarField yv(nuw*yStarv/(Cmu25*pow(kw,0.5)));
-
-
-    // Set epsilon and G
-    forAll(nutw, faceI)
+    // Set T
+    for(int i = 0; i < faceI; i++)
     {
-        label faceCellI = patch().faceCells()[faceI];
+        label faceCellI = patch().faceCells()[i];
 
-        epsilon[faceCellI] =k[faceCellI] *(2*muw[faceI]/(rhow*yv[faceI])
-            +pow(k[faceCellI],0.5)*log(2.0*y[faceI]/yv[faceI])/(kappa_*pow(Cmu_,-0.75)))/(2.0*y[faceI]);
-        scalar tw=rhow*(nutw[faceI] + nuw[faceI])*magGradUw[faceI];
-
-        G[faceCellI] = pow(tw,2)*log(2*y[faceI]/yv[faceI])/(kappa_*2.0*y[faceI]*rhow*Cmu25*pow(k[faceCellI],0.5));
+        T[faceCellI] = TsurfMax_ - TlapseRate_;
     }
 
     fixedInternalValueFvPatchField<scalar>::updateCoeffs();
