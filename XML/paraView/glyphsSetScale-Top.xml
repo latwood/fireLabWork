@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CreateCellToPoint/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="" command="comment" arguments="deselected to show cell-to-point filtered data" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="" command="comment" arguments="hit apply to show only the internal field values" />
+  <pqevent object="pqClientMainWindow/Common/1QToolButton6" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="" command="comment" arguments="created default glyphs" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="GlyphVector" />
+  <pqevent object="" command="comment" arguments="changed glyph scale to be velocity not pressure" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,13,10,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,13,10,/0:0/0:1" />
+  <pqevent object="" command="comment" arguments="deselected the viewing of the overall case. Now only vectors are shown" />
+  <pqevent object="pqClientMainWindow/variableToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="" command="comment" arguments="opening legend properties" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ResetRangeToDataOverTime" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="" command="comment" arguments="rescaled vectors to the maximum range over all timesteps" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="" command="comment" arguments="closed legend" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton8" command="activate" arguments="" />
+  <pqevent object="" command="comment" arguments="look from above" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="" command="comment" arguments="creating video of 5 fps at 1500x1500 pixels" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveAnimation" />
+  <pqevent object="pqAnimationSettingsDialog/frameRate" command="set_double" arguments="5" />
+  <pqevent object="pqAnimationSettingsDialog/frameRate" command="set_double" arguments="5" />
+  <pqevent object="pqAnimationSettingsDialog/width" command="set_string" arguments="15" />
+  <pqevent object="pqAnimationSettingsDialog/width" command="set_string" arguments="15" />
+  <pqevent object="pqAnimationSettingsDialog/width" command="set_string" arguments="150" />
+  <pqevent object="pqAnimationSettingsDialog/width" command="set_string" arguments="1500" />
+  <pqevent object="pqAnimationSettingsDialog/height" command="key" arguments="16777217" />
+  <pqevent object="pqAnimationSettingsDialog/height" command="set_string" arguments="1" />
+  <pqevent object="pqAnimationSettingsDialog/height" command="set_string" arguments="15" />
+  <pqevent object="pqAnimationSettingsDialog/height" command="set_string" arguments="150" />
+  <pqevent object="pqAnimationSettingsDialog/height" command="set_string" arguments="1500" />
+  <pqevent object="pqAnimationSettingsDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="filesSelected" arguments="/home/latwood/Documents/energyEqn/forMeeting/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsSetScale-Top.ogv" />
+  <pqevent object="" command="comment" arguments="Note the video was done over all timesteps" />
+</pqevents>
