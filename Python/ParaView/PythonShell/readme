@@ -1,0 +1,7 @@
+The idea of each of the scripts here is that you copy and paste the entire contents into the python shell of paraview and it just does it all for you.
+
+It looks like you can also run the script exactly as is using pvbatch on the executable file. pvpython works too, but has errors, so maybe there's stuff missing in the commands. Need sudo on both, probably to remind the computer to use the apt-get version of paraview.
+
+So it looks like the goal is to write the scripts in the python shell in paraview, then try them out from the command line.
+
+
