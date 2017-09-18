@@ -18,12 +18,19 @@ imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleF
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
 desiredPictureSize = [1500,1500] #[width, height]
-legendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
+UlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
+TlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
 viewCameraX = 450	# where in the x direction from the center do you want to position the object?
 viewCameraY = -900	# where in the y direction from the center do you want to position the object?
 viewCameraZ = 0	# where in the z direction from the center do you want to position the object?
 cameraElev = -45	# the tilt to give the view
-
+cameraViewUp = [0,0,1]	# this is for changing from which side to view
+glyphFullScaleFactor = 450		# this is the size of the wind vectors
+glyphFullStride = 5			# this is the every Nth number of points to use for showing vectors
+glyphYsliceScaleFactor = 450		# this is the size of the wind vectors
+glyphYsliceStride = 5		# this is the every Nth number of points to use for showing vectors
+glyphXsliceScaleFactor = 450		# this is the size of the wind vectors
+glyphXsliceStride = 5		# this is the every Nth number of points to use for showing vectors
 
 #check to see if directory exists, and if not, create it
 if not os.access(imgDir, os.F_OK):
@@ -65,7 +72,7 @@ ctlReader = GetColorTransferFunction('T')
 scalarbarReader = GetScalarBar(ctlReader,view)
 #scalarbarReader.Title = 'T (K)'	# for some odd reason adding a title throws in the word magnitude
 scalarbarReader.RangeLabelFormat = '%.3f' #'%6.3g'
-scalarbarReader.Position = legendPosition
+scalarbarReader.Position = TlegendPosition
 scalarbarReader.Orientation = 'Horizontal'
 Show(reader)		# shows case (selects the eye), in whatever location the view is at
 Render()			# centers the view on the case somehow
@@ -75,9 +82,9 @@ glyphFull=Glyph(reader, GlyphType='Arrow')	#maybe try doing a glyph straight up 
 glyphFull.Scalars = ['CELLS', 'p']	# sets the glyph scalars to be cells of p
 glyphFull.Vectors = ['CELLS', 'U']	# sets the glyph vectors to be cells of U
 glyphFull.ScaleMode = 'off'	# enable scaling by scalars
-glyphFull.ScaleFactor = 450
+glyphFull.ScaleFactor = glyphFullScaleFactor
 glyphFull.GlyphMode = 'Every Nth Point'
-glyphFull.Stride = 5
+glyphFull.Stride = glyphFullStride
 dpGlyphFull = GetDisplayProperties(glyphFull,view=view)
 ColorBy(dpGlyphFull, ('POINTS','GlyphVector'))
 dpGlyphFull.RescaleTransferFunctionToDataRange()
@@ -86,61 +93,104 @@ ctlGlyphFull = GetColorTransferFunction('GlyphVector')
 scalarbarGlyphFull = GetScalarBar(ctlGlyphFull,view)
 #scalarbarGlyphFull.Title = 'Velocity (m/s)'	# for some odd reason adding a title throws in the word magnitude
 scalarbarGlyphFull.RangeLabelFormat = '%.3f' #'%6.3g'
-scalarbarGlyphFull.Position = legendPosition
+scalarbarGlyphFull.Position = UlegendPosition
 scalarbarGlyphFull.Orientation = 'Horizontal'
 Show(glyphFull)
 Render()
 
-#now make the slice of the full case
-slice = Slice(reader)
-slice.SliceType.Normal = [0,1,0]
-#slice.SliceOffsetValues = [30,60,90,120]	# creates more slices in the single slice at differing offsets of the slice !!! Nice! Except how to toggle on and off? just reset the values
-dpSlice = GetDisplayProperties(slice,view=view)	# get display properties of the reader
-ColorBy(dpSlice, ('CELLS','T'))
-dpSlice.RescaleTransferFunctionToDataRange()
-dpSlice.SetScalarBarVisibility(view, True)
-ctlSlice = GetColorTransferFunction('T')
-scalarbarSlice = GetScalarBar(ctlSlice,view)
-#scalarbarSlice.Title = 'T (K)'	# for some odd reason adding a title throws in the word magnitude
-scalarbarSlice.RangeLabelFormat = '%.3f' #'%6.3g'
-scalarbarSlice.Position = legendPosition
-scalarbarSlice.Orientation = 'Horizontal'
-Show(slice)
+#now make the y slice of the full case
+ySlice = Slice(reader)
+ySlice.SliceType.Normal = [0,1,0]
+#ySlice.SliceOffsetValues = [30,60,90,120]	# creates more slices in the single slice at differing offsets of the slice !!! Nice! Except how to toggle on and off? just reset the values
+dpYslice = GetDisplayProperties(ySlice,view=view)	# get display properties of the reader
+ColorBy(dpYslice, ('CELLS','T'))
+dpYslice.RescaleTransferFunctionToDataRange()
+dpYslice.SetScalarBarVisibility(view, True)
+ctlYslice = GetColorTransferFunction('T')
+scalarbarYslice = GetScalarBar(ctlYslice,view)
+#scalarbarYslice.Title = 'T (K)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarYslice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarYslice.Position = TlegendPosition
+scalarbarYslice.Orientation = 'Horizontal'
+Show(ySlice)
 Render()
 
-#now create glyphs of the slice
-glyphSlice=Glyph(slice, GlyphType='Arrow')	#maybe try doing a glyph straight up of the reader
-glyphSlice.Scalars = ['CELLS', 'p']	# sets the glyph scalars to be cells of p
-glyphSlice.Vectors = ['CELLS', 'U']	# sets the glyph vectors to be cells of U
-glyphSlice.ScaleMode = 'off'	# enable scaling by scalars
-glyphSlice.ScaleFactor = 450
-glyphSlice.GlyphMode = 'Every Nth Point'
-glyphSlice.Stride = 5
-dpGlyphSlice = GetDisplayProperties(glyphSlice,view=view)
-ColorBy(dpGlyphSlice, ('POINTS','GlyphVector'))
-dpGlyphSlice.RescaleTransferFunctionToDataRange()
-dpGlyphSlice.SetScalarBarVisibility(view, True)
-ctlGlyphSlice = GetColorTransferFunction('GlyphVector')
-scalarbarGlyphSlice = GetScalarBar(ctlGlyphSlice,view)
-#scalarbarGlyphSlice.Title = 'Velocity (m/s)'	# for some odd reason adding a title throws in the word magnitude
-scalarbarGlyphSlice.RangeLabelFormat = '%.3f' #'%6.3g'
-scalarbarGlyphSlice.Position = legendPosition
-scalarbarGlyphSlice.Orientation = 'Horizontal'
-Show(glyphSlice)
+#now create glyphs of the y slice
+glyphYslice=Glyph(ySlice, GlyphType='Arrow')	#maybe try doing a glyph straight up of the reader
+glyphYslice.Scalars = ['CELLS', 'p']	# sets the glyph scalars to be cells of p
+glyphYslice.Vectors = ['CELLS', 'U']	# sets the glyph vectors to be cells of U
+glyphYslice.ScaleMode = 'off'	# enable scaling by scalars
+glyphYslice.ScaleFactor = glyphYsliceScaleFactor
+glyphYslice.GlyphMode = 'Every Nth Point'
+glyphYslice.Stride = glyphYsliceStride
+dpGlyphYslice = GetDisplayProperties(glyphYslice,view=view)
+ColorBy(dpGlyphYslice, ('POINTS','GlyphVector'))
+dpGlyphYslice.RescaleTransferFunctionToDataRange()
+dpGlyphYslice.SetScalarBarVisibility(view, True)
+ctlGlyphYslice = GetColorTransferFunction('GlyphVector')
+scalarbarGlyphYslice = GetScalarBar(ctlGlyphYslice,view)
+#scalarbarGlyphYslice.Title = 'Velocity (m/s)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarGlyphYslice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarGlyphYslice.Position = UlegendPosition
+scalarbarGlyphYslice.Orientation = 'Horizontal'
+Show(glyphYslice)
+Render()
+
+#now make the x slice of the full case
+xSlice = Slice(reader)
+xSlice.SliceType.Normal = [1,0,0]
+#xSlice.SliceOffsetValues = [30,60,90,120]	# creates more slices in the single slice at differing offsets of the slice !!! Nice! Except how to toggle on and off? just reset the values
+dpXslice = GetDisplayProperties(xSlice,view=view)	# get display properties of the reader
+ColorBy(dpXslice, ('CELLS','T'))
+dpXslice.RescaleTransferFunctionToDataRange()
+dpXslice.SetScalarBarVisibility(view, True)
+ctlXslice = GetColorTransferFunction('T')
+scalarbarXslice = GetScalarBar(ctlXslice,view)
+#scalarbarXslice.Title = 'T (K)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarXslice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarXslice.Position = TlegendPosition
+scalarbarXslice.Orientation = 'Horizontal'
+Show(xSlice)
+Render()
+
+#now create glyphs of the x slice
+glyphXslice=Glyph(xSlice, GlyphType='Arrow')	#maybe try doing a glyph straight up of the reader
+glyphXslice.Scalars = ['CELLS', 'p']	# sets the glyph scalars to be cells of p
+glyphXslice.Vectors = ['CELLS', 'U']	# sets the glyph vectors to be cells of U
+glyphXslice.ScaleMode = 'off'	# enable scaling by scalars
+glyphXslice.ScaleFactor = glyphXsliceScaleFactor
+glyphXslice.GlyphMode = 'Every Nth Point'
+glyphXslice.Stride = glyphXsliceStride
+dpGlyphXslice = GetDisplayProperties(glyphXslice,view=view)
+ColorBy(dpGlyphXslice, ('POINTS','GlyphVector'))
+dpGlyphXslice.RescaleTransferFunctionToDataRange()
+dpGlyphXslice.SetScalarBarVisibility(view, True)
+ctlGlyphXslice = GetColorTransferFunction('GlyphVector')
+scalarbarGlyphXslice = GetScalarBar(ctlGlyphXslice,view)
+#scalarbarGlyphXslice.Title = 'Velocity (m/s)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarGlyphXslice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarGlyphXslice.Position = UlegendPosition
+scalarbarGlyphXslice.Orientation = 'Horizontal'
+Show(glyphXslice)
 Render()
 
 # now that everything is made, show only the full glyphs from a top view, then step through each time saving pictures
 camera.Elevation(cameraElev)
+view.CameraViewUp = cameraViewUp
 ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
 Render()
 Hide(reader)	# deselect eye thing on the case so only vectors are shown
 dpReader.SetScalarBarVisibility(view, False)
-Hide(slice)
-dpSlice.SetScalarBarVisibility(view, False)
-Hide(glyphSlice)
-dpGlyphSlice.SetScalarBarVisibility(view, False)
+Hide(ySlice)
+dpYslice.SetScalarBarVisibility(view, False)
+Hide(glyphYslice)
+dpGlyphYslice.SetScalarBarVisibility(view, False)
+Hide(xSlice)
+dpXslice.SetScalarBarVisibility(view, False)
+Hide(glyphXslice)
+dpGlyphXslice.SetScalarBarVisibility(view, False)
 dpGlyphFull.SetScalarBarVisibility(view, True)
-scalarbarGlyphFull.Position = legendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+scalarbarGlyphFull.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 Render()
 SetActiveSource(glyphFull)
 
@@ -172,7 +222,7 @@ for i in range(0,len(timeSteps)):
 	ColorBy(dpGlyphFull, ('POINTS','GlyphVector'))
 	dpGlyphFull.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
 	dpGlyphFull.SetScalarBarVisibility(view, True)
-	scalarbarGlyphFull.Position = legendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+	scalarbarGlyphFull.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 	Render()
 	WriteImage(imgDir+str(int(timeSteps[i]))+".png")
 	#get rid of root ownership

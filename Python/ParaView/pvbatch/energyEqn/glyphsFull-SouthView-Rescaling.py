@@ -14,22 +14,23 @@ from paraview.simple import *
 
 ### create needed changeable variables
 mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing group owner for this dir and below
-imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/Tfull-TopViewElevNeg45-Rescaling/"
+imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-SouthView-Rescaling/"
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
 desiredPictureSize = [1500,1500] #[width, height]
 UlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
 TlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
-viewCameraX = 450	# where in the x direction from the center do you want to position the object?
-viewCameraY = -900	# where in the y direction from the center do you want to position the object?
-viewCameraZ = 0	# where in the z direction from the center do you want to position the object?
-cameraElev = -45	# the tilt to give the view. Need to do -90 for certain side views, mixed with viewUp
+viewCameraX = 500	# where in the x direction from the center do you want to position the object?
+viewCameraY = 500	# where in the y direction from the center do you want to position the object?
+viewCameraZ = 350	# where in the z direction from the center do you want to position the object?
+cameraElev = -90	# the tilt to give the view. Need to do -90 for certain side views, mixed with viewUp
 cameraViewUp = [0,0,1]	# this is for changing from which side to view
 glyphFullScaleFactor = 450		# this is the size of the wind vectors
 glyphFullStride = 5			# this is the every Nth number of points to use for showing vectors
 glyphYsliceScaleFactor = 450		# this is the size of the wind vectors
 glyphYsliceStride = 5		# this is the every Nth number of points to use for showing vectors
-
+glyphXsliceScaleFactor = 450		# this is the size of the wind vectors
+glyphXsliceStride = 5		# this is the every Nth number of points to use for showing vectors
 
 #check to see if directory exists, and if not, create it
 if not os.access(imgDir, os.F_OK):
@@ -97,7 +98,7 @@ scalarbarGlyphFull.Orientation = 'Horizontal'
 Show(glyphFull)
 Render()
 
-#now make the slice of the full case
+#now make the y slice of the full case
 ySlice = Slice(reader)
 ySlice.SliceType.Normal = [0,1,0]
 #ySlice.SliceOffsetValues = [30,60,90,120]	# creates more slices in the single slice at differing offsets of the slice !!! Nice! Except how to toggle on and off? just reset the values
@@ -114,9 +115,9 @@ scalarbarYslice.Orientation = 'Horizontal'
 Show(ySlice)
 Render()
 
-#now create glyphs of the slice
+#now create glyphs of the y slice
 glyphYslice=Glyph(ySlice, GlyphType='Arrow')	#maybe try doing a glyph straight up of the reader
-glyphYsice.Scalars = ['CELLS', 'p']	# sets the glyph scalars to be cells of p
+glyphYslice.Scalars = ['CELLS', 'p']	# sets the glyph scalars to be cells of p
 glyphYslice.Vectors = ['CELLS', 'U']	# sets the glyph vectors to be cells of U
 glyphYslice.ScaleMode = 'off'	# enable scaling by scalars
 glyphYslice.ScaleFactor = glyphYsliceScaleFactor
@@ -135,21 +136,63 @@ scalarbarGlyphYslice.Orientation = 'Horizontal'
 Show(glyphYslice)
 Render()
 
+#now make the x slice of the full case
+xSlice = Slice(reader)
+xSlice.SliceType.Normal = [1,0,0]
+#xSlice.SliceOffsetValues = [30,60,90,120]	# creates more slices in the single slice at differing offsets of the slice !!! Nice! Except how to toggle on and off? just reset the values
+dpXslice = GetDisplayProperties(xSlice,view=view)	# get display properties of the reader
+ColorBy(dpXslice, ('CELLS','T'))
+dpXslice.RescaleTransferFunctionToDataRange()
+dpXslice.SetScalarBarVisibility(view, True)
+ctlXslice = GetColorTransferFunction('T')
+scalarbarXslice = GetScalarBar(ctlXslice,view)
+#scalarbarXslice.Title = 'T (K)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarXslice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarXslice.Position = TlegendPosition
+scalarbarXslice.Orientation = 'Horizontal'
+Show(xSlice)
+Render()
+
+#now create glyphs of the x slice
+glyphXslice=Glyph(xSlice, GlyphType='Arrow')	#maybe try doing a glyph straight up of the reader
+glyphXslice.Scalars = ['CELLS', 'p']	# sets the glyph scalars to be cells of p
+glyphXslice.Vectors = ['CELLS', 'U']	# sets the glyph vectors to be cells of U
+glyphXslice.ScaleMode = 'off'	# enable scaling by scalars
+glyphXslice.ScaleFactor = glyphXsliceScaleFactor
+glyphXslice.GlyphMode = 'Every Nth Point'
+glyphXslice.Stride = glyphXsliceStride
+dpGlyphXslice = GetDisplayProperties(glyphXslice,view=view)
+ColorBy(dpGlyphXslice, ('POINTS','GlyphVector'))
+dpGlyphXslice.RescaleTransferFunctionToDataRange()
+dpGlyphXslice.SetScalarBarVisibility(view, True)
+ctlGlyphXslice = GetColorTransferFunction('GlyphVector')
+scalarbarGlyphXslice = GetScalarBar(ctlGlyphXslice,view)
+#scalarbarGlyphXslice.Title = 'Velocity (m/s)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarGlyphXslice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarGlyphXslice.Position = UlegendPosition
+scalarbarGlyphXslice.Orientation = 'Horizontal'
+Show(glyphXslice)
+Render()
+
 # now that everything is made, show only the full glyphs from a top view, then step through each time saving pictures
 camera.Elevation(cameraElev)
 view.CameraViewUp = cameraViewUp
 ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
 Render()
-Hide(glyphFull)	# deselect eye thing on the case so only vectors are shown
-dpGlyphFull.SetScalarBarVisibility(view, False)
+Hide(reader)	# deselect eye thing on the case so only vectors are shown
+dpReader.SetScalarBarVisibility(view, False)
 Hide(ySlice)
 dpYslice.SetScalarBarVisibility(view, False)
 Hide(glyphYslice)
 dpGlyphYslice.SetScalarBarVisibility(view, False)
-dpReader.SetScalarBarVisibility(view, True)
-scalarbarReader.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+Hide(xSlice)
+dpXslice.SetScalarBarVisibility(view, False)
+Hide(glyphXslice)
+dpGlyphXslice.SetScalarBarVisibility(view, False)
+dpGlyphFull.SetScalarBarVisibility(view, True)
+scalarbarGlyphFull.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 Render()
-SetActiveSource(reader)
+SetActiveSource(glyphFull)
 
 # current camera placement for renderView1 #must change the position and focal point equally if moving the view up, down, left, or right. if on the right looking spot, only changing camera position will zoom in or out.
 #starting position is directly above the stuff, so camera position 2 is the zoom in or out. position 0 is left or right, position 1 is up or down.
@@ -176,10 +219,10 @@ for i in range(0,len(timeSteps)):
 	#view.ViewTime = timeSteps[i]
 	#ResetCamera()
 	Render()
-	ColorBy(dpReader, ('CELLS','T'))
-	dpReader.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
-	dpReader.SetScalarBarVisibility(view, True)
-	scalarbarReader.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+	ColorBy(dpGlyphFull, ('POINTS','GlyphVector'))
+	dpGlyphFull.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
+	dpGlyphFull.SetScalarBarVisibility(view, True)
+	scalarbarGlyphFull.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 	Render()
 	WriteImage(imgDir+str(int(timeSteps[i]))+".png")
 	#get rid of root ownership
