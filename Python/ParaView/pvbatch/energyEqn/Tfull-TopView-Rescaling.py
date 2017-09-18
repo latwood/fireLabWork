@@ -14,7 +14,7 @@ from paraview.simple import *
 
 ### create needed changeable variables
 mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing group owner for this dir and below
-imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-TopView-Rescaling/"
+imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/Tfull-TopView-Rescaling/"
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
 desiredPictureSize = [1500,1500] #[width, height]
@@ -131,16 +131,16 @@ Render()
 # now that everything is made, show only the full glyphs from a top view, then step through each time saving pictures
 ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
 Render()
-Hide(reader)	# deselect eye thing on the case so only vectors are shown
-dpReader.SetScalarBarVisibility(view, False)
+Hide(glyphFull)	# deselect eye thing on the case so only vectors are shown
+dpGlyphFull.SetScalarBarVisibility(view, False)
 Hide(slice)
 dpSlice.SetScalarBarVisibility(view, False)
 Hide(glyphSlice)
 dpGlyphSlice.SetScalarBarVisibility(view, False)
-dpGlyphFull.SetScalarBarVisibility(view, True)
-scalarbarGlyphFull.Position = legendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+dpReader.SetScalarBarVisibility(view, True)
+scalarbarReader.Position = legendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 Render()
-SetActiveSource(glyphFull)
+SetActiveSource(reader)
 
 # current camera placement for renderView1 #must change the position and focal point equally if moving the view up, down, left, or right. if on the right looking spot, only changing camera position will zoom in or out.
 #starting position is directly above the stuff, so camera position 2 is the zoom in or out. position 0 is left or right, position 1 is up or down.
@@ -167,10 +167,10 @@ for i in range(0,len(timeSteps)):
 	#view.ViewTime = timeSteps[i]
 	#ResetCamera()
 	Render()
-	ColorBy(dpGlyphFull, ('POINTS','GlyphVector'))
-	dpGlyphFull.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
-	dpGlyphFull.SetScalarBarVisibility(view, True)
-	scalarbarGlyphFull.Position = legendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+	ColorBy(dpReader, ('CELLS','T'))
+	dpReader.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
+	dpReader.SetScalarBarVisibility(view, True)
+	scalarbarReader.Position = legendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 	Render()
 	WriteImage(imgDir+str(int(timeSteps[i]))+".png")
 	#get rid of root ownership

@@ -14,14 +14,15 @@ from paraview.simple import *
 
 ### create needed changeable variables
 mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing group owner for this dir and below
-imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-TopView-Rescaling/"
+imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-TopViewElevNeg45-Rescaling/"
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
 desiredPictureSize = [1500,1500] #[width, height]
 legendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
 viewCameraX = 450	# where in the x direction from the center do you want to position the object?
-viewCameraY = -450	# where in the y direction from the center do you want to position the object?
+viewCameraY = -900	# where in the y direction from the center do you want to position the object?
 viewCameraZ = 0	# where in the z direction from the center do you want to position the object?
+cameraElev = -45	# the tilt to give the view
 
 
 #check to see if directory exists, and if not, create it
@@ -129,6 +130,7 @@ Show(glyphSlice)
 Render()
 
 # now that everything is made, show only the full glyphs from a top view, then step through each time saving pictures
+camera.Elevation(cameraElev)
 ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
 Render()
 Hide(reader)	# deselect eye thing on the case so only vectors are shown
@@ -255,4 +257,4 @@ Render()
 #ColorBy(dpReader, ('POINTS','GlyphVector'))
 #dpReader.RescaleTransferFunctionToDataRange(True)
 #dpReader.SetScalarBarVisibility(view, True)
-
+	
