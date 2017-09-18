@@ -1,11 +1,43 @@
+#import some necessary modules
+import pwd
+import grp
+import os
+
+uid = pwd.getpwnam("latwood").pw_uid
+gid = grp.getgrnam("latwood").gr_gid
+
 #### import the simple module from the paraview
 from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 #paraview.simple._DisableFirstRenderCameraReset()
 
+
+### create needed changeable variables
+mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing group owner for this dir and below
+imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-TopView-Rescaling/"
+
+originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
+desiredPictureSize = [1500,1500] #[width, height]
+legendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
+viewCameraX = 450	# where in the x direction from the center do you want to position the object?
+viewCameraY = -450	# where in the y direction from the center do you want to position the object?
+viewCameraZ = 0	# where in the z direction from the center do you want to position the object?
+
+
+#check to see if directory exists, and if not, create it
+if not os.access(imgDir, os.F_OK):
+	os.makedirs(imgDir,0777)
+	#recursive unsudo the stuff. Doesn't do top directory so do that separate
+	os.chown(mainDir,uid,gid)
+	for root,dirs,files in os.walk(mainDir):
+		for momo in dirs:
+			os.chown(os.path.join(root,momo),uid,gid)
+		for momo in files:
+			os.chown(os.path.join(root,momo),uid,gid)
+
+
 # get active view
 view = GetActiveViewOrCreate('RenderView')
-originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this
 
 # current camera placement for renderView1
 #view.CameraPosition = [0.0, 3000.0, 19186.51464195246]
@@ -30,7 +62,9 @@ dpReader.RescaleTransferFunctionToDataRange()
 dpReader.SetScalarBarVisibility(view, True)
 ctlReader = GetColorTransferFunction('T')
 scalarbarReader = GetScalarBar(ctlReader,view)
-scalarbarReader.Position = [0.45,0.1]
+#scalarbarReader.Title = 'T (K)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarReader.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarReader.Position = legendPosition
 scalarbarReader.Orientation = 'Horizontal'
 Show(reader)		# shows case (selects the eye), in whatever location the view is at
 Render()			# centers the view on the case somehow
@@ -49,7 +83,9 @@ dpGlyphFull.RescaleTransferFunctionToDataRange()
 dpGlyphFull.SetScalarBarVisibility(view, True)
 ctlGlyphFull = GetColorTransferFunction('GlyphVector')
 scalarbarGlyphFull = GetScalarBar(ctlGlyphFull,view)
-scalarbarGlyphFull.Position = [0.45,0.1]
+#scalarbarGlyphFull.Title = 'Velocity (m/s)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarGlyphFull.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarGlyphFull.Position = legendPosition
 scalarbarGlyphFull.Orientation = 'Horizontal'
 Show(glyphFull)
 Render()
@@ -64,7 +100,9 @@ dpSlice.RescaleTransferFunctionToDataRange()
 dpSlice.SetScalarBarVisibility(view, True)
 ctlSlice = GetColorTransferFunction('T')
 scalarbarSlice = GetScalarBar(ctlSlice,view)
-scalarbarSlice.Position = [0.45,0.1]
+#scalarbarSlice.Title = 'T (K)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarSlice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarSlice.Position = legendPosition
 scalarbarSlice.Orientation = 'Horizontal'
 Show(slice)
 Render()
@@ -83,7 +121,9 @@ dpGlyphSlice.RescaleTransferFunctionToDataRange()
 dpGlyphSlice.SetScalarBarVisibility(view, True)
 ctlGlyphSlice = GetColorTransferFunction('GlyphVector')
 scalarbarGlyphSlice = GetScalarBar(ctlGlyphSlice,view)
-scalarbarGlyphSlice.Position = [0.45,0.1]
+#scalarbarGlyphSlice.Title = 'Velocity (m/s)'	# for some odd reason adding a title throws in the word magnitude
+scalarbarGlyphSlice.RangeLabelFormat = '%.3f' #'%6.3g'
+scalarbarGlyphSlice.Position = legendPosition
 scalarbarGlyphSlice.Orientation = 'Horizontal'
 Show(glyphSlice)
 Render()
@@ -92,26 +132,33 @@ Render()
 ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
 Render()
 Hide(reader)	# deselect eye thing on the case so only vectors are shown
+dpReader.SetScalarBarVisibility(view, False)
 Hide(slice)
+dpSlice.SetScalarBarVisibility(view, False)
 Hide(glyphSlice)
+dpGlyphSlice.SetScalarBarVisibility(view, False)
 Render()
 SetActiveSource(glyphFull)
 
 # current camera placement for renderView1 #must change the position and focal point equally if moving the view up, down, left, or right. if on the right looking spot, only changing camera position will zoom in or out.
 #starting position is directly above the stuff, so camera position 2 is the zoom in or out. position 0 is left or right, position 1 is up or down.
-#view.CameraPosition[0] = view.CameraPosition[0]+1000
-view.CameraPosition[1] = view.CameraPosition[1]-300
-#view.CameraPosition[2] = view.CameraPosition[2]+1000
-#view.CameraFocalPoint[0] = view.CameraFocalPoint[0]+1000
-view.CameraFocalPoint[1] = view.CameraFocalPoint[1]-300
-#view.CameraFocalPoint[2] = view.CameraFocalPoint[2]+1000
+view.CameraPosition[0] = view.CameraPosition[0]+viewCameraX
+view.CameraPosition[1] = view.CameraPosition[1]+viewCameraY
+view.CameraPosition[2] = view.CameraPosition[2]+viewCameraZ
+view.CameraFocalPoint[0] = view.CameraFocalPoint[0]+viewCameraX
+view.CameraFocalPoint[1] = view.CameraFocalPoint[1]+viewCameraY
+view.CameraFocalPoint[2] = view.CameraFocalPoint[2]+viewCameraZ
 #view.CameraParallelScale = 4559.043041130733
-Render() 	#don't call reset camera or all this is put back
+Render() 	#don't call reset camera or all this is put back. Make sure that the legend position is set again here
 
 # get the timesteps for the for loop and for changing times
 timeSteps = reader.TimestepValues
 anim = GetAnimationScene()
 anim.PlayMode = 'Snap To TimeSteps'
+
+# set the view size for the pictures
+view.ViewSize = desiredPictureSize
+Render()
 
 for i in range(0,len(timeSteps)):
 	anim.AnimationTime = timeSteps[i]
@@ -121,12 +168,16 @@ for i in range(0,len(timeSteps)):
 	ColorBy(dpGlyphFull, ('POINTS','GlyphVector'))
 	dpGlyphFull.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
 	dpGlyphFull.SetScalarBarVisibility(view, True)
-	view.ViewSize = [1500,1500] #[width, height]
+	scalarbarGlyphFull.Position = legendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 	Render()
-	WriteImage(str(int(timeSteps[i]))+".png")
+	WriteImage(imgDir+str(int(timeSteps[i]))+".png")
+	#get rid of root ownership
+	os.chown(imgDir+str(int(timeSteps[i]))+".png",uid,gid)
 
 view.ViewSize = originalViewSize
 Render()
+
+#
 
 #ctlGlyphFull.UpdateScalarBarsComponentTitle(dpGlyphFull.GetArrayInformationForColorArray())
 
