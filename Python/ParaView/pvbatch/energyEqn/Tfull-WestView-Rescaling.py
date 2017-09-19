@@ -28,6 +28,8 @@ cameraAzmith = -90	# this is the rotation around the z axis if elevation is -90
 cameraViewUp = [0,0,1]	# this is for changing from which side to view
 glyphFullScaleFactor = 450		# this is the size of the wind vectors
 glyphFullStride = 5			# this is the every Nth number of points to use for showing vectors
+ySliceOffset = 0			# this is the offset of the y slice starting point
+xSliceOffset = 0			# this is the offset of the x slice starting point
 glyphYsliceScaleFactor = 450		# this is the size of the wind vectors
 glyphYsliceStride = 5		# this is the every Nth number of points to use for showing vectors
 glyphXsliceScaleFactor = 450		# this is the size of the wind vectors
@@ -102,6 +104,7 @@ Render()
 #now make the y slice of the full case
 ySlice = Slice(reader)
 ySlice.SliceType.Normal = [0,1,0]
+ySlice.SliceType.Origin = [ySlice.SliceType.Origin[0],ySlice.SliceType.Origin[1]+ySliceOffset,ySlice.SliceType.Origin[2]]
 #ySlice.SliceOffsetValues = [30,60,90,120]	# creates more slices in the single slice at differing offsets of the slice !!! Nice! Except how to toggle on and off? just reset the values
 dpYslice = GetDisplayProperties(ySlice,view=view)	# get display properties of the reader
 ColorBy(dpYslice, ('CELLS','T'))
@@ -140,6 +143,7 @@ Render()
 #now make the x slice of the full case
 xSlice = Slice(reader)
 xSlice.SliceType.Normal = [1,0,0]
+xSlice.SliceType.Origin = [xSlice.SliceType.Origin[0]+xSliceOffset,xSlice.SliceType.Origin[1],xSlice.SliceType.Origin[2]]
 #xSlice.SliceOffsetValues = [30,60,90,120]	# creates more slices in the single slice at differing offsets of the slice !!! Nice! Except how to toggle on and off? just reset the values
 dpXslice = GetDisplayProperties(xSlice,view=view)	# get display properties of the reader
 ColorBy(dpXslice, ('CELLS','T'))
