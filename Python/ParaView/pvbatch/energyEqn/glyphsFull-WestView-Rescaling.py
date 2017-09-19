@@ -14,20 +14,20 @@ from paraview.simple import *
 
 ### create needed changeable variables
 mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing group owner for this dir and below
-imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-TopViewElevNeg45-Rescaling/"
+imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-WestView-Rescaling/"
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
 desiredPictureSize = [1500,1500] #[width, height]
 UlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
 TlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
-viewCameraX = 450	# where in the x direction from the center do you want to position the object?
-viewCameraY = -900	# where in the y direction from the center do you want to position the object?
-viewCameraZ = 0	# where in the z direction from the center do you want to position the object?
-cameraElev = -45	# the tilt to give the view
-cameraAzmith = 0	# this is the rotation around the z axis if elevation is -90
+viewCameraX = 500	# where in the x direction from the center do you want to position the object?
+viewCameraY = -300	# where in the y direction from the center do you want to position the object?
+viewCameraZ = 800	# where in the z direction from the center do you want to position the object?
+cameraElev = -90	# the tilt to give the view. Need to do -90 for certain side views, mixed with viewUp
+cameraAzmith = -90	# this is the rotation around the z axis if elevation is -90
 cameraViewUp = [0,0,1]	# this is for changing from which side to view
 glyphFullScaleFactor = 450		# this is the size of the wind vectors
-glyphFullStride = 10			# this is the every Nth number of points to use for showing vectors
+glyphFullStride = 10			# this is the every Nth number of points to use for showing vectors. Top is just barely too few with 10, bottom is still way too overpopulated with 10, probably even at 40 is too overpopulated. Use apply init to set some value that can be used for a threshold to get different layers at different numbers of vectors
 glyphYsliceScaleFactor = 450		# this is the size of the wind vectors
 glyphYsliceStride = 5		# this is the every Nth number of points to use for showing vectors
 glyphXsliceScaleFactor = 450		# this is the size of the wind vectors

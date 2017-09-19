@@ -14,20 +14,20 @@ from paraview.simple import *
 
 ### create needed changeable variables
 mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing group owner for this dir and below
-imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/glyphsFull-TopViewElevNeg45-Rescaling/"
+imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/Tfull-SouthView-Rescaling/"
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
 desiredPictureSize = [1500,1500] #[width, height]
 UlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
 TlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
-viewCameraX = 450	# where in the x direction from the center do you want to position the object?
-viewCameraY = -900	# where in the y direction from the center do you want to position the object?
-viewCameraZ = 0	# where in the z direction from the center do you want to position the object?
-cameraElev = -45	# the tilt to give the view
+viewCameraX = 0	# where in the x direction from the center do you want to position the object?
+viewCameraY = 500	# where in the y direction from the center do you want to position the object?
+viewCameraZ = 500	# where in the z direction from the center do you want to position the object?
+cameraElev = -90	# the tilt to give the view. Need to do -90 for certain side views, mixed with viewUp
 cameraAzmith = 0	# this is the rotation around the z axis if elevation is -90
 cameraViewUp = [0,0,1]	# this is for changing from which side to view
 glyphFullScaleFactor = 450		# this is the size of the wind vectors
-glyphFullStride = 10			# this is the every Nth number of points to use for showing vectors
+glyphFullStride = 5			# this is the every Nth number of points to use for showing vectors
 glyphYsliceScaleFactor = 450		# this is the size of the wind vectors
 glyphYsliceStride = 5		# this is the every Nth number of points to use for showing vectors
 glyphXsliceScaleFactor = 450		# this is the size of the wind vectors
@@ -181,8 +181,8 @@ view.CameraViewUp = cameraViewUp
 camera.Azimuth(cameraAzmith)
 ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
 Render()
-Hide(reader)	# deselect eye thing on the case so only vectors are shown
-dpReader.SetScalarBarVisibility(view, False)
+Hide(glyphFull)	# deselect eye thing on the case so only vectors are shown
+dpGlyphFull.SetScalarBarVisibility(view, False)
 Hide(ySlice)
 dpYslice.SetScalarBarVisibility(view, False)
 Hide(glyphYslice)
@@ -191,10 +191,10 @@ Hide(xSlice)
 dpXslice.SetScalarBarVisibility(view, False)
 Hide(glyphXslice)
 dpGlyphXslice.SetScalarBarVisibility(view, False)
-dpGlyphFull.SetScalarBarVisibility(view, True)
-scalarbarGlyphFull.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+dpReader.SetScalarBarVisibility(view, True)
+scalarbarReader.Position = TlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 Render()
-SetActiveSource(glyphFull)
+SetActiveSource(reader)
 
 # current camera placement for renderView1 #must change the position and focal point equally if moving the view up, down, left, or right. if on the right looking spot, only changing camera position will zoom in or out.
 #starting position is directly above the stuff, so camera position 2 is the zoom in or out. position 0 is left or right, position 1 is up or down.
@@ -220,10 +220,10 @@ for i in range(0,len(timeSteps)):
 	anim.AnimationTime = timeSteps[i]
 	#view.ViewTime = timeSteps[i]
 	Render()
-	ColorBy(dpGlyphFull, ('POINTS','GlyphVector'))
-	dpGlyphFull.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
-	dpGlyphFull.SetScalarBarVisibility(view, True)
-	scalarbarGlyphFull.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
+	ColorBy(dpReader, ('CELLS','T'))
+	dpReader.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
+	dpReader.SetScalarBarVisibility(view, True)
+	scalarbarReader.Position = TlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 	Render()
 	WriteImage(imgDir+str(int(timeSteps[i]))+".png")
 	#get rid of root ownership
@@ -308,4 +308,4 @@ Render()
 #ColorBy(dpReader, ('POINTS','GlyphVector'))
 #dpReader.RescaleTransferFunctionToDataRange(True)
 #dpReader.SetScalarBarVisibility(view, True)
-	
+

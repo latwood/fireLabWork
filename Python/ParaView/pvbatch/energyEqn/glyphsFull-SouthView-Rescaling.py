@@ -20,13 +20,14 @@ originalViewSize = [906, 780]	# this is the original view size, need to get bett
 desiredPictureSize = [1500,1500] #[width, height]
 UlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
 TlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
-viewCameraX = 500	# where in the x direction from the center do you want to position the object?
+viewCameraX = 0	# where in the x direction from the center do you want to position the object?
 viewCameraY = 500	# where in the y direction from the center do you want to position the object?
-viewCameraZ = 350	# where in the z direction from the center do you want to position the object?
+viewCameraZ = 500	# where in the z direction from the center do you want to position the object?
 cameraElev = -90	# the tilt to give the view. Need to do -90 for certain side views, mixed with viewUp
+cameraAzmith = 0	# this is the rotation around the z axis if elevation is -90
 cameraViewUp = [0,0,1]	# this is for changing from which side to view
 glyphFullScaleFactor = 450		# this is the size of the wind vectors
-glyphFullStride = 5			# this is the every Nth number of points to use for showing vectors
+glyphFullStride = 10			# this is the every Nth number of points to use for showing vectors. Top is just barely too few with 10, bottom is still way too overpopulated with 10, probably even at 40 is too overpopulated. Use apply init to set some value that can be used for a threshold to get different layers at different numbers of vectors
 glyphYsliceScaleFactor = 450		# this is the size of the wind vectors
 glyphYsliceStride = 5		# this is the every Nth number of points to use for showing vectors
 glyphXsliceScaleFactor = 450		# this is the size of the wind vectors
@@ -177,6 +178,7 @@ Render()
 # now that everything is made, show only the full glyphs from a top view, then step through each time saving pictures
 camera.Elevation(cameraElev)
 view.CameraViewUp = cameraViewUp
+camera.Azimuth(cameraAzmith)
 ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
 Render()
 Hide(reader)	# deselect eye thing on the case so only vectors are shown
@@ -217,7 +219,6 @@ Render()
 for i in range(0,len(timeSteps)):
 	anim.AnimationTime = timeSteps[i]
 	#view.ViewTime = timeSteps[i]
-	#ResetCamera()
 	Render()
 	ColorBy(dpGlyphFull, ('POINTS','GlyphVector'))
 	dpGlyphFull.RescaleTransferFunctionToDataRange()	#looks like if you throw a True into this final parenthesis, it only rescales if the value is greater
