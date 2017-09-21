@@ -14,7 +14,7 @@ from paraview.simple import *
 
 ### create needed changeable variables
 mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing group owner for this dir and below
-imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-InnerField-zeroGradientWalls/Tfull-TopViewElevNeg45-Rescaling/"
+imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot/buoyantBoussinesqPimpleFoam/1mph0deg-reformedConditions/Tfull-TopViewElevNeg45-Rescaling/"
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
 desiredPictureSize = [1500,1500] #[width, height]
@@ -179,12 +179,7 @@ scalarbarGlyphXslice.Orientation = 'Horizontal'
 Show(glyphXslice)
 Render()
 
-# now that everything is made, show only the full glyphs from a top view, then step through each time saving pictures
-camera.Elevation(cameraElev)
-view.CameraViewUp = cameraViewUp
-camera.Azimuth(cameraAzmith)
-ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
-Render()
+
 Hide(glyphFull)	# deselect eye thing on the case so only vectors are shown
 dpGlyphFull.SetScalarBarVisibility(view, False)
 Hide(ySlice)
@@ -199,6 +194,13 @@ dpReader.SetScalarBarVisibility(view, True)
 scalarbarReader.Position = UlegendPosition	# have to reset this every time you make the scalar bar visible again, SetScalarBarVisibility resets the legend position
 Render()
 SetActiveSource(reader)
+
+# now that everything is made, show only the full glyphs from a top view, then step through each time saving pictures
+camera.Elevation(cameraElev)
+view.CameraViewUp = cameraViewUp
+camera.Azimuth(cameraAzmith)
+ResetCamera()		#reset the camera to the full view, if now camera view has changed, this should be looking from above
+Render()
 
 # current camera placement for renderView1 #must change the position and focal point equally if moving the view up, down, left, or right. if on the right looking spot, only changing camera position will zoom in or out.
 #starting position is directly above the stuff, so camera position 2 is the zoom in or out. position 0 is left or right, position 1 is up or down.

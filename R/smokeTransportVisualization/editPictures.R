@@ -9,13 +9,50 @@ library(gtools)
 ###variables you can change
 
 
-mainOriginalPictureDirectory <- "/home/latwood/Documents/smokeTransportVisualization/newPics"
-mainNewPictureDirectory <- "/home/latwood/Documents/smokeTransportVisualization/picturesForVideos"
+mainOriginalPictureDirectory <- "/home/latwood/Documents/ParaViewVisualization/Pics"
+mainNewPictureDirectory <- "/home/latwood/Documents/ParaViewVisualization/picturesForVideos"
 
-pictureDirectoryName <- "/SmokeTracer/vshapedValley_tilt_flatbottom39.71mRes/NativeSolver_DomainAvg/diurnal/6-15-2016_21hr00min_72F/rightValley/southView"
+pictureDirectoryName <- "/energyEqn/vshapedvalley-flatbot-notilt/buoyantBoussinesqPimpleFoam/Coarse/1mph0deg-InnerField-zeroGradientWalls/TglyphSlice-WestView-Rescaling"
 
 OriginalPictureDirectory <- paste(mainOriginalPictureDirectory,pictureDirectoryName,sep="")
 NewPictureDirectory <- paste(mainNewPictureDirectory,pictureDirectoryName,sep="")
+
+getTimeStamp <- function(timeInSeconds)
+{
+  sum <- timeInSeconds
+  hours <- sum %/% 3600.0
+  sum <- sum - hours * 3600.0
+  mins <- sum %/% 60.0
+  sum <- sum - mins * 60.0
+  secs <- sum %/% 1
+  
+  if(hours < 10)
+  {
+    theTimeStamp <- paste("0",hours,":",sep="")
+  } else
+  {
+    theTimeStamp <- paste(hours,":",sep="")
+  }
+  if(mins < 10)
+  {
+    theTimeStamp <- paste(theTimeStamp,"0",mins,":",sep="")
+  } else
+  {
+    theTimeStamp <- paste(theTimeStamp,mins,":",sep="")
+  }
+  if(secs < 10)
+  {
+    theTimeStamp <- paste(theTimeStamp,"0",secs,sep="")
+  } else
+  {
+    theTimeStamp <- paste(theTimeStamp,secs,sep="")
+  }
+  
+  theTimeStamp <- paste(theTimeStamp," hrs:min:sec",sep="")
+  print(paste("theTimeStamp =",theTimeStamp))
+  
+  return(theTimeStamp) 
+}
 
 # numberOfPictures <- 277
 # ignoreFirstPics <- 0
@@ -466,65 +503,65 @@ NewPictureDirectory <- paste(mainNewPictureDirectory,pictureDirectoryName,sep=""
 # timesForPics[74] <- "04:15:00 hrs:min:sec"    # 15300
 # timesForPics[75] <- "04:30:00 hrs:min:sec"    # 16200
 
-numberOfPictures <- 55
-ignoreFirstPics <- 0
-ignoreLastPics <- 0
-timesForPics <- matrix(nrow=numberOfPictures)
-timesForPics[1] <- "00:00:00 hrs:min:sec"    # 0
-timesForPics[2] <- "00:05:00 hrs:min:sec"    # 300
-timesForPics[3] <- "00:10:00 hrs:min:sec"    # 600
-timesForPics[4] <- "00:15:00 hrs:min:sec"    # 900
-timesForPics[5] <- "00:20:00 hrs:min:sec"    # 1200
-timesForPics[6] <- "00:25:00 hrs:min:sec"    # 1500
-timesForPics[7] <- "00:30:00 hrs:min:sec"    # 1800
-timesForPics[8] <- "00:35:00 hrs:min:sec"    # 2100
-timesForPics[9] <- "00:40:00 hrs:min:sec"    # 2400
-timesForPics[10] <- "00:45:00 hrs:min:sec"    # 2700
-timesForPics[11] <- "00:50:00 hrs:min:sec"    # 3000
-timesForPics[12] <- "00:55:00 hrs:min:sec"    # 3300
-timesForPics[13] <- "01:00:00 hrs:min:sec"    # 3600
-timesForPics[14] <- "01:05:00 hrs:min:sec"    # 3900
-timesForPics[15] <- "01:10:00 hrs:min:sec"    # 4200
-timesForPics[16] <- "01:15:00 hrs:min:sec"    # 4500
-timesForPics[17] <- "01:20:00 hrs:min:sec"    # 4800
-timesForPics[18] <- "01:25:00 hrs:min:sec"    # 5100
-timesForPics[19] <- "01:30:00 hrs:min:sec"    # 5400
-timesForPics[20] <- "01:35:00 hrs:min:sec"    # 5700
-timesForPics[21] <- "01:40:00 hrs:min:sec"    # 6000
-timesForPics[22] <- "01:45:00 hrs:min:sec"    # 6300
-timesForPics[23] <- "01:50:00 hrs:min:sec"    # 6600
-timesForPics[24] <- "01:55:00 hrs:min:sec"    # 6900
-timesForPics[25] <- "02:00:00 hrs:min:sec"    # 7200
-timesForPics[26] <- "02:05:00 hrs:min:sec"    # 7500
-timesForPics[27] <- "02:10:00 hrs:min:sec"    # 7800
-timesForPics[28] <- "02:15:00 hrs:min:sec"    # 8100
-timesForPics[29] <- "02:20:00 hrs:min:sec"    # 8400
-timesForPics[30] <- "02:25:00 hrs:min:sec"    # 8700
-timesForPics[31] <- "02:30:00 hrs:min:sec"    # 9000
-timesForPics[32] <- "02:35:00 hrs:min:sec"    # 9300
-timesForPics[33] <- "02:40:00 hrs:min:sec"    # 9600
-timesForPics[34] <- "02:45:00 hrs:min:sec"    # 9900
-timesForPics[35] <- "02:50:00 hrs:min:sec"    # 10200
-timesForPics[36] <- "02:55:00 hrs:min:sec"    # 10500
-timesForPics[37] <- "03:00:00 hrs:min:sec"    # 10800
-timesForPics[38] <- "03:05:00 hrs:min:sec"    # 11100
-timesForPics[39] <- "03:10:00 hrs:min:sec"    # 11400
-timesForPics[40] <- "03:15:00 hrs:min:sec"    # 11700
-timesForPics[41] <- "03:20:00 hrs:min:sec"    # 12000
-timesForPics[42] <- "03:25:00 hrs:min:sec"    # 12300
-timesForPics[43] <- "03:30:00 hrs:min:sec"    # 12600
-timesForPics[44] <- "03:35:00 hrs:min:sec"    # 12900
-timesForPics[45] <- "03:40:00 hrs:min:sec"    # 13200
-timesForPics[46] <- "03:45:00 hrs:min:sec"    # 13500
-timesForPics[47] <- "03:50:00 hrs:min:sec"    # 13800
-timesForPics[48] <- "03:55:00 hrs:min:sec"    # 14100
-timesForPics[49] <- "04:00:00 hrs:min:sec"    # 14400
-timesForPics[50] <- "04:05:00 hrs:min:sec"    # 14700
-timesForPics[51] <- "04:10:00 hrs:min:sec"    # 15000
-timesForPics[52] <- "04:15:00 hrs:min:sec"    # 15300
-timesForPics[53] <- "04:20:00 hrs:min:sec"    # 15600
-timesForPics[54] <- "04:25:00 hrs:min:sec"    # 15900
-timesForPics[55] <- "04:30:00 hrs:min:sec"    # 16200
+# numberOfPictures <- 55
+# ignoreFirstPics <- 0
+# ignoreLastPics <- 0
+# timesForPics <- matrix(nrow=numberOfPictures)
+# timesForPics[1] <- "00:00:00 hrs:min:sec"    # 0
+# timesForPics[2] <- "00:05:00 hrs:min:sec"    # 300
+# timesForPics[3] <- "00:10:00 hrs:min:sec"    # 600
+# timesForPics[4] <- "00:15:00 hrs:min:sec"    # 900
+# timesForPics[5] <- "00:20:00 hrs:min:sec"    # 1200
+# timesForPics[6] <- "00:25:00 hrs:min:sec"    # 1500
+# timesForPics[7] <- "00:30:00 hrs:min:sec"    # 1800
+# timesForPics[8] <- "00:35:00 hrs:min:sec"    # 2100
+# timesForPics[9] <- "00:40:00 hrs:min:sec"    # 2400
+# timesForPics[10] <- "00:45:00 hrs:min:sec"    # 2700
+# timesForPics[11] <- "00:50:00 hrs:min:sec"    # 3000
+# timesForPics[12] <- "00:55:00 hrs:min:sec"    # 3300
+# timesForPics[13] <- "01:00:00 hrs:min:sec"    # 3600
+# timesForPics[14] <- "01:05:00 hrs:min:sec"    # 3900
+# timesForPics[15] <- "01:10:00 hrs:min:sec"    # 4200
+# timesForPics[16] <- "01:15:00 hrs:min:sec"    # 4500
+# timesForPics[17] <- "01:20:00 hrs:min:sec"    # 4800
+# timesForPics[18] <- "01:25:00 hrs:min:sec"    # 5100
+# timesForPics[19] <- "01:30:00 hrs:min:sec"    # 5400
+# timesForPics[20] <- "01:35:00 hrs:min:sec"    # 5700
+# timesForPics[21] <- "01:40:00 hrs:min:sec"    # 6000
+# timesForPics[22] <- "01:45:00 hrs:min:sec"    # 6300
+# timesForPics[23] <- "01:50:00 hrs:min:sec"    # 6600
+# timesForPics[24] <- "01:55:00 hrs:min:sec"    # 6900
+# timesForPics[25] <- "02:00:00 hrs:min:sec"    # 7200
+# timesForPics[26] <- "02:05:00 hrs:min:sec"    # 7500
+# timesForPics[27] <- "02:10:00 hrs:min:sec"    # 7800
+# timesForPics[28] <- "02:15:00 hrs:min:sec"    # 8100
+# timesForPics[29] <- "02:20:00 hrs:min:sec"    # 8400
+# timesForPics[30] <- "02:25:00 hrs:min:sec"    # 8700
+# timesForPics[31] <- "02:30:00 hrs:min:sec"    # 9000
+# timesForPics[32] <- "02:35:00 hrs:min:sec"    # 9300
+# timesForPics[33] <- "02:40:00 hrs:min:sec"    # 9600
+# timesForPics[34] <- "02:45:00 hrs:min:sec"    # 9900
+# timesForPics[35] <- "02:50:00 hrs:min:sec"    # 10200
+# timesForPics[36] <- "02:55:00 hrs:min:sec"    # 10500
+# timesForPics[37] <- "03:00:00 hrs:min:sec"    # 10800
+# timesForPics[38] <- "03:05:00 hrs:min:sec"    # 11100
+# timesForPics[39] <- "03:10:00 hrs:min:sec"    # 11400
+# timesForPics[40] <- "03:15:00 hrs:min:sec"    # 11700
+# timesForPics[41] <- "03:20:00 hrs:min:sec"    # 12000
+# timesForPics[42] <- "03:25:00 hrs:min:sec"    # 12300
+# timesForPics[43] <- "03:30:00 hrs:min:sec"    # 12600
+# timesForPics[44] <- "03:35:00 hrs:min:sec"    # 12900
+# timesForPics[45] <- "03:40:00 hrs:min:sec"    # 13200
+# timesForPics[46] <- "03:45:00 hrs:min:sec"    # 13500
+# timesForPics[47] <- "03:50:00 hrs:min:sec"    # 13800
+# timesForPics[48] <- "03:55:00 hrs:min:sec"    # 14100
+# timesForPics[49] <- "04:00:00 hrs:min:sec"    # 14400
+# timesForPics[50] <- "04:05:00 hrs:min:sec"    # 14700
+# timesForPics[51] <- "04:10:00 hrs:min:sec"    # 15000
+# timesForPics[52] <- "04:15:00 hrs:min:sec"    # 15300
+# timesForPics[53] <- "04:20:00 hrs:min:sec"    # 15600
+# timesForPics[54] <- "04:25:00 hrs:min:sec"    # 15900
+# timesForPics[55] <- "04:30:00 hrs:min:sec"    # 16200
 
 #delete the new file directory if it exists
 if(file.exists(NewPictureDirectory))
@@ -573,26 +610,65 @@ dir.create(NewPictureDirectory,recursive=TRUE)
 # pics <- list.files(NewPictureDirectory,full.names=TRUE,recursive=FALSE,pattern="jpg")
 # pics <- mixedsort(pics)
 
+ignoreFirstPics <- 0
+ignoreLastPics <- 0
 
 ########## for png  ##############
 #copy pictures and sort them so they can be opened and changed in the right order
 pics <- list.files(OriginalPictureDirectory,full.names=TRUE,recursive=FALSE,pattern="png")
 pics <- mixedsort(pics)
+numberOfPictures <- length(pics)
 file.copy(pics[(1+ignoreFirstPics):(numberOfPictures-ignoreLastPics)],NewPictureDirectory)
 pics <- list.files(NewPictureDirectory,full.names=TRUE,recursive=FALSE,pattern="png")
 pics <- mixedsort(pics)
+numberOfPictures <- length(pics)
+
+### create an array of picture titles. Better make sure the titles are numeric lol
+pictureTimeTitles <- matrix(nrow=numberOfPictures)
+for(i in 1:numberOfPictures)
+{
+  for(j in (nchar(pics[i])-4):1) # use - 4 for .png, might need -5 for .jpeg
+  {
+    if(substr(pics[i],j,j) == "/")
+    {
+      pictureTimeTitles[i] <- as.numeric(substr(pics[i],j+1,nchar(pics[i])-4))
+      print(paste("pictureTimeTitles[i] = ",pictureTimeTitles[i],sep=""))
+      if(nchar(pictureTimeTitles[i]) == 0)
+      {
+        print("Error, the picture time title is empty!")
+      } else if(is.na(pictureTimeTitles[i]))
+      {
+        print("Error the picture time title isn't completely numeric! Adjust functions!")
+      }
+      break
+    }
+  }
+}
+
+timeStartPic <- 4 # picture number in array that will be the time start of the simulation
+timesForPics <- matrix(nrow=numberOfPictures)
+for(i in 1:timeStartPic)
+{
+  timesForPics[i] <- paste("TimeDir ",pictureTimeTitles[i],"    00:00:00 hrs:min:sec",sep="")
+}
+for(i in (timeStartPic+1):numberOfPictures)
+{
+  timestamp <- getTimeStamp(pictureTimeTitles[i]-pictureTimeTitles[timeStartPic])
+  timesForPics[i] <- paste("TimeDir ",pictureTimeTitles[i],"    ",timestamp,sep="")
+}
 
 #open files and remake them, adding in the text that is the time
 for(i in 1:length(pics))
 {
-  title <- "Tilt_FlatBot_RightValley, DT = 1, source = 75"
-  centeringValue <- 0.5
-  textRelativeHeight <- 0.6
-  cropLeftValue <- 100
-  cropTopValue <- 525
-  cropRightValue <- 100
-  cropBotValue <- 425
-  
+  title <- "vshapedvalley-flatbot-notilt/Coarse"
+  title2 <- "1mph0deg-InnerField-zeroGradientWalls"
+  centeringValue <- 0.475
+  textRelativeHeight <- 0.575
+  cropLeftValue <- 125
+  cropTopValue <- 500
+  cropRightValue <- 225
+  cropBotValue <- 50
+
   #read file
   img<-readPNG(pics[i])
   #get size
@@ -609,7 +685,8 @@ for(i in 1:length(pics))
   rasterImage(img, usr[1], usr[3], usr[2], usr[4])
   #add text
   text(centeringValue,textRelativeHeight,timesForPics[i+ignoreFirstPics],cex=3,col="white")
-  text(centeringValue,textRelativeHeight+0.035,title,cex=4,col="white")
+  text(centeringValue,textRelativeHeight+0.035,title2,cex=4,col="white")
+  text(centeringValue,textRelativeHeight+0.035*2,title,cex=4,col="white")
   #close image
   dev.off()
   #crop image if desired
