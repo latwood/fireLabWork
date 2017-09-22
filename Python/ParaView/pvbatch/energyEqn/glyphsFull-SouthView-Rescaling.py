@@ -17,12 +17,12 @@ mainDir = "/home/latwood/Documents/ParaViewVisualization/"	#warning, changing gr
 imgDir = mainDir+"/Pics/energyEqn/vshapedvalley-flatbot-notilt/buoyantBoussinesqPimpleFoam/Coarse/1mph0deg-reformedConditions/glyphsFull-SouthView-Rescaling/"
 
 originalViewSize = [906, 780]	# this is the original view size, need to get better at getting this. The problem is that if I call getViewSize, I get a proxy which changes
-desiredPictureSize = [1500,1500] #[width, height]
-UlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
-TlegendPosition = [0.3,0.12]	# this will need to be adjusted a bunch
+desiredPictureSize = [2560,2048]	# this is double the monitor resolution which is [1280,1024] #[width, height] I used to use [1500,1500] just to have an arbitrarily big size and cut off edges as needed
+UlegendPosition = [0.475,0.12]	# this will need to be adjusted a bunch	# give up on the move the xyz shower, so put the scale in a similar outside the area spot
+TlegendPosition = [0.475,0.12]	# this will need to be adjusted a bunch
 viewCameraX = 0	# where in the x direction from the center do you want to position the object?
-viewCameraY = 500	# where in the y direction from the center do you want to position the object?
-viewCameraZ = 500	# where in the z direction from the center do you want to position the object?
+viewCameraY = 0	# where in the y direction from the center do you want to position the object?
+viewCameraZ = 0	# where in the z direction from the center do you want to position the object?
 cameraElev = -90	# the tilt to give the view. Need to do -90 for certain side views, mixed with viewUp
 cameraAzmith = 0	# this is the rotation around the z axis if elevation is -90
 cameraViewUp = [0,0,1]	# this is for changing from which side to view

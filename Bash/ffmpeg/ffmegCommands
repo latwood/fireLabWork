@@ -59,3 +59,5 @@ ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "sendcmd=filename=timestamps-toVide
 
 	now need to figure out the right commands to stitch two videos together
 
+
+ffmpeg -framerate 5 -f image2 -i %d.png -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k vshapedvalley-flatbot-notilt_1mph0degInnerField-zeroGradientWalls_TglyphSlice-5fps.mp4
