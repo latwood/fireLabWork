@@ -61,7 +61,37 @@ int main(int argc, char *argv[])
 	// give the right location the value, then use the x,y,or z counter
 	// to give it the cell index counter in the x,y,or z direction!
 
-	Info<< "Setting zThresh values" << endl;
+	Info<< "Setting x,y, and z Thresh values" << endl;
+	volScalarField xThresh
+	(
+		IOobject
+		(
+			"xThresh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	label southPatchID = mesh.boundaryMesh().findPatchID("south_face");
+	const polyPatch& southPatch = mesh.boundaryMesh()[southPatchID];
+
+	volScalarField yThresh
+	(
+		IOobject
+		(
+			"yThresh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	label westPatchID = mesh.boundaryMesh().findPatchID("west_face");
+	const polyPatch& westPatch = mesh.boundaryMesh()[westPatchID];
+
 	volScalarField zThresh
 	(
 		IOobject
@@ -74,103 +104,37 @@ int main(int argc, char *argv[])
 		),
 		mesh
 	);
-
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
 	const polyPatch& minZpatch = mesh.boundaryMesh()[minZpatchID];
 	
-	volScalarField internalField_x(mesh.C().component(0));
-	volScalarField internalField_y(mesh.C().component(1));
-	volScalarField internalField_z(mesh.C().component(2));
-	//volScalarField internalField_z = wallDist(mesh).y();
+	scalar Az = minZpatch.size();
+	scalar Ay = westPatch.size();
+	scalar Ax = southPatch.size();
+	std::cout << "Ax = " << Ax << ", Ay = " << Ay << ", Az = " << Az << "\n";
+	scalar xMax = std::sqrt(Az*Ax/Ay);
+	scalar yMax = Ay*xMax/Ax;
+	scalar zMax = Ax/xMax;
+	std::cout << "zMax = " << zMax << ", yMax = " << yMax << ", xMax = " << xMax << "\n";
 
-	forAll(internalField_z,cellI)
+	std::cout << "listed cellI: \n";
+	for(double k = 0; k < zMax; k++)
 	{
-		scalar inField_x = internalField_x[cellI];
-		inField_x = round(inField_x*1000.0)/1000.0;
-		scalar inField_y = internalField_y[cellI];
-		inField_y = round(inField_y*1000.0)/1000.0;
-		forAll(minZpatch,faceI)
+		for(double i = 0; i < yMax; i++)
 		{
-			scalar minZ_x = mesh.C().boundaryField()[minZpatchID][faceI].component(0);
-			minZ_x = round(minZ_x*1000.0)/1000.0;	//rounds to the nearest 3rd decimal place
-			scalar minZ_y = mesh.C().boundaryField()[minZpatchID][faceI].component(1);
-			minZ_y = round(minZ_y*1000.0)/1000.0;
-			if(minZ_x == inField_x && minZ_y == inField_y)
+			for(double j = 0; j < xMax; j++)
 			{
-				scalar minZ_z = mesh.Cf().boundaryField()[minZpatchID][faceI].component(2);
-				zThresh[cellI] = internalField_z[cellI]/minZ_z;
-				break;
+				scalar cellI = Az*k+xMax*i+j;	
+				std::cout << " " << cellI;
+				xThresh[cellI] = i;
+				yThresh[cellI] = j;
+				zThresh[cellI] = k;
 			}
+			std::cout << "\n";
 		}
 	}
+	xThresh.write();
+	yThresh.write();
 	zThresh.write();
-
-	//const volVectorField& meshC = mesh.C();
-
-	//scalar minZ_x = mesh.C().boundaryField()[minZpatchID][1].component(0);
-/*
-	volScalarField minZ_x(minZpatch.mesh.C().component(0));
-	volScalarField minZ_y(minZpatch.mesh.C().component(1));
-	volScalarField minZ_z(minZpatch.mesh.C().component(2));
-	
-	volScalarField internalField_x(mesh.C().component(0));
-	volScalarField internalField_y(mesh.C().component(1));
-	volScalarField internalField_z(mesh.C().component(2));
-
-	forAll(internalField_z,cellI)
-	{
-		forAll(minZpatch,faceI)
-		{
-			if(minZ_x[faceI] == internalField_x[cellI] && minZ_y[faceI] == internalField_y[cellI])
-			{
-				zThresh[cellI] = internalField_z[cellI]/minZ_z[faceI];
-			}
-		}
-	}
-	zThresh.write();
-*/
-
-/*	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
-	const polyPatch& minZpatch = mesh.boundaryMesh()[minZpatchID];
-	volScalarField minZ_x(minZpatch.faceCentres().component(0));
-	volScalarField minZ_y(minZpatch.faceCentres().component(1));
-	volScalarField minZ_z(minZpatch.faceCentres().component(2));
-	
-	volScalarField internalField_x(mesh.C().component(0));
-	volScalarField internalField_y(mesh.C().component(1));
-	volScalarField internalField_z(mesh.C().component(2));
-	
-	forAll(internalField_z,cellI)
-	{
-		forAll(minZpatch,faceI)
-		{
-			if(minZ_x[faceI] == internalField_x[cellI] && minZ_y[faceI] == internalField_y[cellI])
-			{
-				zThresh[cellI] = internalField_z[cellI]/minZ_z[faceI];
-			}
-		}
-	}
-	zThresh.write();
-*/
-
-
-//	volScalarField zMin = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ
-//	volScalarField zMax(mesh.C().component(2)); //z-component of cell center. So height above lowest z point, not height above z0 for each z point.
-	//looks like you can replace wallDist with patchDistMethod for other options
-
-//	forAll(zMin, cellI)
-//	{
-		// relative height from ground for face lists
-//		scalar AGLmin = zMin[cellI];	//I think that AGL is the height of the cell
-//		scalar AGLmax = zMax[cellI];
-
-		//Apply formula to get profile. Make sure that the AGL is corrected for the minZ height
-		//ThreshCalc = (AGLmax-AGLmin)*ThresholdValueIncrementer;
-		//ThreshCalc = AGLmin*ThresholdValueIncrementer;
-//		ThreshCalc = AGLmax/(AGLmax-AGLmin)*ThresholdValueIncrementer;
- //   	zThresh[cellI] = ThreshCalc;
-//	}
-//	zThresh.write();
 
 	Info<< "End\n" << endl;
 
