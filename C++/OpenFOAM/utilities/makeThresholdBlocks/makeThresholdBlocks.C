@@ -30,6 +30,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include <vector>
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
@@ -40,6 +41,17 @@ Description
 
 // turbulence constants - file-scope
 
+double rounder(double valToRound,double roundVal = 1.0)	//roundVal = 1000.0 means round to 3 decimals
+{
+	if(roundVal == 0)
+	{
+		std::cout << "Error in Rounder function! Can't use 0 as the input " 
+				<< "since divide by 0! Changing it to 1.0 as default!\n";
+		roundVal = 1.0;
+	}
+	double roundedValue = round(valToRound*roundVal)/roundVal;
+	return roundedValue;
+}
 
 int main(int argc, char *argv[])
 {
@@ -60,7 +72,26 @@ int main(int argc, char *argv[])
 	// then I use a summation of the three counter variables to represent the cellI to
 	// give the right location the value, then use the x,y,or z counter
 	// to give it the cell index counter in the x,y,or z direction!
+	
+	// hmm, this worked up until the mesh started to get refined. I could counter it
+	// by copying over the file and adding zeroes to the end, up until renumber mesh happens
+	// then all the cell numbers are all messed up. There is no way to do this without
+	// figuring out how to access a cell index, which it looks like the indices are not in
+	// in order of 0 to max from left to right, down and up in the mesh.
+	// So I need to go through openfoam and figure out what data stuff I can know and think
+	// of how geometrically I can manipulate what I can get to always acheive the 0,1,2,3 . . .
+	// values for each layer
 
+	// So I know a cell center x,y,z coordinates for the inner field,
+	// the same coordinates, but with z subtracting the z coordinate of the lowest cell center
+	// the face center x,y,z coordinates for each patch (so the z of minZ patch is actually
+	// smaller than the lowest z of the inner field since it is a face and not a patch)
+
+	// the cell centers by themselves are useless. Need the cell centers based off of the
+	// height from the ground, so taking away the smallest value
+	// but I need to somehow get the smallest value back to divide in to get my actual values
+
+/*
 	Info<< "Setting x,y, and z Thresh values" << endl;
 	volScalarField xThresh
 	(
@@ -105,8 +136,9 @@ int main(int argc, char *argv[])
 		mesh
 	);
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
-	const polyPatch& minZpatch = mesh.boundaryMesh()[minZpatchID];
+	const polyPatch& minZpatch = mesh.boundaryMesh()[minZpatchID];*/
 	
+/*
 	scalar Az = minZpatch.size();
 	scalar Ay = westPatch.size();
 	scalar Ax = southPatch.size();
@@ -134,6 +166,123 @@ int main(int argc, char *argv[])
 	}
 	xThresh.write();
 	yThresh.write();
+	zThresh.write();*/
+
+
+
+	//find all unique x,y coordinates of the inner fields
+	// then find the smallest minZ values for each x,y coordinates
+	// then go through the z values and divide it by the minZ values of the same x,y coordinates
+	// for this to work even with refined mesh, since the coordinates are not the same for the inner field as for the walls, this needs to be done using the inner field
+	
+	volScalarField zThresh
+	(
+		IOobject
+		(
+			"zThresh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	
+	std::cout << "Finding unique xcoords\n";	//would totally do this just with patch faces, except the mesh doesn't keep the same coordinates as the side walls throughout the mesh	
+	std::vector<double> xcoords;
+	//notice that these are the nearest to the wall values for each inner field cell centers
+	volScalarField internalField_x(mesh.C().component(0));
+	forAll(internalField_x,cellI)
+	{
+		bool repeatedXcoord = false;
+		double xcoordsSize = xcoords.size();
+		for(double i = 0; i < xcoordsSize; i++)
+		{
+			if(rounder(internalField_x[cellI]) == rounder(xcoords[i]))
+			{
+				repeatedXcoord = true;
+				break;
+			}
+		}
+		if(repeatedXcoord == false)
+		{
+			xcoords.push_back(internalField_x[cellI]);
+			std::cout << internalField_x[cellI] << " ";
+		}
+	}
+	std::cout << "\nxcoords.size = " << xcoords.size() << "\n";
+
+	
+	std::cout << "Finding unique ycoords\n";	//would totally do this just with patch faces, except the mesh doesn't keep the same coordinates as the side walls throughout the mesh
+	std::vector<double> ycoords;
+	//notice that these are the nearest to the wall values for each inner field cell centers
+	volScalarField internalField_y(mesh.C().component(1));
+	forAll(internalField_y,cellI)
+	{
+		bool repeatedYcoord = false;
+		double ycoordsSize = ycoords.size();
+		for(double j = 0; j < ycoordsSize; j++)
+		{
+			if(rounder(internalField_y[cellI]) == rounder(ycoords[j]))
+			{
+				repeatedYcoord = true;
+				break;
+			}
+		}
+		if(repeatedYcoord == false)
+		{
+			ycoords.push_back(internalField_y[cellI]);
+			std::cout << internalField_y[cellI] << " ";
+		}
+	}
+	std::cout << "\nycoords.size = " << ycoords.size() << "\n";
+
+	std::cout << "Finding smallest minZ values for each x & y coords\n";
+	//std::vector< std::vector<int> > zMin(4, std::vector<int>(4,4));
+	std::vector< std::vector<double> > zMin(xcoords.size(), std::vector<double>(ycoords.size(),9999999));	// this will have to get filled based off of the other two
+	volScalarField z = wallDist(mesh).y();	// this is the height above the smallest cell in the mesh
+	forAll(z, cellI)
+	{
+		double ycoordsSize = ycoords.size();
+		for(double j = 0; j < ycoordsSize; j++)
+		{
+			double xcoordsSize = xcoords.size();
+			for(double i = 0; i < xcoordsSize; i++)
+			{
+				if(rounder(internalField_x[cellI]) == rounder(xcoords[i])
+				 && rounder(internalField_y[cellI]) == rounder(ycoords[j]))
+				{
+					if(z[cellI] < zMin[i][j])
+					{
+						zMin[i][j] = z[cellI];
+					}
+					i = xcoordsSize;
+					j = ycoordsSize;
+				}
+			}
+		}
+	}
+
+	std::cout << "setting zThresh values\n";
+	forAll(z, cellI)
+	{
+		double ycoordsSize = ycoords.size();
+		for(double j = 0; j < ycoordsSize; j++)
+		{
+			double xcoordsSize = xcoords.size();
+			for(double i = 0; i < xcoordsSize; i++)
+			{
+				if(rounder(internalField_x[cellI]) == rounder(xcoords[i])
+				 && rounder(internalField_y[cellI]) == rounder(ycoords[j]))
+				{
+					zThresh[cellI] = (z[cellI]/zMin[i][j]-1)/2.0;
+					i = xcoordsSize;
+					j = ycoordsSize;
+				}
+			}
+		}
+	}
+	std::cout << "writing zThresh values\n";
 	zThresh.write();
 
 	Info<< "End\n" << endl;
