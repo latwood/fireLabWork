@@ -90,9 +90,32 @@ int main(int argc, char *argv[])
 	// the cell centers by themselves are useless. Need the cell centers based off of the
 	// height from the ground, so taking away the smallest value
 	// but I need to somehow get the smallest value back to divide in to get my actual values
+	
+
+	// okay, I finally realized that even the z height above the mesh doesn't even get a
+	// uniform value along a given z layer, and in fact the mesh isn't even boxes anymore,
+	// causing the x,y points to be all funky if you use cell centers
+	// the true way to convert to the locations is that I need what cell number in a given
+	// direction the current coordinate is for, then I can divide out the point coordinate
+	// and multiply by the cell number it is in a given x,y,z direction.
+	// but OpenFoam does not appear to store the mesh in this way at all. They just care about
+	// going from one cell to the next in calculations! So they don't care at all about 
+	// a given cell number in a given x,y,z direction which is why stuff goes relatively fast!
+	// So I either need to find something that does give me this information, like maybe the
+	// foam to vtk stuff, or I need to get the number of cells using the points, neighbors,
+	// owners, and boundaries which is basically writing a mesh class.
+	// This will be tricky because even cell centers are off since none of the cells are true
+	// boxes anymore, or at least they skew off in different directions.
+	// you can get cell center info by running writeCellCentres.
+	
+	// another trick would be figuring out how to force renumberMesh to actually give nice
+	// structured organization, even with the refined cells at the bottom of the mesh
+	// I guess this would be turning those cells into some kind of separate block or something
+	// I had errors just trying a straight renumberMesh to structured mesh, it wanted me to
+	// go the other way and undo a renumberMesh!
 
 /*
-	Info<< "Setting x,y, and z Thresh values" << endl;
+	Info<< "Setting x,y, and z Thresh values using structured i,j,k indices (which don't work after the mesh is refined and especially not after renumbering! Can get close if you put zeroes in to fill in the remaining cells, copying over the mesh from before refining)" << endl;
 	volScalarField xThresh
 	(
 		IOobject
@@ -136,9 +159,9 @@ int main(int argc, char *argv[])
 		mesh
 	);
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
-	const polyPatch& minZpatch = mesh.boundaryMesh()[minZpatchID];*/
+	const polyPatch& minZpatch = mesh.boundaryMesh()[minZpatchID];
 	
-/*
+
 	scalar Az = minZpatch.size();
 	scalar Ay = westPatch.size();
 	scalar Ax = southPatch.size();
@@ -168,8 +191,62 @@ int main(int argc, char *argv[])
 	yThresh.write();
 	zThresh.write();*/
 
+	Info<< "Setting x,y, and z Thresh values as the cell centers of the internal mesh. Can also be adjusted to write out zThresh to be the cell center height above the zMin patch instead of referencing 0 height" << endl;
+	volScalarField xThresh
+	(
+		IOobject
+		(
+			"xThresh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
 
+	volScalarField yThresh
+	(
+		IOobject
+		(
+			"yThresh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
 
+	volScalarField zThresh
+	(
+		IOobject
+		(
+			"zThresh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+
+	volScalarField internalField_x(mesh.C().component(0));
+	volScalarField internalField_y(mesh.C().component(1));
+	//volScalarField internalField_z(mesh.C().component(2));
+	volScalarField internalField_z = wallDist(mesh).y();	// adding a false here does not change things much
+
+	forAll(internalField_z,cellI)
+	{
+		xThresh[cellI] = internalField_x[cellI];
+		yThresh[cellI] = internalField_y[cellI];
+		zThresh[cellI] = internalField_z[cellI];
+	}
+	xThresh.write();
+	yThresh.write();
+	zThresh.write();
+
+/*
 	//find all unique x,y coordinates of the inner fields
 	// then find the smallest minZ values for each x,y coordinates
 	// then go through the z values and divide it by the minZ values of the same x,y coordinates
@@ -283,7 +360,53 @@ int main(int argc, char *argv[])
 		}
 	}
 	std::cout << "writing zThresh values\n";
-	zThresh.write();
+	zThresh.write();*/
+	
+/*
+	Info<< "Setting z Thresh values to biggest unique neighbor face ID" << endl;
+
+	volScalarField zThresh
+	(
+		IOobject
+		(
+			"zThresh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	
+	const unallocLabelList & theOwners( mesh.owner() );
+	const unallocLabelList & theNeighbors( mesh.neighbour() );
+	std::vector<label> uniqueNeighbors(mesh.C().size(),99999);
+	
+	label neighborCellI = 0;
+	uniqueNeighbors[0] = theNeighbors[0];
+	for(label faceI = 1; faceI < mesh.nInternalFaces(); faceI++)
+	{
+		if(theOwners[faceI] == theOwners[faceI-1])
+		{
+			if(theNeighbors[faceI] < uniqueNeighbors[neighborCellI])
+			{
+				uniqueNeighbors[neighborCellI] = theNeighbors[faceI];
+			}
+		} else
+		{
+			if(uniqueNeighbors[neighborCellI] == 99999)
+			{
+				uniqueNeighbors[neighborCellI] = theNeighbors[faceI];
+			}
+			neighborCellI++;
+		}
+	}
+
+	for(label cellI = 0; cellI < uniqueNeighbors.size(); cellI++)
+	{
+		zThresh[cellI] = uniqueNeighbors[cellI];
+	}
+	zThresh.write();*/
 
 	Info<< "End\n" << endl;
 
