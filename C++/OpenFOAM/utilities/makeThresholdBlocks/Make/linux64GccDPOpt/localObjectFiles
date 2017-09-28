@@ -1,2 +1,6 @@
 LOCAL_OBJECTS = \
-makeThresholdBlocks.o
+makeThresholdBlocks.o\
+sortedMesh.o\
+foamPoint.o\
+meshPoint.o\
+meshCell.o

@@ -1,2 +1,6 @@
 DEPENDENCIES = \
-makeThresholdBlocks.dep
+makeThresholdBlocks.dep\
+sortedMesh.dep\
+foamPoint.dep\
+meshPoint.dep\
+meshCell.dep

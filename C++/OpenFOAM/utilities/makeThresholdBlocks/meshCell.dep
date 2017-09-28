@@ -1,0 +1,7 @@
+$(OBJECTS_DIR)/meshCell.o: meshCell.dep
+meshCell.dep: meshCell.C
+meshCell.dep: meshCell.H
+$(OBJECTS_DIR)/meshCell.o: $(EXE_DEP)
+$(OBJECTS_DIR)/meshCell.o:
+	@SOURCE_DIR=.
+	SOURCE=meshCell.C ; $(Ctoo)

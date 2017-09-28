@@ -1,0 +1,7 @@
+$(OBJECTS_DIR)/meshPoint.o: meshPoint.dep
+meshPoint.dep: meshPoint.C
+meshPoint.dep: meshPoint.H
+$(OBJECTS_DIR)/meshPoint.o: $(EXE_DEP)
+$(OBJECTS_DIR)/meshPoint.o:
+	@SOURCE_DIR=.
+	SOURCE=meshPoint.C ; $(Ctoo)

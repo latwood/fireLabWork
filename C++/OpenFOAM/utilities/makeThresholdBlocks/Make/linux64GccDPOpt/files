@@ -54,5 +54,9 @@
 # 4 "<command-line>" 2
 # 1 "files"
 makeThresholdBlocks.C
+sortedMesh.C
+foamPoint.C
+meshPoint.C
+meshCell.C
 
 EXE = $(FOAM_USER_APPBIN)/makeThresholdBlocks

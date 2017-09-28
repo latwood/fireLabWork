@@ -30,6 +30,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "sortedMesh.H"
+
 #include <vector>
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
@@ -61,6 +63,13 @@ int main(int argc, char *argv[])
 	#include "createTime.H"
     #include "createMesh.H"
 
+	mesh.points();
+	//const unallocLabelList & theOwners( mesh.owner() );	// const is on the left, so unallocLabelList is the constant, not the & reference. If const were on the right of &, the reference would be the const
+	//const unallocLabelList & theNeighbors( mesh.neighbour() );
+	//std::vector<label> uniqueNeighbors(mesh.C().size(),99999);
+
+	sortedMesh betterMesh(mesh.points(),mesh.faces(),mesh.faceOwner(),mesh.faceNeighbour(),mesh.boundaryMesh());	// problem I had here was that somehow the new .C file was not included in some kind of building list. So add the .C file to the files list not the exe list in the make/files file!
+	//betterMesh.message();
 
 	// need to make a patch minZ and get the face centers of the patch
 	// then in the loop going through the internal cells, if the x and y coordinates
@@ -191,7 +200,7 @@ int main(int argc, char *argv[])
 	yThresh.write();
 	zThresh.write();*/
 
-	Info<< "Setting x,y, and z Thresh values as the cell centers of the internal mesh. Can also be adjusted to write out zThresh to be the cell center height above the zMin patch instead of referencing 0 height" << endl;
+	/*Info<< "Setting x,y, and z Thresh values as the cell centers of the internal mesh. Can also be adjusted to write out zThresh to be the cell center height above the zMin patch instead of referencing 0 height" << endl;
 	volScalarField xThresh
 	(
 		IOobject
@@ -244,7 +253,7 @@ int main(int argc, char *argv[])
 	}
 	xThresh.write();
 	yThresh.write();
-	zThresh.write();
+	zThresh.write();*/
 
 /*
 	//find all unique x,y coordinates of the inner fields
