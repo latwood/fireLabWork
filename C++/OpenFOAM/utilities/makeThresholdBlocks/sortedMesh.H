@@ -61,11 +61,25 @@ public:
 				const labelList& theOwners,
 				const labelList& theNeighbors,
 				const polyBoundaryMesh& theBoundaries);
+	//creates all needed information for later functions
 	
-	void message();
+	double colorBySortedValue(double faceI);
+	
+	double colorByXlayers(double faceI);
+	double colorByYlayers(double faceI);
+	double colorByZlayers(double faceI);
 
 private:
+	
+	void findFaceSharedPoints(const faceList& theFaces,double nInternalFaces);
 
+	std::vector< std::vector<double> > facesSharingABpoints;
+	std::vector< std::vector<double> > facesSharingACpoints;
+	std::vector< std::vector<double> > facesSharingADpoints;
+	std::vector< std::vector<double> > facesSharingBCpoints;
+	std::vector< std::vector<double> > facesSharingBDpoints;
+	std::vector< std::vector<double> > facesSharingCDpoints;
+	
 	std::vector<foamPoint> sortedPoints;
 
 	// end result values

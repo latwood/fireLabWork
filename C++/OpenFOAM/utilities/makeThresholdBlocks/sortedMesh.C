@@ -23,10 +23,12 @@ sortedMesh::sortedMesh(const pointField& thePoints,
 	std::cout << "theOwners[0] = " << theOwners[0] << "\n";
 	std::cout << "theNeighbors[0] = " << theNeighbors[0] << "\n";
 	std::cout << "theBoundaries[0][0][0] = " << theBoundaries[0][0][0] << "\n";
+	
+	findFaceSharedPoints(theFaces,theNeighbors.size()-theBoundaries.size());
 	// generateNewPointsList();
 }
 
-void sortedMesh::message()
+void sortedMesh::findFaceSharedPoints(const faceList& theFaces,double nInternalFaces)
 {
-	std::cout << "showing a message! you better work this time!\n";
+
 }

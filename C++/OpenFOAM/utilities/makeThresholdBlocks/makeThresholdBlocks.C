@@ -69,7 +69,27 @@ int main(int argc, char *argv[])
 	//std::vector<label> uniqueNeighbors(mesh.C().size(),99999);
 
 	sortedMesh betterMesh(mesh.points(),mesh.faces(),mesh.faceOwner(),mesh.faceNeighbour(),mesh.boundaryMesh());	// problem I had here was that somehow the new .C file was not included in some kind of building list. So add the .C file to the files list not the exe list in the make/files file!
-	//betterMesh.message();
+	
+	Info<< "Setting coloredFaces using sortedMesh techniques" << endl;
+	volScalarField coloredFaces
+	(
+		IOobject
+		(
+			"coloredFaces",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	
+	forAll(mesh.nInternalFaces(), faceI)
+	{
+		coloredFaces[faceI] = 1;	//going to have to use some kind of getFace function where it just wants the face index, and it returns the value it is supposed to get. So colorBySortedValue
+		//or we need something to return what is needed of the faces information or sorted information and do some kind of comparison. I almost think it would be better if it uses a face index to give a value like colorByZlayers or colorByYlayers or colorByXlayers
+	}
+	coloredFaces.write();
 
 	// need to make a patch minZ and get the face centers of the patch
 	// then in the loop going through the internal cells, if the x and y coordinates
