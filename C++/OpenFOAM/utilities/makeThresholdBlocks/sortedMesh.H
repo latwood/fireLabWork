@@ -73,12 +73,22 @@ private:
 	
 	void findFaceSharedPoints(const faceList& theFaces,double nInternalFaces);
 
-	std::vector< std::vector<double> > facesSharingABpoints;
-	std::vector< std::vector<double> > facesSharingACpoints;
-	std::vector< std::vector<double> > facesSharingADpoints;
-	std::vector< std::vector<double> > facesSharingBCpoints;
-	std::vector< std::vector<double> > facesSharingBDpoints;
-	std::vector< std::vector<double> > facesSharingCDpoints;
+	std::vector< std::vector<double> > facesSharingABpoints_internal;
+	std::vector< std::vector<double> > facesSharingACpoints_internal;
+	std::vector< std::vector<double> > facesSharingADpoints_internal;
+	std::vector< std::vector<double> > facesSharingBCpoints_internal;
+	std::vector< std::vector<double> > facesSharingBDpoints_internal;
+	std::vector< std::vector<double> > facesSharingCDpoints_internal;
+	
+	std::vector< std::vector<double> > facesSharingABpoints_boundary;
+	std::vector< std::vector<double> > facesSharingACpoints_boundary;
+	std::vector< std::vector<double> > facesSharingADpoints_boundary;
+	std::vector< std::vector<double> > facesSharingBCpoints_boundary;
+	std::vector< std::vector<double> > facesSharingBDpoints_boundary;
+	std::vector< std::vector<double> > facesSharingCDpoints_boundary;
+	
+	std::vector<double> faceColor_internal;
+	std::vector<double> faceColor_boundary;
 	
 	std::vector<foamPoint> sortedPoints;
 

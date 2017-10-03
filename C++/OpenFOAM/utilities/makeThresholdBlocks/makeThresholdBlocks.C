@@ -84,10 +84,14 @@ int main(int argc, char *argv[])
 		mesh
 	);
 	
-	forAll(mesh.nInternalFaces(), faceI)
+	for(double faceI = 0; faceI < mesh.faceNeighbour().size(); faceI++)
 	{
 		coloredFaces[faceI] = 1;	//going to have to use some kind of getFace function where it just wants the face index, and it returns the value it is supposed to get. So colorBySortedValue
 		//or we need something to return what is needed of the faces information or sorted information and do some kind of comparison. I almost think it would be better if it uses a face index to give a value like colorByZlayers or colorByYlayers or colorByXlayers
+	}
+	for(double faceI = mesh.faceNeighbour().size(); faceI < mesh.faces().size(); faceI++)
+	{
+		coloredFaces[faceI] = 1;
 	}
 	coloredFaces.write();
 
