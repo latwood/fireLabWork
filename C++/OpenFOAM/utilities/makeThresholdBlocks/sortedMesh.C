@@ -24,6 +24,11 @@ sortedMesh::sortedMesh(const pointField& thePoints,
 	std::cout << "theNeighbors[0] = " << theNeighbors[0] << "\n";
 	std::cout << "theBoundaries[0][0][0] = " << theBoundaries[0][0][0] << "\n";
 	
+	faceColor_internal.resize(theNeighbors.size(),0);
+	std::cout << "faceColor_internal.size() = " << faceColor_internal.size() << "\n";
+	faceColor_boundary.resize(theFaces.size()-theNeighbors.size(),0);
+	std::cout << "faceColor_boundary.size() = " << faceColor_boundary.size() << "\n";
+	
 	findFaceSharedPoints(theFaces,theNeighbors.size());
 	// generateNewPointsList();
 }
@@ -42,12 +47,16 @@ void sortedMesh::findFaceSharedPoints(const faceList& theFaces,double nInternalF
 			std::vector<double> matchingFaces;
 			matchingFaces.push_back(j);
 			matchingFaces.push_back(i);
-			if(theFaces[j][0] == theFaces[i][1])
+			if(theFaces[j][0] == theFaces[i][1] || theFaces[j][1] == theFaces[i][0])
 			{
 				facesSharingABpoints_internal.push_back(matchingFaces);
-//				faceColor_internal.push_back();
-// this doesn't quite work right, since a single face could have multiple colors.
-// this will cause the vector to get too big. Need to initialize it with a size of all the faces, and with a value of 0, then have value checking to determine if it already has a color or not, and reassign to the more correct color.
+				/*if(faceColor_internal[j] == -1)
+				{
+					faceColor_internal[j] = 0;
+				} else if(faceColor_internal[j] == 0)
+				{
+				}
+					faceColor_internal[i] = 0;*/
 			}
 			if(theFaces[j][0] == theFaces[i][2])
 			{

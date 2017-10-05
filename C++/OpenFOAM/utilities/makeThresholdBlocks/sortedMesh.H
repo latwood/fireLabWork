@@ -87,6 +87,41 @@ private:
 	std::vector< std::vector<double> > facesSharingBDpoints_boundary;
 	std::vector< std::vector<double> > facesSharingCDpoints_boundary;
 	
+	/*
+		color schemes for internal faceColors
+		xlayers have AB, DC (CD), DA (AD), CB (BC)	give end value of 0
+		ylayers have DA (AD), CB (BC), BA (AB), CD
+		zlayers have BA (AB), CD, CB (BC), DA (AD)
+
+		color scheme for external faceColors-hmm, for x and y layers, it is the same for both sides, just a different order of the points. Maybe should just sort them all together, and if the index is greater than the boundary, use that to tell them apart? Later yes, just do if statement on indices to determine if it is internal or external, then if statement to determine which face
+		depending on the values of the points, it should be possible to sort by height above the mesh, or simply by index above the mesh in a given layer. Maybe have a separate value kept that is the index in the layer, then just do a search of that to determine which value to output
+		interesting, the same thing appears in the zlayers
+
+		xlayers west face have AD, BC, BA (AB), CD  give end value of 
+		xlayers east face have AB, DC (CD), DA (AD), CB (BC)  give end value of
+		ylayers south face have BA (AB), CD, CB (BC), DA (AD)
+		ylayers north face have DA (AD), CB (BC), BA (AB), CD
+		zlayers minZ have CB (BC), DA (AD), BA (AB), CD
+		zlayers maxZ have BA (AB), CD, CB (BC), DA (AD)
+
+		okay, lets rearrange to make it easier to organize into my if statements
+		xlayers have AB, AD, BC, CD 
+		ylayers have AB, AD, BC, CD
+		zlayers have AB, AD, BC, CD
+		um, they all match the same way!
+		So there aren't any AC or BD?
+		
+		So I guess this means it would be easier to sort them all by smallest of 1st, 2nd, 3rd, or 4th points
+		
+		
+		AC = 1
+		AD = 2
+		BC = 3
+		BD = 4
+		CD = 5
+		AB, AC = 0.1
+		AB, AC, AD = 0.2
+	*/
 	std::vector<double> faceColor_internal;
 	std::vector<double> faceColor_boundary;
 	
