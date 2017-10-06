@@ -63,29 +63,17 @@ public:
 				const polyBoundaryMesh& theBoundaries);
 	//creates all needed information for later functions
 	
-	double colorBySortedValue(double faceI);
-	
 	double colorByXlayers(double faceI);
 	double colorByYlayers(double faceI);
 	double colorByZlayers(double faceI);
 
 private:
 	
-	void findFaceSharedPoints(const faceList& theFaces,double nInternalFaces);
+	void findFaceLayers(const faceList& theFaces,double nInternalFaces);
 
-	std::vector< std::vector<double> > facesSharingABpoints_internal;
-	std::vector< std::vector<double> > facesSharingACpoints_internal;
-	std::vector< std::vector<double> > facesSharingADpoints_internal;
-	std::vector< std::vector<double> > facesSharingBCpoints_internal;
-	std::vector< std::vector<double> > facesSharingBDpoints_internal;
-	std::vector< std::vector<double> > facesSharingCDpoints_internal;
-	
-	std::vector< std::vector<double> > facesSharingABpoints_boundary;
-	std::vector< std::vector<double> > facesSharingACpoints_boundary;
-	std::vector< std::vector<double> > facesSharingADpoints_boundary;
-	std::vector< std::vector<double> > facesSharingBCpoints_boundary;
-	std::vector< std::vector<double> > facesSharingBDpoints_boundary;
-	std::vector< std::vector<double> > facesSharingCDpoints_boundary;
+	std::vector<double> xFaceLayers;
+	std::vector<double> yFaceLayers;
+	std::vector<double> zFaceLayers;
 	
 	/*
 		color schemes for internal faceColors
@@ -111,19 +99,43 @@ private:
 		um, they all match the same way!
 		So there aren't any AC or BD?
 		
-		So I guess this means it would be easier to sort them all by smallest of 1st, 2nd, 3rd, or 4th points
+		So I guess this means it would be easier to sort them all by smallest of 1st, 2nd, 3rd, or 4th points. No this wouldn't work because each point actually is a set of x,y,z
+		need something a bit more complex
 		
 		
-		AC = 1
-		AD = 2
-		BC = 3
-		BD = 4
-		CD = 5
-		AB, AC = 0.1
-		AB, AC, AD = 0.2
+		okay, lets not do any of the boundaries and just have all those be zero gradient
+		assuming the first point is the bottom left corner, the faces are xlayers in a
+		given zlayer 
+			if 1 == B and 4 == C
+		a given xlayer face is above another xlayer face 
+			if 3 == b and 4 == a
+		
+		the faces are ylayers in a given zlayer
+			if 3 == B and 4 == A
+		a given ylayer face is above another ylayer face
+			if 2 == a and 3 == d
+		
+		the faces are zlayers
+			if 2 == A and 3 == D or (3 == b and 4 == a) watch this last part, it is the same as ylayers
+		a given zlayer face is above another zlayer face, or in the same zlayer
+			if 3 == b and 4 == a
+		*/
+		
+	/*
+	so a face is an xlayer if at any time, it is found that another internal face satisfies the following if statements, in which case both faces are xlayers
+		if 1 == B and 4 == C or B == 1 and C == 4
+		or 3 == b and 4 == a or b == 3 and a == 4
+	a face is a ylayer if at any time, it is found that another internal face satisfies the following if statements, in which case both faces are ylayer faces
+		if 3 == B and 4 == A or B == 3 and A == 4
+		or 2 == a and 3 == d or a == 2 and d == 3
+	a face is a zlayer if at any time, it is found that another internal face satisfies the following if statements, in which case both faces are zlayer faces
+		if 2 == A and 3 == D or A == 2 and D == 3
+		or 3 == b and 4 == a or b == 3 and a == 4
+		
+	hmm, since stuff is shared, it would be best to first search by the first line if statements, since those are all unique, then in a given layer do some kind of search with the second line if statement to determine if they are in the same zlayer, or in differing x or y layers. Then sort by smallest to largest of different point location criteria of some sort
+	hmm, just realized that while it appeared that the first statement for zlayers was independent, it is actually the same one as the first statement for x.
+	guess that means that I should use the first statement, but that it actually gets me xlayers with some zlayers, and ylayers with some zlayers. Then I need to repeat the process with some more if statements to determine if they are an xlayer or zlayer, or if they are a ylayer or a zlayer.
 	*/
-	std::vector<double> faceColor_internal;
-	std::vector<double> faceColor_boundary;
 	
 	std::vector<foamPoint> sortedPoints;
 

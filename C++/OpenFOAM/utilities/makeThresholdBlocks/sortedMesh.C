@@ -24,121 +24,166 @@ sortedMesh::sortedMesh(const pointField& thePoints,
 	std::cout << "theNeighbors[0] = " << theNeighbors[0] << "\n";
 	std::cout << "theBoundaries[0][0][0] = " << theBoundaries[0][0][0] << "\n";
 	
-	faceColor_internal.resize(theNeighbors.size(),0);
-	std::cout << "faceColor_internal.size() = " << faceColor_internal.size() << "\n";
-	faceColor_boundary.resize(theFaces.size()-theNeighbors.size(),0);
-	std::cout << "faceColor_boundary.size() = " << faceColor_boundary.size() << "\n";
-	
-	findFaceSharedPoints(theFaces,theNeighbors.size());
+	findFaceLayers(theFaces,theNeighbors.size());	//assumes that all boundary faces are held after all the internalField faces!!!
 	// generateNewPointsList();
 }
 
-void sortedMesh::findFaceSharedPoints(const faceList& theFaces,double nInternalFaces)
+void sortedMesh::findFaceLayers(const faceList& theFaces,double nInternalFaces)
 {
-	// first lets do the internal faces
+	// find what faces belong to each type of layer. Another function will sort the faces in a given layer
+
 	//okay need some kind of recursion. The first one needs compared with all others but itself
 	// the second one needs compared with all others but the first one and itself, since the first one was already compared with it
 	// the third one needs compared with all others but the first and second ones and itself, since the first and second ones have already compared themselves with it
 	// the last one will not need to check on any others, since the second to last will have compared itself with the last one
+	// should have a bool for each face telling whether it has already been assigned to a layer or not. Still need to check if only one of the faces has been assigned, but if both have, we are done and need to move on
+	
+	std::vector<double> xFaceLayers_unsorted;
+	std::vector<double> yFaceLayers_unsorted;
+	std::vector<double> zFaceLayers_unsorted;
+	
+	//impossible to separate the zlayers from the x or y layers, so first sort by x and y layers, throwing in the zlayers
+	
+	std::vector<bool> assignedToLayer(nInternalFaces,false);
+	std::vector<double> xzFaceLayers;
+	std::vector<double> yzFaceLayers;
+
 	for(double j = 0; j < nInternalFaces-1; j++)	// all but the last one
 	{
 		for(double i = j+1; i < nInternalFaces; i++)	// all but the current one and those before
 		{
-			std::vector<double> matchingFaces;
-			matchingFaces.push_back(j);
-			matchingFaces.push_back(i);
-			if(theFaces[j][0] == theFaces[i][1] || theFaces[j][1] == theFaces[i][0])
+			if(assignedToLayer[j] != true && assignedToLayer[i] != true)
 			{
-				facesSharingABpoints_internal.push_back(matchingFaces);
-				/*if(faceColor_internal[j] == -1)
+				if((theFaces[j][0] == theFaces[i][1]
+					&& theFaces[j][3] == theFaces[i][2])
+					|| (theFaces[j][1] == theFaces[i][0]
+					&& theFaces[j][2] == theFaces[i][3]))
 				{
-					faceColor_internal[j] = 0;
-				} else if(faceColor_internal[j] == 0)
+					if(assignedToLayer[j] == false)
+					{
+						xzFaceLayers.push_back(j);
+						assignedToLayer[j] = true;
+					}
+					if(assignedToLayer[i] == false)
+					{
+						xzFaceLayers.push_back(i);
+						assignedToLayer[i] = true;
+					}
+				} else if((theFaces[j][2] == theFaces[i][1]
+					&& theFaces[j][3] == theFaces[i][0])
+					|| (theFaces[j][1] == theFaces[i][2]
+					&& theFaces[j][0] == theFaces[i][3]))
 				{
+					if(assignedToLayer[j] == false)
+					{
+						yzFaceLayers.push_back(j);
+						assignedToLayer[j] = true;
+					}
+					if(assignedToLayer[i] == false)
+					{
+						yzFaceLayers.push_back(i);
+						assignedToLayer[i] = true;
+					}
+				} else
+				{
+					std::cout << "not sure how, but faces weren't assigned to layers!\n";
+					std::cout << "j = " << j << ", i = " << i << "\n";
 				}
-					faceColor_internal[i] = 0;*/
-			}
-			if(theFaces[j][0] == theFaces[i][2])
-			{
-				facesSharingACpoints_internal.push_back(matchingFaces);
-			}
-			if(theFaces[j][0] == theFaces[i][3])
-			{
-				facesSharingADpoints_internal.push_back(matchingFaces);
-			}
-			if(theFaces[j][1] == theFaces[i][2])
-			{
-				facesSharingBCpoints_internal.push_back(matchingFaces);
-			}
-			if(theFaces[j][1] == theFaces[i][3])
-			{
-				facesSharingBDpoints_internal.push_back(matchingFaces);
-			}
-			if(theFaces[j][2] == theFaces[i][3])
-			{
-				facesSharingCDpoints_internal.push_back(matchingFaces);
 			}
 		}
 	}
-	std::cout << "facesSharingABpoints_internal.size() = " 
-			<< facesSharingABpoints_internal.size() << "\n";
-	std::cout << "facesSharingACpoints_internal.size() = " 
-			<< facesSharingACpoints_internal.size() << "\n";
-	std::cout << "facesSharingADpoints_internal.size() = " 
-			<< facesSharingADpoints_internal.size() << "\n";
-	std::cout << "facesSharingBCpoints_internal.size() = " 
-			<< facesSharingBCpoints_internal.size() << "\n";
-	std::cout << "facesSharingBDpoints_internal.size() = " 
-			<< facesSharingBDpoints_internal.size() << "\n";
-	std::cout << "facesSharingCDpoints_internal.size() = " 
-			<< facesSharingCDpoints_internal.size() << "\n";
-
 	
-	// now repeat the same for the boundaries
-	for(double j = nInternalFaces; j < theFaces.size()-1; j++)	// all but the last one
+	std::cout << "xzFaceLayers.size() = " << xzFaceLayers.size() << "\n";
+	std::cout << "yzFaceLayers.size() = " << yzFaceLayers.size() << "\n";
+	
+	// now go through and separate out the zlayers with a similar process
+	
+	std::vector<bool> assignedToLayer_xz(xzFaceLayers.size(),false);
+	
+	for(double j = 0; j < xzFaceLayers.size()-1; j++)	// all but the last one
 	{
-		for(double i = j+1; i < theFaces.size(); i++)	// all but the current one and those before
+		for(double i = j+1; i < xzFaceLayers.size(); i++)	// all but the current one and those before
 		{
-			std::vector<double> matchingFaces;
-			matchingFaces.push_back(j);
-			matchingFaces.push_back(i);
-			if(theFaces[j][0] == theFaces[i][1])
+			if(assignedToLayer_xz[j] != true && assignedToLayer_xz[i] != true)
 			{
-				facesSharingABpoints_boundary.push_back(matchingFaces);
-			}
-			if(theFaces[j][0] == theFaces[i][2])
-			{
-				facesSharingACpoints_boundary.push_back(matchingFaces);
-			}
-			if(theFaces[j][0] == theFaces[i][3])
-			{
-				facesSharingADpoints_boundary.push_back(matchingFaces);
-			}
-			if(theFaces[j][1] == theFaces[i][2])
-			{
-				facesSharingBCpoints_boundary.push_back(matchingFaces);
-			}
-			if(theFaces[j][1] == theFaces[i][3])
-			{
-				facesSharingBDpoints_boundary.push_back(matchingFaces);
-			}
-			if(theFaces[j][2] == theFaces[i][3])
-			{
-				facesSharingCDpoints_boundary.push_back(matchingFaces);
+				if((theFaces[xzFaceLayers[j]][2] == theFaces[xzFaceLayers[i]][1]
+					&& theFaces[xzFaceLayers[j]][3] == theFaces[xzFaceLayers[i]][0])
+					|| (theFaces[xzFaceLayers[j]][1] == theFaces[xzFaceLayers[i]][2]
+					&& theFaces[xzFaceLayers[j]][0] == theFaces[xzFaceLayers[i]][3]))
+				{
+					if(assignedToLayer_xz[j] == false)
+					{
+						xFaceLayers_unsorted.push_back(xzFaceLayers[j]);
+						assignedToLayer_xz[j] = true;
+					}
+					if(assignedToLayer_xz[i] == false)
+					{
+						xFaceLayers_unsorted.push_back(xzFaceLayers[i]);
+						assignedToLayer_xz[i] = true;
+					}
+				} else 
+				{
+					if(assignedToLayer_xz[j] == false)
+					{
+						zFaceLayers_unsorted.push_back(xzFaceLayers[j]);
+						assignedToLayer_xz[j] = true;
+					}
+					if(assignedToLayer_xz[i] == false)
+					{
+						zFaceLayers_unsorted.push_back(xzFaceLayers[i]);
+						assignedToLayer_xz[i] = true;
+					}
+				}
 			}
 		}
 	}
-	std::cout << "facesSharingABpoints_boundary.size() = " 
-			<< facesSharingABpoints_boundary.size() << "\n";
-	std::cout << "facesSharingACpoints_boundary.size() = " 
-			<< facesSharingACpoints_boundary.size() << "\n";
-	std::cout << "facesSharingADpoints_boundary.size() = " 
-			<< facesSharingADpoints_boundary.size() << "\n";
-	std::cout << "facesSharingBCpoints_boundary.size() = " 
-			<< facesSharingBCpoints_boundary.size() << "\n";
-	std::cout << "facesSharingBDpoints_boundary.size() = " 
-			<< facesSharingBDpoints_boundary.size() << "\n";
-	std::cout << "facesSharingCDpoints_boundary.size() = " 
-			<< facesSharingCDpoints_boundary.size() << "\n";
-
+	
+	std::cout << "xFaceLayers_unsorted.size() = " << xFaceLayers_unsorted.size() << "\n";
+	std::cout << "zFaceLayers_unsorted.size() = " << zFaceLayers_unsorted.size() << "\n";
+	
+	// now go through and separate out the zlayers with a similar process
+	
+	std::vector<bool> assignedToLayer_yz(yzFaceLayers.size(),false);
+	
+	for(double j = 0; j < yzFaceLayers.size()-1; j++)	// all but the last one
+	{
+		for(double i = j+1; i < yzFaceLayers.size(); i++)	// all but the current one and those before
+		{
+			if(assignedToLayer_yz[j] != true && assignedToLayer_yz[i] != true)
+			{
+				if((theFaces[yzFaceLayers[j]][2] == theFaces[yzFaceLayers[i]][1]
+					&& theFaces[yzFaceLayers[j]][3] == theFaces[yzFaceLayers[i]][0])
+					|| (theFaces[yzFaceLayers[j]][1] == theFaces[yzFaceLayers[i]][2]
+					&& theFaces[yzFaceLayers[j]][0] == theFaces[yzFaceLayers[i]][3]))
+				{
+					if(assignedToLayer_yz[j] == false)
+					{
+						yFaceLayers_unsorted.push_back(yzFaceLayers[j]);
+						assignedToLayer_yz[j] = true;
+					}
+					if(assignedToLayer_yz[i] == false)
+					{
+						yFaceLayers_unsorted.push_back(yzFaceLayers[i]);
+						assignedToLayer_yz[i] = true;
+					}
+				} else 
+				{
+					if(assignedToLayer_yz[j] == false)
+					{
+						zFaceLayers_unsorted.push_back(yzFaceLayers[j]);
+						assignedToLayer_yz[j] = true;
+					}
+					if(assignedToLayer_yz[i] == false)
+					{
+						zFaceLayers_unsorted.push_back(yzFaceLayers[i]);
+						assignedToLayer_yz[i] = true;
+					}
+				}
+			}
+		}
+	}
+	
+	std::cout << "yFaceLayers_unsorted.size() = " << yFaceLayers_unsorted.size() << "\n";
+	std::cout << "zFaceLayers_unsorted.size() = " << zFaceLayers_unsorted.size() << "\n";
+	
 }
