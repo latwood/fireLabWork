@@ -598,9 +598,6 @@ sortedMesh.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/argListI.H
 sortedMesh.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/timeSelector.H
 sortedMesh.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/scalarRanges.H
 sortedMesh.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/scalarRange.H
-sortedMesh.dep: foamPoint.H
-sortedMesh.dep: meshPoint.H
-sortedMesh.dep: meshCell.H
 $(OBJECTS_DIR)/sortedMesh.o: $(EXE_DEP)
 $(OBJECTS_DIR)/sortedMesh.o:
 	@SOURCE_DIR=.

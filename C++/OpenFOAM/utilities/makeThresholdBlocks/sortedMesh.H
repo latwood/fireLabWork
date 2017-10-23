@@ -6,10 +6,6 @@
 
 #include "fvCFD.H"
 
-#include "foamPoint.H"
-#include "meshPoint.H"
-#include "meshCell.H"
-
 class sortedMesh
 {
 public:
@@ -69,7 +65,8 @@ public:
 
 private:
 	
-	void findFaceLayers(const faceList& theFaces,double nInternalFaces);
+	void findFaceLayers(const faceList& theFaces, 
+		const labelList& theOwners, double nInternalFaces);
 
 	std::vector<double> xFaceLayers;
 	std::vector<double> yFaceLayers;
@@ -135,17 +132,9 @@ private:
 	hmm, since stuff is shared, it would be best to first search by the first line if statements, since those are all unique, then in a given layer do some kind of search with the second line if statement to determine if they are in the same zlayer, or in differing x or y layers. Then sort by smallest to largest of different point location criteria of some sort
 	hmm, just realized that while it appeared that the first statement for zlayers was independent, it is actually the same one as the first statement for x.
 	guess that means that I should use the first statement, but that it actually gets me xlayers with some zlayers, and ylayers with some zlayers. Then I need to repeat the process with some more if statements to determine if they are an xlayer or zlayer, or if they are a ylayer or a zlayer.
-	*/
 	
-	std::vector<foamPoint> sortedPoints;
-
-	// end result values
-	std::vector< std::vector<meshPoint> > xPointLayers;
-	std::vector< std::vector<meshPoint> > yPointLayers;
-	std::vector< std::vector<meshPoint> > zPointLayers;
-	std::vector< std::vector<meshCell> > xCellLayers;
-	std::vector< std::vector<meshCell> > yCellLayers;
-	std::vector< std::vector<meshCell> > zCellLayers;
+	after each layer is sorted, and thus given a value, we can go through the neighbor file to give each cell index the value of that given face
+	*/
 
 };
 

@@ -1,7 +1,0 @@
-$(OBJECTS_DIR)/foamPoint.o: foamPoint.dep
-foamPoint.dep: foamPoint.C
-foamPoint.dep: foamPoint.H
-$(OBJECTS_DIR)/foamPoint.o: $(EXE_DEP)
-$(OBJECTS_DIR)/foamPoint.o:
-	@SOURCE_DIR=.
-	SOURCE=foamPoint.C ; $(Ctoo)

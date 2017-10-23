@@ -598,9 +598,6 @@ makeThresholdBlocks.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/argListI.H
 makeThresholdBlocks.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/timeSelector.H
 makeThresholdBlocks.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/scalarRanges.H
 makeThresholdBlocks.dep: $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/scalarRange.H
-makeThresholdBlocks.dep: foamPoint.H
-makeThresholdBlocks.dep: meshPoint.H
-makeThresholdBlocks.dep: meshCell.H
 makeThresholdBlocks.dep: $(WM_PROJECT_DIR)/src/transportModels/incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H
 makeThresholdBlocks.dep: $(WM_PROJECT_DIR)/src/transportModels/incompressible/transportModel/transportModel.H
 makeThresholdBlocks.dep: $(WM_PROJECT_DIR)/src/turbulenceModels/incompressible/RAS/RASModel/RASModel.H

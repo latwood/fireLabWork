@@ -1,5 +1,2 @@
 include makeThresholdBlocks.dep
 include sortedMesh.dep
-include foamPoint.dep
-include meshPoint.dep
-include meshCell.dep
