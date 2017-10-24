@@ -40,8 +40,49 @@ void sortedMesh::findFaceLayers(const faceList& theFaces,
 	std::vector<double> yFaceLayers_unsorted;
 	std::vector<double> zFaceLayers_unsorted;
 	
+	// this will sort a nonrefined mesh if it happens to be the right order,
+	// BUT it looks like the refined mesh somehow has more than the usual 3 faces owned!
+	// even up to 19 faces owned by one cell!
+	// maybe deal with hit by looking up the neighbor for each of those faces and comparing
+	// some kind of point between the current face and it's neighbor to see which way it is
+	// oriented! Maybe that is the trick for all given faces, look up the neighbor for a given
+	// face and check to see how it is different
+	// hm, maybe not, since the neighbor is not a neighbor face, but a neighbor cell
+	// unless we can use the cellIndex to obtain the minZ face, maxZ face, west east faces.
+	
+	// what if we compare the minZ of each cellIndex? If the cells share two minZ points
+	// between owner and neighbor, then they are of the same zlayer. If the owner and neighbor
+	// cell share two west or east points, then they are of the same xlayer or something
+	
+	// so need to go through each owner, or cell, 
+	// and figure out which face is it's minZ (or maxZ), which face is its west (or east)
+	// and which face is its south (or north), then look at the neighbor for that desired face
+	// and figure out which faces of the neighbor are the minZ (or maxZ), the west (or east),
+	// and the south (or north). If the two faces match, then we know that the two cells are
+	// of the same given layer. Heck all we need to know if which faces of the owner are which
+	// then we know that the neighbor cell is in that given layer with it.
+	
+	// but how to store it? okay we are starting with a single cell, we can know based 
+	// off of that given cell to what layer to add it and those next to it. So we can know
+	// from 3 to 6 cells around it. So if we throw the indices into some vectors, then we
+	// need to keep track of whether they have already been assigned an x, y, and z layer
+	// since each cell will belong to at least one of the given layers.
+	// this would require checking through the vector if it already exists in there.
+	// a better implementation would be a class, called meshCells or something like that
+	// where a mesh cell has a given mesh number, the cell Index used by openfoam, and
+	// a given layer number for each type of layer (x,y,z layers).
+	// 		Then the first cell can be given a layer number of 0 for each type of layer
+	// it gives a value of 0 or -1 or 1 for the correct layers depending on the cell direction
+	// then check the next cell, which should be one of the neighbors if possible (I think
+	// (this will be the case because of the way the lists are organized, if just loop cellI)
+	// , and use information for the already assigned layer numbers around it
+	// to assign the new layer numbers. At the end, renumber all layer numbers to start from 0.
+	
+	
+	
 	double faceIndex = 0;
 	double pastFaceIndex = 0;
+	bool foundSingle = false;
 	for(double j = 0; j < nInternalFaces-1; j++)
 	{
 		if(theOwners[j] == theOwners[j+1])
@@ -62,8 +103,15 @@ void sortedMesh::findFaceLayers(const faceList& theFaces,
 					zFaceLayers_unsorted.push_back(j);
 				} else if(pastFaceIndex == 1)
 				{
-					xFaceLayers_unsorted.push_back(j-1);
-					zFaceLayers_unsorted.push_back(j);
+					if(foundSingle == false)
+					{
+						xFaceLayers_unsorted.push_back(j-1);
+						zFaceLayers_unsorted.push_back(j);
+					} else
+					{
+						xFaceLayers_unsorted.push_back(j-1);
+						yFaceLayers_unsorted.push_back(j);
+					}
 				} else if(pastFaceIndex == 0)
 				{
 					xFaceLayers_unsorted.push_back(j-1);
@@ -73,7 +121,14 @@ void sortedMesh::findFaceLayers(const faceList& theFaces,
 			{
 				if(pastFaceIndex == 1)
 				{
-					zFaceLayers_unsorted.push_back(j);
+					if(foundSingle == false)
+					{
+						foundSingle = true;
+						zFaceLayers_unsorted.push_back(j);
+					} else
+					{
+						yFaceLayers_unsorted.push_back(j);
+					}
 				} else if(pastFaceIndex == 0)
 				{
 					xFaceLayers_unsorted.push_back(j);

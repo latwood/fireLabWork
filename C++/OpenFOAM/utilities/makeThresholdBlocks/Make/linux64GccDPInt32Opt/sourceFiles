@@ -1,6 +1,0 @@
-SOURCE = \
-makeThresholdBlocks.C \
-sortedMesh.C \
-foamPoint.C \
-meshPoint.C \
-meshCell.C 
