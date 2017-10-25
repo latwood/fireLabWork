@@ -1,3 +1,4 @@
 OBJECTS = \
 $(OBJECTS_DIR)/makeThresholdBlocks.o\
-$(OBJECTS_DIR)/sortedMesh.o
+$(OBJECTS_DIR)/sortedMesh.o\
+$(OBJECTS_DIR)/meshCell.o

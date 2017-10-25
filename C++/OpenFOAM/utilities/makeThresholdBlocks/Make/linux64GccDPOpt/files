@@ -55,5 +55,6 @@
 # 1 "files"
 makeThresholdBlocks.C
 sortedMesh.C
+meshCell.C
 
 EXE = $(FOAM_USER_APPBIN)/makeThresholdBlocks

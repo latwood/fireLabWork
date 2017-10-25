@@ -4,7 +4,8 @@ sortedMesh::sortedMesh(const pointField& thePoints,
 						const faceList& theFaces,
 						const labelList& theOwners,
 						const labelList& theNeighbors,
-						const polyBoundaryMesh& theBoundaries)
+						const polyBoundaryMesh& theBoundaries,
+						double numberOfCells)
 {
 	std::cout << "constructing for sortedMesh class from polyMesh points,faces,owners,neighbours, and boundaries\n";
 	std::cout << "thePoints.size() = " << thePoints.size() << "\n";
@@ -26,8 +27,171 @@ sortedMesh::sortedMesh(const pointField& thePoints,
 	std::cout << "theBoundaries[0][0][0] = " << theBoundaries[0][0][0] << "\n";
 	*/
 	
-	findFaceLayers(theFaces,theOwners,theNeighbors.size());	//assumes that all boundary faces are held after all the internalField faces!!!
+	for(double j = 0; j < numberOfCells; j++)
+	{
+		theCells.push_back(meshCell(j));
+	}
+	std::cout << "theCells.size() = " << theCells.size() << "\n";
+	
+	findCellFaces(thePoints,theFaces,theOwners,theNeighbors,theNeighbors.size());
+
+	//findFaceLayers(theFaces,theOwners,theNeighbors.size());	//assumes that all boundary faces are held after all the internalField faces!!!
 	// generateNewPointsList();
+}
+
+void sortedMesh::findCellFaces(const pointField& thePoints, const faceList& theFaces,
+	const labelList& theOwners,	const labelList& theNeighbors, double nInternalFaces)
+{
+	std::cout << "finding owners and neighbors per cell\n";
+	std::vector< std::vector<double> > ownersPerCell(theCells.size(),std::vector<double>(0,0));
+	std::vector< std::vector<double> > neighborsPerCell(theCells.size(),std::vector<double>(0,0));
+	for(double j = 0; j < nInternalFaces; j++)
+	{
+		ownersPerCell[theOwners[j]].push_back(j);
+		neighborsPerCell[theNeighbors[j]].push_back(j);
+	}
+	
+	// hmm, I did what I wanted, except it wasn't actually what I wanted.
+	// the owners and neighbors do show which faces belong to a given cell,
+	// BUT it means that only one of the two cells connected to the face are given?
+	// wait, technically 6 isn't the max number anymore. the boundaries aren't included here
+	// let's include the boundaries now
+	for(double j = nInternalFaces; j < theOwners.size(); j++)
+	{
+		ownersPerCell[theOwners[j]].push_back(j);
+	}
+	//much better!
+	
+	for(double j = 0; j < theCells.size(); j++)
+	{
+		std::cout << "ownersPerCell[j].size() = " << ownersPerCell[j].size() << "\n";
+		for(double i = 0; i < ownersPerCell[j].size(); i++)
+		{
+			std::cout << "ownersPerCell[j][i] = " << ownersPerCell[j][i] << "\n";
+		}
+		std::cout << "neighborsPerCell[j].size() = " << neighborsPerCell[j].size() << "\n";
+		for(double i = 0; i < neighborsPerCell[j].size(); i++)
+		{
+			std::cout << "neighborsPerCell[j][i] = " << neighborsPerCell[j][i] << "\n";
+		}
+	}
+	
+	std::cout << "categorizing owners and faces of cell\n";
+	for(double j = 0; j < theCells.size(); j++)
+	{
+		double nFacesPerCell = ownersPerCell[j].size() + neighborsPerCell[j].size();
+		std::cout << "j = " << j << ", nFacesPerCell = " << nFacesPerCell << "\n";
+		if(nFacesPerCell > 6)
+		{
+			// this cell has a bunch of refinement stuff going on!
+		} else
+		{
+			double smallestX = 999999999999;
+			double smallestY = 999999999999;
+			double smallestZ = 999999999999;
+			double smallestXface = -1;
+			double smallestYface = -1;
+			double smallestZface = -1;
+			double biggestX = -999999999999;
+			double biggestY = -999999999999;
+			double biggestZ = -999999999999;
+			double biggestXface = -1;
+			double biggestYface = -1;
+			double biggestZface = -1;
+			for(double i = 0; i < ownersPerCell[j].size(); i++)
+			{
+				for(double kk = 0; kk < 4; kk++)	// 4 because there are 4 points in a face
+				{
+					// there are 3 parts to a point
+					if(thePoints[theFaces[ownersPerCell[j][i]][kk]][0] < smallestX)
+					{
+						smallestX = thePoints[theFaces[ownersPerCell[j][i]][kk]][0];
+						smallestXface = ownersPerCell[j][i];
+					}
+					if(thePoints[theFaces[ownersPerCell[j][i]][kk]][0] > biggestX)
+					{
+						biggestX = thePoints[theFaces[ownersPerCell[j][i]][kk]][0];
+						biggestXface = ownersPerCell[j][i];
+					}
+
+					if(thePoints[theFaces[ownersPerCell[j][i]][kk]][1] < smallestY)
+					{
+						smallestY = thePoints[theFaces[ownersPerCell[j][i]][kk]][1];
+						smallestYface = ownersPerCell[j][i];
+					}
+					if(thePoints[theFaces[ownersPerCell[j][i]][kk]][1] > biggestY)
+					{
+						biggestY = thePoints[theFaces[ownersPerCell[j][i]][kk]][1];
+						biggestYface = ownersPerCell[j][i];
+					}
+
+					if(thePoints[theFaces[ownersPerCell[j][i]][kk]][2] < smallestZ)
+					{
+						smallestZ = thePoints[theFaces[ownersPerCell[j][i]][kk]][2];
+						smallestZface = ownersPerCell[j][i];
+					}
+					if(thePoints[theFaces[ownersPerCell[j][i]][kk]][2] < biggestZ)
+					{
+						biggestZ = thePoints[theFaces[ownersPerCell[j][i]][kk]][2];
+						biggestZface = ownersPerCell[j][i];
+					}
+				}
+			}
+
+			for(double i = 0; i < neighborsPerCell[j].size(); i++)
+			{
+				for(double kk = 0; kk < 4; kk++)	// 4 because there are 4 points in a face
+				{
+					// there are 3 parts to a point
+					if(thePoints[theFaces[neighborsPerCell[j][i]][kk]][0] < smallestX)
+					{
+						smallestX = thePoints[theFaces[neighborsPerCell[j][i]][kk]][0];
+						smallestXface = neighborsPerCell[j][i];
+					}
+					if(thePoints[theFaces[neighborsPerCell[j][i]][kk]][0] > biggestX)
+					{
+						biggestX = thePoints[theFaces[neighborsPerCell[j][i]][kk]][0];
+						biggestXface = neighborsPerCell[j][i];
+					}
+
+					if(thePoints[theFaces[neighborsPerCell[j][i]][kk]][1] < smallestY)
+					{
+						smallestY = thePoints[theFaces[neighborsPerCell[j][i]][kk]][1];
+						smallestYface = neighborsPerCell[j][i];
+					}
+					if(thePoints[theFaces[neighborsPerCell[j][i]][kk]][1] > biggestY)
+					{
+						biggestY = thePoints[theFaces[neighborsPerCell[j][i]][kk]][1];
+						biggestYface = neighborsPerCell[j][i];
+					}
+
+					if(thePoints[theFaces[neighborsPerCell[j][i]][kk]][2] < smallestZ)
+					{
+						smallestZ = thePoints[theFaces[neighborsPerCell[j][i]][kk]][2];
+						smallestZface = neighborsPerCell[j][i];
+					}
+					if(thePoints[theFaces[neighborsPerCell[j][i]][kk]][2] < biggestZ)
+					{
+						biggestZ = thePoints[theFaces[neighborsPerCell[j][i]][kk]][2];
+						biggestZface = neighborsPerCell[j][i];
+					}
+				}
+			}
+
+			theCells[j].set_minZfaceID(smallestZface);
+			theCells[j].set_maxZfaceID(biggestZface);
+			theCells[j].set_westFaceID(smallestYface);
+			theCells[j].set_eastFaceID(biggestYface);
+			theCells[j].set_southFaceID(smallestXface);
+			theCells[j].set_northFaceID(biggestXface);
+			std::cout << "theCells[j].minZfaceID = " << theCells[j].minZface() << "\n";
+			std::cout << "theCells[j].maxZfaceID = " << theCells[j].maxZface() << "\n";
+			std::cout << "theCells[j].westFaceID = " << theCells[j].westFace() << "\n";
+			std::cout << "theCells[j].eastFaceID = " << theCells[j].eastFace() << "\n";
+			std::cout << "theCells[j].southFaceID = " << theCells[j].southFace() << "\n";
+			std::cout << "theCells[j].northFaceID = " << theCells[j].northFace() << "\n";
+		}
+	}
 }
 
 void sortedMesh::findFaceLayers(const faceList& theFaces, 
@@ -77,6 +241,14 @@ void sortedMesh::findFaceLayers(const faceList& theFaces,
 	// (this will be the case because of the way the lists are organized, if just loop cellI)
 	// , and use information for the already assigned layer numbers around it
 	// to assign the new layer numbers. At the end, renumber all layer numbers to start from 0.
+	
+	// going to be tricky dealing with the refined mesh, since the owners are screwed up
+	// in theory it still works as long as I just use cell indices, but it has to go from one
+	// cell to the next. Can't jump cell positions or this won't work at all
+	
+	// going to be easier to do this by simply using the owner and neighbor and other lists
+	// using the mesh member functions tends to be only for cell centers or vectors,
+	// not for points in corners
 	
 	
 	

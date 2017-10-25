@@ -1,3 +1,4 @@
 DEPENDENCIES = \
 makeThresholdBlocks.dep\
-sortedMesh.dep
+sortedMesh.dep\
+meshCell.dep

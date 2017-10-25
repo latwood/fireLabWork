@@ -6,6 +6,8 @@
 
 #include "fvCFD.H"
 
+#include "meshCell.H"
+
 class sortedMesh
 {
 public:
@@ -56,7 +58,8 @@ public:
 				const faceList& theFaces,
 				const labelList& theOwners,
 				const labelList& theNeighbors,
-				const polyBoundaryMesh& theBoundaries);
+				const polyBoundaryMesh& theBoundaries,
+				double numberOfCells);
 	//creates all needed information for later functions
 	
 	double colorByXlayers(double faceI);
@@ -64,6 +67,11 @@ public:
 	double colorByZlayers(double faceI);
 
 private:
+	
+	std::vector<meshCell> theCells;
+	
+	void findCellFaces(const pointField& thePoints, const faceList& theFaces,
+		const labelList& theOwners,	const labelList& theNeighbors, double nInternalFaces);
 	
 	void findFaceLayers(const faceList& theFaces, 
 		const labelList& theOwners, double nInternalFaces);

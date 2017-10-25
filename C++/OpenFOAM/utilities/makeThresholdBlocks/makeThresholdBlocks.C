@@ -63,12 +63,12 @@ int main(int argc, char *argv[])
 	#include "createTime.H"
     #include "createMesh.H"
 
-	mesh.points();
+	std::cout << "mesh size = " << mesh.C().size() << "\n";
 	//const unallocLabelList & theOwners( mesh.owner() );	// const is on the left, so unallocLabelList is the constant, not the & reference. If const were on the right of &, the reference would be the const
 	//const unallocLabelList & theNeighbors( mesh.neighbour() );
 	//std::vector<label> uniqueNeighbors(mesh.C().size(),99999);
 
-	sortedMesh betterMesh(mesh.points(),mesh.faces(),mesh.faceOwner(),mesh.faceNeighbour(),mesh.boundaryMesh());	// problem I had here was that somehow the new .C file was not included in some kind of building list. So add the .C file to the files list not the exe list in the make/files file!
+	sortedMesh betterMesh(mesh.points(),mesh.faces(),mesh.faceOwner(),mesh.faceNeighbour(),mesh.boundaryMesh(),mesh.C().size());	// problem I had here was that somehow the new .C file was not included in some kind of building list. So add the .C file to the files list not the exe list in the make/files file!
 	
 	Info<< "Setting coloredFaces using sortedMesh techniques" << endl;
 	volScalarField coloredFaces
