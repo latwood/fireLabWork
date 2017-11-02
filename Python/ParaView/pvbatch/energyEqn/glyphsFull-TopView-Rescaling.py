@@ -1,3 +1,6 @@
+# so the goal is to create a property that can be filtered with threshold that goes 0 for the first layer, 1 for second, and so on and so forth for each layer
+# but that is really really hard to do. For now, could create a file or do something that involves getting the heights, or just use relative cell height, and do that as the difference
+
 #import some necessary modules
 import pwd
 import grp
