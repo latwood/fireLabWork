@@ -2,9 +2,9 @@ library(raster)
 
 prj<-"+proj=utm +zone=12 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
 mainDir <- "/home/latwood/Downloads/"
-tiffFileName <- paste(mainDir,"mesoWeatherPaper.tif",sep="")
-demPlotFileName <- paste(mainDir,"demPlot.png",sep="")
-sidePlotFileName <- paste(mainDir,"sideDemPlot.png",sep="")
+tiffFileName <- paste(mainDir,"mesoscaleWeatherPaper2.tif",sep="")
+demPlotFileName <- paste(mainDir,"mesoscaleWeatherPaper2-demPlot.png",sep="")
+sidePlotFileName <- paste(mainDir,"mesoscaleWeatherPaper2-sideDemPlot.png",sep="")
 
 h_p <- 1500
 L_y <- 100000
@@ -15,14 +15,11 @@ X_2 <- 9500
 X_3 <- 10500
 X_4 <- 19500
 
-x0 <- -50000
-xf <- 50000
-y0 <- -100000
+
+x0 <- -60000
+xf <- 60000
+y0 <- -200000
 yf <- 100000
-# x0 <- -60000
-# xf <- 60000
-# y0 <- -200000
-# yf <- 200000
 demRes <- 1000
 initialHeight <- 0
 
@@ -32,7 +29,6 @@ sidePlot_xMax <- 30000
 sidePlot_zMin <- 0
 sidePlot_zMax <- 4000
 sidePlot_yPosition <- 1000
-
 
 
 #====== functions =======================
@@ -55,7 +51,7 @@ hy <- function(y) {
   if (y <= -S_y) {
     h_y <- 0
   } else if (-S_y < y && y < 0) {
-    h_y <- 0.5+0.5*cos((pi*y)/S_y)
+    h_y <- 0.5+0.5*cos(pi*y/S_y)
   } else if(y >= 0) {
     h_y <- 1
   }
@@ -107,6 +103,7 @@ getSidePlotValues <- function(theRaster, xMin, xMax, yPos) {
   return (theSidePlotValues)
 }
 
+
 m <- raster()
 crs(m)<-prj
 extent(m)<-extent(x0, xf, y0, yf)
@@ -121,7 +118,7 @@ plot(s)
 dev.off()
 
 zSidePlotValues <- getSidePlotValues(s, sidePlot_xMin, sidePlot_xMax, sidePlot_yPosition)
-xSidePlotValues <- seq(from=sidePlot_xMin,to=sidePlot_xMax,length.out=length(sidePlotValues))
+xSidePlotValues <- seq(from=sidePlot_xMin,to=sidePlot_xMax,length.out=length(zSidePlotValues))
 plot(xSidePlotValues,zSidePlotValues,main="xz plot",type="o",pch=16,ylim=c(sidePlot_zMin,sidePlot_zMax))
 png(sidePlotFileName)
 plot(xSidePlotValues,zSidePlotValues,main="xz plot",type="o",pch=16,ylim=c(sidePlot_zMin,sidePlot_zMax))
