@@ -1,3 +1,6 @@
+# This contains what I used for different ffmpeg video clips. Each of the stuff here should work, though it might need to be adjusted for different needs
+# note that some of these things require the C++ timeStampCMD script that I wrote. It may be possible to replace all of this with a nice C++ script someday since ffmpeg can be loaded in as a library
+
 
 	To get a standard video from images, name the images 0, 1, 2, 3 or 1, 2, 3, 4 (probably 0 starting is better), then use the following command:
 ffmpeg -framerate 25 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4
@@ -60,4 +63,5 @@ ffmpeg -framerate 25 -f image2 -i %d.jpg -vf "sendcmd=filename=timestamps-toVide
 	now need to figure out the right commands to stitch two videos together
 
 
+# used for another batch of files I was making
 ffmpeg -framerate 5 -f image2 -i %d.png -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k vshapedvalley-flatbot-notilt_1mph0degInnerField-zeroGradientWalls_TglyphSlice-5fps.mp4

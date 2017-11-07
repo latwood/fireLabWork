@@ -1,0 +1,4 @@
+timeStampCMD is supposed to be used in conjunction with Bash/ffmpeg/ffmpegCommands. The idea is that you prepare all the inputs for timeStampCMD following the instructions in ffmpegCommands, then timeStampCMD gives the output timeStamp file needed to add timestamps to a video using ffmpeg commands. So it kind of goes back and forth between the two scripts/applications a bit.
+
+Long term I would love to combine these guys so that they are a single C++ script, but not sure how to do that without running something like system("") which is supposed to be bad practice.
+

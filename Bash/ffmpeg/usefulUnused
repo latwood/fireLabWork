@@ -1,3 +1,5 @@
+# this contains a bunch of stuff that I was trying to do with ffmeg, but failed. It is still useful because it contains a lot of interesting bash tricks that might be handy for making some bash scripts
+
 
 	To get a standard video from images, name the images 0, 1, 2, 3 or 1, 2, 3, 4 (probably 0 starting is better), then use the following command:
 ffmpeg -framerate 25 -f image2 -i %d.jpg -c:v mpeg4 -q:v 1 -b:a 800k -b:v 800k test.mp4

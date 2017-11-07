@@ -1,0 +1,4 @@
+So paraview has a ton of nice features. There are a ton of projects revolving around it and it might be tricky to separate the different scripts nicely in this repository. For sure, most of the scripts are either python or xml, and xml sucks compared to python. I believe the long term goal is to only use python scripts. Even python scripts can be done different ways, run from the command line or run in the paraview python shell. For now, the python shell is much easier to do.
+
+Most of these scripts should be written for paraview 5.0.0. I didn't think of doing something to keep track of what version of paraview and python they are using.
+

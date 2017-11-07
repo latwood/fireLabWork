@@ -1,3 +1,0 @@
-lapseRateProfileTemperatureInletFvPatchScalarField.C
-
-LIB = $(FOAM_USER_LIBBIN)/libTemperatureStuff

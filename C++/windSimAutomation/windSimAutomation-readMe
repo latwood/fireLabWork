@@ -1,0 +1,2 @@
+The idea here was to automate a ton of WindNinja simulations by taking a single config file and a few different variables that need to change to produce a ton of simulations. I did have it working, but the project needs rethought because so far it saves more time to simply write a ton of config files. I think the main problem is that I basically have to replicate WindNinja code to some extent, which can change. But, if I set up something where WindNinja itself verifies if the config files are done correctly, and reports the problem at the end, that could work.
+

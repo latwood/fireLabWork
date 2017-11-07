@@ -1,0 +1,10 @@
+I originally wrote fillSetFieldsDict with the intent of being able to create simple functions for choosing profiles for any property in a given OpenFOAM case. So you could easily set all the values for the ground for temperature as an example. Could set any of the sides of the domain just as easily.
+
+But, while this did work, it got confusing really fast because there are just so many different ways to change the values. Plus, refineMesh and renumberMesh cause the meshes to have crazy order for all the cells, so this script will probably not work very well for new cases. In fact, setting innerField values ended up being impossible because the order becomes completely random in that case.
+
+It is still possible to use this application, but know that I did get it to work for setting temperature profiles on any of the sides of the domain, but I gave up before making it nice and easy to use. It just wasn't worth so much time since you can do the same thing, but with less work, with OpenFOAM. Plus, I'm still working out the details to sort the mesh by the points, which is a completely different project, prompting me to think that I would rewrite this entire project to fit with the mesh reordering. Basically there are more efficient ways to do this.
+
+But, the idea was that if you can set any value of any property anywhere in the mesh that you want, then it will be possible to set sources in a more controlled manner. It will also be easier to set stuff up for paraview visualization scripts.
+
+Anyhow, the problem is that OpenFOAM does not keep enough information about the mesh that makes this sort of stuff easy, so the problem is non-trivial.
+

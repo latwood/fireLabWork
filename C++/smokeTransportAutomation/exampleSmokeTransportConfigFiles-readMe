@@ -1,0 +1,4 @@
+The idea of the exampleSmokeTransportConfigFiles is to have a set of example config files to be used for smokeTransportAutomation. This is similar to the config files used in WindNinja.
+
+Notice that these files may change over time as the smokeTransportAutomation is improved. Still need to work out how to do the windninja automation within smokeTransportAutomation, and how that will affect the config files.
+

@@ -1,0 +1,2 @@
+In the past, running myScalarTransportFoam involved lots of starting and stopping of the solver, updating files at each change. The smokeTransportAutomation application is supposed to replace all the by hand changes and just run it all at once, using a config file. At one point this all worked just using smoke transport, given the windninja simulations were already completed. Now the nature of finished windninja cases has changed, as well as the nature of smoke sources. The automation script needs rethought and reworked to adjust to these changes.
+

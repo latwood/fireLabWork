@@ -80,7 +80,6 @@
         ),
         mesh
     );
-	turbulence->nut()/Prt;
 	
 	Info<< "Reading field kappaEff\n" << endl;
     volScalarField kappaEff
@@ -128,7 +127,7 @@
     );
 
     label pRefCell = 0;
-    scalar pRefValue = 0.0;
+    scalar pRefValue = 0;
     setRefCell
     (
         p,

@@ -1,0 +1,2 @@
+The goal of this utility is to split up any given OpenFOAM mesh by layers of cells in each x,y, and z direction. The method is to give a single value to each of these layers, which means being able to derive a list of cells in a single layer. If this is acheived, then there will be more control over setting sources and values of anything in the mesh. More importantly, it will mean being able to sort the mesh by threshold in paraview, making it easier to have better visualization control for visualization scripts.
+
