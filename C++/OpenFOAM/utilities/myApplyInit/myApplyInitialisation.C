@@ -71,6 +71,68 @@ int main(int argc, char *argv[])
 		mesh
 	);
 	
+	Info<< "Calculating innerField profile for T" << endl;
+
+	volScalarField z_innerField = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ. Notice that this is only for the inner field!
+	
+	scalar phi_s = 280; // K
+	scalar gamma = 0.0032;	// K/m
+	scalar deltaphi = 5;	// K
+	scalar beta = 0.002;	// 1/m
+	
+	
+	// Loop over all the faces in the patch
+	// and initialize the temperature profile
+	// find Tmin for setting minZ temperature
+	scalar Tmin = 99999999;	// set to huge value initially
+	forAll(z_innerField, cellI)
+	{
+		// relative height from ground for face lists
+		scalar z = z_innerField[cellI];	//I think that AGL is the height of the cell
+
+		//Apply formula to get profile. Make sure that the AGL is corrected for the minZ height
+		scalar Tcalc = phi_s + gamma*z + deltaphi*(1 - std::exp(-beta*z));
+		if(Tcalc < Tmin)
+		{
+			Tmin = Tcalc;
+		}
+    	T[cellI] = Tcalc;
+	}
+	T.write();
+
+	Info<< "Set innerField profile for T" << endl;
+	std::cout << "Tmin = " << Tmin << "\n";
+	Info<< "Setting minZ profile using Tmin" << endl;
+	
+	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
+	scalarField& minZTpatch = refCast<scalarField>(T.boundaryField()[minZpatchID]);
+	forAll(minZTpatch, faceI)
+	{
+		minZTpatch[faceI] = Tmin;
+	}
+	T.write();
+	
+
+	// this is what I used to do. I like this, but it has some issues
+    /*
+	#include "setRootCase.H"
+
+	#include "createTime.H"
+    #include "createMesh.H"
+
+	volScalarField T
+	(
+		IOobject
+		(
+			"T",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	
 	Info<< "Calculating log profile for T" << endl;
 
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
@@ -110,7 +172,7 @@ int main(int argc, char *argv[])
 		Tcalc = TsurfMax - TlapseRate*AGL;
     	T[cellI] = Tcalc;
 	}
-	T.write();
+	T.write();*/
 
 	Info<< "End\n" << endl;
 

@@ -1,0 +1,75 @@
+1::
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev
+
+2::  
+sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+curl -sSL https://get.rvm.io | bash -s stable
+
+do one of the two following:
+
+insert line into .bashrc without opening .bashrc
+----------------------
+echo 'source ~/.rvm/scripts/rvm' >> ~/.bashrc
+
+
+insert line into .bashrc manually
+----------------------
+source ~/.rvm/scripts/rvm
+----------------------
+
+after either of these methods rerun the bashrc
+-----------------------
+source ~/.bashrc
+
+now install the right version of ruby
+-------------------
+rvm install 2.3.1
+rvm use 2.3.1 --default
+ruby -v
+
+'heads up, the echo stuff redirected to the .bashrc file makes it so you add that 
+'line to the .bashrc every time you enter it. Type it right and only do it once
+
+3::
+gem install bundler
+
+CREATE Gemfile
+
+instert two lines
+-------------------
+source 'https://rubygems.org'
+gem 'github-pages', group: :jekyll_plugins
+--------------------
+
+now run
+-----------------
+bundle install
+
+next run
+-----------------
+gem install jekyll
+
+4::
+
+installations are complete
+in your file location where you want the server to run,
+use these every time you want to run the server
+-----------------
+jekyll build
+jekyll serve
+
+go to your internet browser and copy and paste this line to the url
+or use the url that jekyll gives. Links may need adjusted a little
+--------------------
+localhost:4000
+
+
+5:: 
+jekyll documentation is found at the following url
+https://jekyllrb.com/docs/home/
+
+
+
