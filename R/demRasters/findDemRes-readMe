@@ -1,0 +1,4 @@
+As I did work and left cases behind, I periodically needed to revisit them. I found that without having saved cfg files, I knew most of the inputs, but not quite enough. Also, I noticed that there were discrepancies between the gui and cli mesh resolutions for input vs output stuff unless you set the resolutions. In addition, I needed to know the stl resolution and tif resolution to do the mesh conversion correctly.
+
+This script is very simple, but the idea was to keep an easy to understand and use script for outputting the mesh resolution.
+

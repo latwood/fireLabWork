@@ -1,0 +1,2 @@
+The Grant Creek prescribed burn occured April 11-12th 2016 just on the outskirts of Missoula. During the burn, a bunch of wind and pm2.5 sensors were set out for measuring wind and smoke with the intent of generating a dataset for validating smoke transport in WindNinja. This script was designed for generating pictures and analyzing the data that came from these different sets of equipment. The non-old version of the script was what I originally used to generate the files.
+

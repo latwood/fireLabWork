@@ -1,0 +1,3 @@
+When I was first learning how to use R, I needed some good examples to practice with. I set up a combustion problem from my combustion textbook, basically copying some of the values from a set of tables in the text. It might have actually been from some kind of combustion program that I used from the class, I can't even remember what it was called. Regardless, it was data for a bunch of combustion stuff that I stored in PracticeData.csv. I wrote the TrialFile script so that I could understand how R worked to read in and use data. In the end, I started a different project where I had more uses for R before I could do too much with this practice.
+
+

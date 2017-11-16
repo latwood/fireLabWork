@@ -52,7 +52,7 @@ Description
 
 int main(int argc, char *argv[])
 {
-
+/*
     #include "setRootCase.H"
 
 	#include "createTime.H"
@@ -112,9 +112,10 @@ int main(int argc, char *argv[])
 	}
 	T.write();
 	
-
+*/
 	// this is what I used to do. I like this, but it has some issues
-    /*
+	// I set a temperature field, but apparently a potential temperature field is better
+    
 	#include "setRootCase.H"
 
 	#include "createTime.H"
@@ -172,7 +173,7 @@ int main(int argc, char *argv[])
 		Tcalc = TsurfMax - TlapseRate*AGL;
     	T[cellI] = Tcalc;
 	}
-	T.write();*/
+	T.write();
 
 	Info<< "End\n" << endl;
 

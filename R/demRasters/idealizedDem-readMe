@@ -1,0 +1,2 @@
+During the smoke transport and mesh conversion work, I noticed that the wind field looked strange when using thermal parameters. At first I thought it was a problem with my mesh, but it turned out that the vtk files looked the same. So Natalie created a bunch of idealized v-shaped valley dems to run tests on. This is the script that she gave me for creating the idealized v-shaped valley dems.
+
