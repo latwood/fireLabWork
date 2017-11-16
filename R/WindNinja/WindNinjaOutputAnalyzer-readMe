@@ -1,0 +1,3 @@
+It's been a long time since I did this work. I suspect that this script is supposed to be a combination, or a simplification, of both the IterationImpact and MeshCount scripts. See both of those scripts did similar operations, but varied just slightly because it was a different set of changing variables. I think that I wrote this script to do the same thing as both of those scripts, but to be more interchangeable, such that it could be used for both but with almost no changes.
+
+

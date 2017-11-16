@@ -1,0 +1,17 @@
+This is a complex project because the idea is to create pictures of slices throughout the dem in paraview at each cell center, prepare the pictures for use of the ruby script, then run the ruby script to create a kmz file with each set of slices.
+
+To find the cell centers, I used a list of points from the polyMesh/points file of the mesh, finding the first and second min and first and second max points for both x and y. I also found the min and max z points. cell centers are at halfway between the first and second points and I assumed that x and y were uniform throughout the mesh (they are not, but this still works).
+
+It was also fun, but I also needed to find the long/lat coordinates for each side of the mesh. I did this by using the x and y min and max points and using a utm to long/lat calculator. The findingCellCenters file shows how I got a lot of information (except that conversion).
+
+I then created an xml file that would more easily enable picture taking of each separate slice taken at each of these cell centers. I then opened the pictures in paint to crop them so that each side only extended to the edge of the dem. Then I copied the clip of the picture into powerpoint, made them transparent, then saved the pictures over the old versions. Finally I opened ruby and ran the script on the pictures, editing the inputs until I got the spacing that I liked.
+
+So limitations. The xml file I used would be tedious and near impossible to edit for use on a different case and it doesn't save pictures, you have to do that part yourself. It would be better to make a new python script that does that whole part for us.
+I don't see an easy way to do the cropping other than in paint. It might be possible to do some kind of calculation using the number of pixels the picture is saved in and the min and maxZ. The ruby script could get thrown off if this isn't quite right. There might be a way to export the pictures already transparent from a newer version of paraview, or even export 3D pictures, which would mean that the slices won't need saved as separate pictures.
+The way I set up the ruby script, it would not handle a change of the utm domain location (11, 12, whatever that number is).
+Right now it saves everything as a separate kmz file, but it would be more handy to create a single kmz file that can toggle on and off the different sets of slices as layers.
+
+Installing and running the ruby script: you have to place the folder with the main function and the ex.rb file in the following path: /users/username/(hidden)AppData/Roaming/SketchUp/SketchUp2017/SketchUp/Plugins/
+Then when you open sketchup 2017 on windows, you can run the script by going to Extensions/scriptname.
+It helps to go to Window/RubyConsole to get to you ruby editor before running the script.
+

@@ -1,0 +1,10 @@
+As I the number and type of projects increased in my workload and as the number of variables to keep track in a single project increased, I found it more and more difficult to keep an organized file system. After one or two times of changing my file system naming schemes to stay more organized, I dreamed of creating a tool that could more easily modify series of file names. The idea would be to create a set of filenames where you could rearrange the order of the name to allow the files to be sorted differently.
+
+This script did not fulfill this idea, and honestly I think that to do such a thing there are too many case by case basis situations that are ad hoc to easily create a perfect script. Probably would be easier to do such stuff if one got a ton more familiar with command line file manipulation.
+
+But a situation where I did need to change filenames in a specific way all the time showed up. It involved image processing. I found that it was simplest to use picture editing tools that turn series of pictures into videos if they use the simplest naming format: 0, 1, 2, 3, . . .
+
+So this script was designed to be adjusted in whatever ad hock fasion is necessary to change picture filenames into this nice and easy to use format. This was also useful for taking pictures in stange name formats and giving them the name of the timeDirectory they belonged to so that the meaning of the pictures is not altogether lost.
+
+Something that I did discover later. The pictures are saved in file system setups that help to keep track of their meta information. But there are too many inputs. So it would be a good habit to use readMe's all the time when data is generated or changed.
+

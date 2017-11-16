@@ -1,0 +1,12 @@
+Working with XML scripts in paraview is a pain. In the older version of paraview, the dropdown menu would be ignored by the script writer and so there was no way to access those functions. There were also times when you would do something while the xml outputter was running, but when you would run the xml file again, it would break on that part.
+
+So my goal was to do things one step at a time. Open paraview, do a simple task or two with as few steps as possible, saving the xml file. Open paraview and run the xml file to see if it worked. If it worked, keep that saved separately, then always start up paraview using that file, then start a new paraview script from there for a few more things. If that worked too when rerunning it, append it into the other file and use the combined file.
+
+So most of these files were me just trying to do one or two small things. Appended files that combine these smaller files have _ connecting a bunch of names.
+
+The GrantCreek1stMomentum33o07mRes_xyzCellCenterSlices script is very important. I used that script to generate the pictures that I used for my sketchup kmz generation work.
+
+In the end, all this stuff is so so much easier to create/manipulate in python. In fact, these scripts may not work on separate machines running the same version of paraview. I know that they break down because all that stuff was restructured for later versions of paraview.
+
+So I would try stuff out with the older version of paraview given with WindNinja's older OpenFOAM 2.2.0, but then move on to a better version of paraview (version 5 or later) and recreate stuff in Python.
+

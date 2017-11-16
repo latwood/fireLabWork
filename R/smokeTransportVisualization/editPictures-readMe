@@ -1,0 +1,6 @@
+There were many times when Natalie wanted me to create a video of different paraview results. After playing around in paraview doing tons of stuff manually, I finally got to a point where I had a repeatable process to take pictures in a specific way for a specific scene, but for different cases. But the pictures always tend to have too much background leaking in and I thought that it would be helpful to add a timestamp and heading to the pictures, that would be useful in the videos. So this script was set up just for that purpose.
+
+This script is set up such that the pictures are already saved in a specific and useful file directory. It then creates a replicate directory in the main part of that directory, but with copies of the pictures. You have to play around a bit with each scenario to get the right cropping variables and text placement and text words correct, but once that is done you just click go and it produces copies of the original pictures, but cropped and with text as needed.
+I have found it useful to save the metadata from the latest run of the script inside the original picture directory. This is because if you are doing the same view of the same dem, but with tons of variables different, you will reuse the same inputs each time you run this script.
+
+

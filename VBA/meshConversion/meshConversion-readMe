@@ -1,0 +1,3 @@
+During my time trying to convert the native WindNinja solver mesh to an OpenFoam format mesh, I was having trouble figuring out how to read the points/neighbors/faces and all those other polyMesh files. I generated this script to help convert each list of values into a more understandable format, helping me do my mesh conversion work. I kept it just for knowledge's sake.
+
+

@@ -1,0 +1,2 @@
+I don't know if these are valid still since we upgraded to Ubuntu 16.04, but this is what we needed to do in order to use jekyl on Ubuntu 14.04. I think we were having troubles getting ruby to install correctly or something.
+

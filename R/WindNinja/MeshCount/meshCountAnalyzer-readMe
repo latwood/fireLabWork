@@ -1,0 +1,3 @@
+The meshCount project was similar to the iterationImpact project and was done second. We needed similar plots of basically the same information, just this time we would be keeping the number of iterations constant while varying the number of cells in the mesh to see if we could operate with fewer cells.
+
+
