@@ -7,6 +7,8 @@
 #include <sstream>
 #include <cstdlib>
 
+#include "usefulFunctions.h"  //includes <iostream> and <sys/stat.h>
+
 using namespace std;
 
 class configOption
@@ -14,7 +16,6 @@ class configOption
 
 public:
 
-    //this should probably be actually called configOption
     configOption(std::string optionName_value,std::string optionDataType_value,
                   std::string optionNumberOfValues_value,std::vector<std::string> conflictingOptions_value);
     void resetOption();     //kind of a reusable constructor/destructor
@@ -47,8 +48,6 @@ private:
     size_t optionCurrentNumberOfValues;
     std::vector<std::string> optionValues;
     bool optionConflicts;
-
-    void message(std::string theMessage);
 
 };
 

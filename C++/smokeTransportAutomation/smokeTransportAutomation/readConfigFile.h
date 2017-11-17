@@ -11,6 +11,8 @@
 #include <smokeTransportOptions.h>
 #include <configOption.h>
 
+#include "usefulFunctions.h"  //includes <iostream> and <sys/stat.h>
+
 using namespace std;
 
 class readConfigFile
@@ -64,8 +66,6 @@ private:
 
     bool setupFail;
     bool conversionFail;
-
-    void message(std::string theMessage);
 
 };
 

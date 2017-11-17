@@ -11,7 +11,7 @@ configOption::configOption(std::string optionName_value,std::string optionDataTy
         optionDataType = optionDataType_value;
     } else
     {
-        message("optionDataType: " + optionDataType_value + " for option: " + optionName_value + " not a valid data type!\n");
+        message("optionDataType: " + optionDataType_value + " for option: " + optionName_value + " not a valid data type!");
     }
     optionOriginalNumberOfValues = optionNumberOfValues_value;
     conflictingOptions = conflictingOptions_value;
@@ -38,7 +38,7 @@ bool configOption::check_optionDataType(std::string newOptionDataType)
         return true;
     } else
     {
-        message("optionDataType: " + newOptionDataType + " not valid type!\n");
+        message("optionDataType: " + newOptionDataType + " not valid type!");
         return false;
     }
 }
@@ -52,7 +52,7 @@ bool configOption::check_optionNumberOfValues(std::string newOptionNumberOfValue
     size_t n = 0;
     if((strm >> n).fail())
     {
-        message("optionNumberOfValues: " + newOptionNumberOfValues + " is not numeric!\n");
+        message("optionNumberOfValues: " + newOptionNumberOfValues + " is not numeric!");
         return false;
     } else
     {
@@ -114,7 +114,7 @@ bool configOption::check_optionValue(std::string newOptionValue)
 
     if(valuesGood == false)
     {
-        message("optionDataType is " + optionDataType + " but newOptionValue \"" + newOptionValue + "\" is not that type!\n");
+        message("optionDataType is " + optionDataType + " but newOptionValue \"" + newOptionValue + "\" is not that type!");
     }
     return valuesGood;
 }
@@ -138,7 +138,7 @@ void configOption::addOptionValue(std::string newOptionValue)
         optionValues.push_back(newOptionValue);
     } else
     {
-        message("optionValue \"" + newOptionValue + "\" not valid!\n");
+        exitMessage("optionValue \"" + newOptionValue + "\" not valid!");
     }
 }
 
@@ -177,12 +177,4 @@ std::vector<std::string> configOption::get_optionValues()
 bool configOption::get_optionConflicts()
 {
     return optionConflicts;
-}
-
-
-//other useful functions
-void configOption::message(std::string theMessage)
-{
-    std::cout << theMessage;
-    system("sleep 0.5");
 }

@@ -3,6 +3,8 @@
 
 #include <fstream>
 
+#include "usefulFunctions.h"  //includes <iostream> and <sys/stat.h>
+
 class OpenFoamSystemFiles
 {
 public:

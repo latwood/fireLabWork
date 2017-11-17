@@ -12,6 +12,8 @@
 
 #include <readConfigFile.h>
 
+#include "usefulFunctions.h"  //includes <iostream> and <sys/stat.h>
+
 class smokeTransportRun
 {
 public:
@@ -46,7 +48,6 @@ private:
     int missingTimes;
     std::vector<std::string> missingTimeDirectories;
 
-    void smokeMessage(std::string theMessage);
 };
 
 #endif // SMOKETRANSPORTRUN_H

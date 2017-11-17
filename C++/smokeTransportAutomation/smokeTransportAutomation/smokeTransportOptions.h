@@ -5,13 +5,18 @@
 
 #include <configOption.h>
 
+#include "usefulFunctions.h"  //includes <iostream> and <sys/stat.h>
+
 class smokeTransportOptions
 {
 
 public:
 
-    //constructor related functions
+    //constructor, which sets up the available options
+    // also checks to make sure the available options were set correctly
     smokeTransportOptions();
+
+
     void addOption(std::string newOptionName,std::string newOptionDataType,std::string newOptionNumberOfValues,std::vector<std::string> newConflictingOtions); //might make this private so that it is only called by constructor
     void setupAvailableOptions();
 
@@ -31,8 +36,6 @@ public:
 private:
 
     std::vector<configOption> theOptions;
-
-    void message(std::string theMessage);
 
 };
 

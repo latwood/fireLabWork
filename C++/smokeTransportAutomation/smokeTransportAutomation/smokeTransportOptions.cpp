@@ -4,14 +4,15 @@
 //constructor related functions
 smokeTransportOptions::smokeTransportOptions()
 {
+    message("\nSetting up available smokeTransportOptions");    // extra line at the beginning because this is a new set of functions/operations
     setupAvailableOptions();
     if(check_duplicateOptions() == false)
     {
-        message("duplicate option found during setup!\n");
+        exitMessage("duplicate option found during setup!");
     }
     if(check_OriginalNumberOfValues() == false)
     {
-        message("invalid numberOfValues found during setup!\n");
+        exitMessage("invalid numberOfValues found during setup!");
     }
 }
 
@@ -58,7 +59,7 @@ bool smokeTransportOptions::check_duplicateOptions()
         {
             if(theOptions[i].get_optionName() == theOptions[j].get_optionName())
             {
-                message("Duplicate option: " + theOptions[i].get_optionName() + "!\n");
+                message("Duplicate option: " + theOptions[i].get_optionName() + "!");
                 return false;
             }
         }
@@ -89,7 +90,7 @@ bool smokeTransportOptions::check_OriginalNumberOfValues()
                 }
                 if(j == theOptions.size()-1 && foundName == false)
                 {
-                    message("invalid numberOfValues for option " + theOptions[i].get_optionName() + "!\n");
+                    message("invalid numberOfValues for option " + theOptions[i].get_optionName() + "!");
                     return false;
                 }
             }
@@ -113,7 +114,7 @@ bool smokeTransportOptions::check_ConflictingOptions()//probably need this in re
             {
                 if(currentConflictingOptions[k] == theOptions[i].get_optionName())
                 {
-                    message("Conflicting option: " + currentConflictingOptions[k] + " specified the same as it's own option!\n");
+                    message("Conflicting option: " + currentConflictingOptions[k] + " specified the same as it's own option!");
                     conflictingOptionsPass = false;
                 } else
                 {
@@ -126,7 +127,7 @@ bool smokeTransportOptions::check_ConflictingOptions()//probably need this in re
                         }
                         if(j == theOptions.size()-1 && foundOptionName == false)
                         {
-                            message("Conflicting option: " + currentConflictingOptions[k] + " for option: " + theOptions[i].get_optionName() + "specified during setup but is not an option!\n");
+                            message("Conflicting option: " + currentConflictingOptions[k] + " for option: " + theOptions[i].get_optionName() + "specified during setup but is not an option!");
                             conflictingOptionsPass = false;
                         }
                     }
@@ -141,12 +142,4 @@ bool smokeTransportOptions::check_ConflictingOptions()//probably need this in re
 std::vector<configOption> smokeTransportOptions::get_theOptions()
 {
     return theOptions;
-}
-
-
-//other useful functions
-void smokeTransportOptions::message(std::string theMessage)
-{
-    std::cout << theMessage;
-    system("sleep 0.5");
 }

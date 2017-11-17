@@ -9,6 +9,9 @@ using namespace std;
 
 int main()
 {
+
+    #define YESDEBUG   // comment this out if you don't want debug messages
+
     //initialize the classes before the loop
     smokeTransportOptions smokeOptions;
     readConfigFile configFile(smokeOptions.get_theOptions());
@@ -17,7 +20,7 @@ int main()
 
     std::string configFilePaths[numberOfConfigFiles] =
     {
-        "/home/latwood/Documents/qtCreatorProjects/reworks/exampleSmokeTransportConfig.cfg"
+        "/home/latwood/Downloads/exampleSmokeTransportConfig.cfg"
     };
 
     for(int i = 0; i < numberOfConfigFiles; i++)
@@ -25,6 +28,7 @@ int main()
         configFile.newConfigFile(configFilePaths[i]);
         smokeTransportRun smokeRun(configFile);     //will be something like configFile.getData()
     }
+
 
     return 0;
 }

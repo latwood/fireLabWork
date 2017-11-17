@@ -8,6 +8,9 @@ readConfigFile::readConfigFile(std::vector<configOption> theOptions_value)
 
 void readConfigFile::newConfigFile(std::string configFilePath_value)
 {
+
+    message("\nreading config file");   // extra space because this is a new set of functions/operations
+
     //clear old variables
     for(size_t i = 0; i < theOptions.size(); i++)
     {
@@ -26,17 +29,21 @@ void readConfigFile::newConfigFile(std::string configFilePath_value)
     checkVariableFill();
     if(setupFail == true)
     {
-        message("failed to read config file: " + configFilePath + ".\nEnding program now\n");
-        exit(EXIT_FAILURE);
+        exitMessage("failed to read config file: " + configFilePath);
     } else
     {
-        message("succeeded in reading config file: " + configFilePath + ".\n\n");
+        message("succeeded in reading config file");
     }
 }
 
 
 void readConfigFile::readFile()
 {
+    if(fileExists(configFilePath) != true)
+    {
+        exitMessage("config file: " + configFilePath + " doesn't exist!");
+        exit(EXIT_FAILURE);
+    }
     std::ifstream is_file(configFilePath);
 
 //smokeTransportConfig
@@ -51,7 +58,6 @@ void readConfigFile::readFile()
 //following until the next key would have to be considered variables for that key
 
     //get each line in the file
-    message("\nreading config file\n");
     std::string line;
     while(std::getline(is_file,line))
     {
@@ -92,7 +98,7 @@ void readConfigFile::readFile()
         processWords();
         emptyWords();
     }
-    std::cout << "finished reading config file\n";
+    debugMessage("finished reading config file");
 }
 
 void readConfigFile::processWords()
@@ -101,7 +107,7 @@ void readConfigFile::processWords()
     {
         if(foundWords.size() == 1)
         {
-            message("Error! single word on a line! Need to specify both a variable name AND its values!\n");
+            message("Error! single word on a line! Need to specify both a variable name AND its values!");
             setupFail = false;
         } else
         {
@@ -111,23 +117,23 @@ void readConfigFile::processWords()
                 {
                     if(theOptions[i].get_optionCurrentNumberOfValues() != 0)
                     {
-                        message("Duplicate option: " + theOptions[i].get_optionName() + "!\n");
+                        message("Duplicate option: " + theOptions[i].get_optionName() + "!");
                     } else
                     {
                         updateNumberOfValues(i);
                         if(foundWords.size()-1 != theOptions[i].get_optionCurrentNumberOfValues())
                         {
-                            message(theOptions[i].get_optionName() + " specified but wrong number of values!\n");
+                            message(theOptions[i].get_optionName() + " specified but wrong number of values!");
                             setupFail = true;
                         } else
                         {
-                            std::cout << "Inserting " << foundWords.size()-1 << " words into " + theOptions[i].get_optionName() + ":";
+                            splitDebugMessage("Inserting " + int_to_string(foundWords.size()-1) + " words into " + theOptions[i].get_optionName() + ":");
                             for(size_t j = 1; j < foundWords.size(); j++)
                             {
-                                std::cout << " \"" << foundWords[j] << "\"";
+                                splitDebugMessage(" \"" + foundWords[j] + "\"");
                                 theOptions[i].addOptionValue(foundWords[j]);
                             }
-                            message("\n");
+                            debugMessage("");
                         }
                     }
                 }
@@ -152,11 +158,11 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
                 {
                     if(j >= theOptionNumber)
                     {
-                        message(theOptions[theOptionNumber].get_optionName() + " specified before " + theOptions[j].get_optionName() + "!\n");
+                        message(theOptions[theOptionNumber].get_optionName() + " specified before " + theOptions[j].get_optionName() + "!");
                         setupFail = false;
                     } else
                     {
-                        message(theOptions[j].get_optionName() + " not filled! Can't update currentNumberOfValues for: " + theOptions[theOptionNumber].get_optionName() + "!\n");
+                        message(theOptions[j].get_optionName() + " not filled! Can't update currentNumberOfValues for: " + theOptions[theOptionNumber].get_optionName() + "!");
                         setupFail = false;
                     }
                 } else
@@ -165,10 +171,10 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
                     n = 0;
                     if((strm >> n).fail())
                     {
-                        message("Could not update current number of values to: " + theOptions[j].get_optionValues()[0] + "\n");
+                        message("Could not update current number of values to: " + theOptions[j].get_optionValues()[0]);
                     } else
                     {
-                        message("Updating current number of options to: " + theOptions[j].get_optionValues()[0] + "\n");
+                        debugMessage("Updating current number of options to: " + theOptions[j].get_optionValues()[0]);
                         theOptions[theOptionNumber].updateNumberOfValues(n);
                     }
                 }
@@ -176,7 +182,7 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
         }
     } else
     {
-        message("Updating numberOfValues to: " + theOptions[theOptionNumber].get_optionOriginalNumberOfValues() + "\n");
+        debugMessage("Updating numberOfValues to: " + theOptions[theOptionNumber].get_optionOriginalNumberOfValues());
         theOptions[theOptionNumber].updateNumberOfValues(n);
     }
 }
@@ -211,14 +217,14 @@ void readConfigFile::checkConflictingOptions()
 
 void readConfigFile::checkVariableFill()
 {
-    message("verifying all variables specified and assigned values\n");
+    message("verifying all variables specified and assigned values");
     for(size_t i = 0; i < theOptions.size(); i++)
     {
         if(theOptions[i].get_optionConflicts() == true)
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 0 || theOptions[i].get_optionValues().size() != 0)
             {
-                message("the " + theOptions[i].get_optionName() + " option conflicts! It should have no values!\n");
+                message("the " + theOptions[i].get_optionName() + " option conflicts! It should have no values!");
                 setupFail = true;
             }
         } else
@@ -226,7 +232,7 @@ void readConfigFile::checkVariableFill()
             std::vector<std::string> currentOptionValues = theOptions[i].get_optionValues();
             if(theOptions[i].get_optionCurrentNumberOfValues() == 0)
             {
-                message("NumberOfValues for " + theOptions[i].get_optionName() + " didn't get filled!\n");
+                message("NumberOfValues for " + theOptions[i].get_optionName() + " didn't get filled!");
                 setupFail = true;
             }
             for(size_t j = 0; j < currentOptionValues.size(); j++)
@@ -234,13 +240,12 @@ void readConfigFile::checkVariableFill()
                 std::string stringOfCounter = int_to_string(j);
                 if(currentOptionValues[j] == "") //oh yeah, I purposefully made it so instead of using "" to specify no change, I said all values had to be filled
                 {
-                    message("Values for " + theOptions[i].get_optionName() + " index " + stringOfCounter + " not specified!\n");
+                    message("Values for " + theOptions[i].get_optionName() + " index " + stringOfCounter + " not specified!");
                     setupFail = true;
                 }
             }
         }
     }
-    message("verification complete!\n");
 }
 
 int readConfigFile::get_optionValues_singleInt(std::string desiredOptionName)
@@ -251,7 +256,7 @@ int readConfigFile::get_optionValues_singleInt(std::string desiredOptionName)
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 1)
             {
-                message("Requested single int value for " + desiredOptionName + " when there are currently " + int_to_string(theOptions[i].get_optionCurrentNumberOfValues()) + " values!\n");
+                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + int_to_string(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
                 return -1;
             } else
             {
@@ -259,7 +264,7 @@ int readConfigFile::get_optionValues_singleInt(std::string desiredOptionName)
             }
         }
     }
-    message(desiredOptionName + " is not a valid option!\n");
+    exitMessage(desiredOptionName + " is not a valid option!");
     return -1;
 }
 
@@ -277,7 +282,7 @@ std::vector<int> readConfigFile::get_optionValues_multiInt(std::string desiredOp
             return theOptionValues;
         }
     }
-    message(desiredOptionName + " is not a valid option!\n");
+    exitMessage(desiredOptionName + " is not a valid option!");
     return {-1};
 }
 
@@ -289,7 +294,7 @@ std::string readConfigFile::get_optionValues_singleString(std::string desiredOpt
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 1)
             {
-                message("Requested single int value for " + desiredOptionName + " when there are currently " + int_to_string(theOptions[i].get_optionCurrentNumberOfValues()) + " values!\n");
+                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + int_to_string(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
                 return "";
             } else
             {
@@ -297,7 +302,7 @@ std::string readConfigFile::get_optionValues_singleString(std::string desiredOpt
             }
         }
     }
-    message(desiredOptionName + " is not a valid option!\n");
+    exitMessage(desiredOptionName + " is not a valid option!");
     return "";
 }
 
@@ -310,7 +315,7 @@ std::vector<std::string> readConfigFile::get_optionValues_multiString(std::strin
             return theOptions[i].get_optionValues();
         }
     }
-    message(desiredOptionName + " is not a valid option!\n");
+    exitMessage(desiredOptionName + " is not a valid option!");
     return std::vector<std::string> {""};
 }
 
@@ -324,7 +329,7 @@ int readConfigFile::string_to_int(std::string s)
     if((strm >> n).fail())
     {
         strm.clear();
-        message("conversion of string to int failed!\n");
+        exitMessage("conversion of string to int failed!");
         conversionFail = true;
     }
     return n;
@@ -337,14 +342,8 @@ std::string readConfigFile::int_to_string(int n)
     if((strm << n).fail())
     {
         strm.clear();
-        message("conversion of int to string failed!\n");
+        exitMessage("conversion of int to string failed!");
         conversionFail = true;
     }
     return strm.str();
-}
-
-void readConfigFile::message(std::string theMessage)
-{
-    std::cout << theMessage;
-    system("sleep 0.5");
 }

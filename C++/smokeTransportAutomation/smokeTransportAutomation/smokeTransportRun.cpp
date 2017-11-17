@@ -2,6 +2,9 @@
 
 smokeTransportRun::smokeTransportRun(readConfigFile configFile)
 {
+
+    message("\nStarting smokeTransportRun");    // extra line at the beginning because this is the beginning of a new set of functions/operations
+
     //need to change all these to: getOption("configFileName") . . .
     //thought about passing the config file on to openFoamSystemFiles, but in the end, each variable that
     //needs to change majorly is changed here in loop statements
@@ -46,7 +49,7 @@ smokeTransportRun::smokeTransportRun(readConfigFile configFile)
             sourceMinCoordinates = sourceMinCoordinates.substr(0,i) + " " + sourceMinCoordinates.substr(i+1,sourceMinCoordinates.size());
         }
     }
-    std::cout << "sourceMinCoordinates = " << sourceMinCoordinates << endl;
+    debugMessage("sourceMinCoordinates = " + sourceMinCoordinates);
     sourceMaxCoordinates = configFile.get_optionValues_singleString("sourceMaxCoordinates");
     for(size_t i = 0; i < sourceMaxCoordinates.length(); i++)
     {
@@ -55,7 +58,7 @@ smokeTransportRun::smokeTransportRun(readConfigFile configFile)
             sourceMaxCoordinates = sourceMaxCoordinates.substr(0,i) + " " + sourceMaxCoordinates.substr(i+1,sourceMaxCoordinates.size());
         }
     }
-    std::cout << "sourceMaxCoordinates = " << sourceMaxCoordinates << endl;
+    debugMessage("sourceMaxCoordinates = " + sourceMaxCoordinates);
     sourceValues = configFile.get_optionValues_multiString("sourceValues");
     UfileLocations = configFile.get_optionValues_multiString("UfileLocations");
     missingTimes = configFile.get_optionValues_singleInt("missingTimes");
@@ -90,7 +93,7 @@ smokeTransportRun::smokeTransportRun(readConfigFile configFile)
 
 void smokeTransportRun::createTransportCase()
 {
-    smokeMessage("creating transport case\n");
+    message("creating transport case");
     std::string removeOldCaseCommand = "rm -rf " + transportCase;
     system(removeOldCaseCommand.c_str());
     std::string createTransportCaseCommand = "cp -rT " + parentDirectory + startCase +
@@ -100,14 +103,14 @@ void smokeTransportRun::createTransportCase()
 
 void smokeTransportRun::copySmokeTransportConfigFile()
 {
-    smokeMessage("transferring transport config file\n");
+    message("transferring transport config file");
     std::string copySmokeTransportConfigFileCommand = "cp " + configFilePath + " " + transportCase + configFileName;
     system(copySmokeTransportConfigFileCommand.c_str());
 }
 
 void smokeTransportRun::updateTimeDirectories()
 {
-    smokeMessage("adding missing time directories\n");
+    message("adding missing time directories");
     std::string createTimeDirectoryCommand;
     for(int i = 0; i < missingTimes; i++)
     {
@@ -119,7 +122,7 @@ void smokeTransportRun::updateTimeDirectories()
 
 void smokeTransportRun::updateSystemFiles(int i)
 {
-    smokeMessage("updating system files\n");
+    message("updating system files");
     if(i == 0)
     {
         OpenFoamSystemFiles updateSystem(true,transportCase,initialTime,endTimes[i],writeIntervals[i],
@@ -133,7 +136,7 @@ void smokeTransportRun::updateSystemFiles(int i)
 
 void smokeTransportRun::updateUfile(int i)
 {
-    smokeMessage("updating velocity files\n");
+    message("updating velocity files");
     //it is i-1 because this is endTImes not startTimes. The UfileLocations is still i since that is the current case
     std::string copyUfileCommand = "cp -rT " + parentDirectory + UfileLocations[i] + "U" +
             " " + transportCase+endTimes[i-1]+"/U";
@@ -144,20 +147,14 @@ void smokeTransportRun::updateUfile(int i)
 
 void smokeTransportRun::runSetFields()
 {
-    smokeMessage("running setFields command\n");
+    message("running setFields command\n"); //need an extra space, it just looks better
     std::string setFieldsCommand = "setFields -case " + transportCase;
     system(setFieldsCommand.c_str());
 }
 
 void smokeTransportRun::runSmokeTransport()
 {
-    smokeMessage("running myScalarTransportFoam command\n");
+    message("running myScalarTransportFoam command\n"); // need an extra space, it just looks better
     std::string runSmokeTransportCommand = "myScalarTransportFoam -case " + transportCase;
     system(runSmokeTransportCommand.c_str());
-}
-
-void smokeTransportRun::smokeMessage(std::string theMessage)
-{
-    std::cout << theMessage;
-    system("sleep 0.5");
 }
