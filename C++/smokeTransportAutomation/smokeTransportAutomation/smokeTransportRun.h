@@ -13,6 +13,7 @@
 #include <readConfigFile.h>
 
 #include "usefulFunctions.h"  //includes <iostream> and <sys/stat.h>
+#include "useCmd.h"
 
 class smokeTransportRun
 {

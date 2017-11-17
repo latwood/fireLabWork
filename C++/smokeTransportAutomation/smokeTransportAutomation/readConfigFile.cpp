@@ -3,7 +3,6 @@
 readConfigFile::readConfigFile(std::vector<configOption> theOptions_value)
 {
     theOptions = theOptions_value;
-    conversionFail = false;
 }
 
 void readConfigFile::newConfigFile(std::string configFilePath_value)
@@ -127,7 +126,7 @@ void readConfigFile::processWords()
                             setupFail = true;
                         } else
                         {
-                            splitDebugMessage("Inserting " + int_to_string(foundWords.size()-1) + " words into " + theOptions[i].get_optionName() + ":");
+                            splitDebugMessage("Inserting " + intToString(foundWords.size()-1) + " words into " + theOptions[i].get_optionName() + ":");
                             for(size_t j = 1; j < foundWords.size(); j++)
                             {
                                 splitDebugMessage(" \"" + foundWords[j] + "\"");
@@ -144,20 +143,22 @@ void readConfigFile::processWords()
 
 void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
 {
-    istringstream strm;
-    strm.str(theOptions[theOptionNumber].get_optionOriginalNumberOfValues());
+    std::string s = theOptions[theOptionNumber].get_optionOriginalNumberOfValues();
+    // I almost want to say that the assumption is that this value hasn't been verified to actually be the right type yet, and that it hasn't been verified in configOption
+    // oh wait, it was purposefully left as a string because the value is specified somewhere else
     size_t n = 0;
-    if((strm >> n).fail())
+    if(is_size_t(s) == false)
     {
-        strm.clear();
         for(size_t j = 0; j < theOptions.size(); j++)
         {
             if(theOptions[theOptionNumber].get_optionOriginalNumberOfValues() == theOptions[j].get_optionName())
             {
+              // assumes the new value isn't a string?
                 if(theOptions[j].get_optionCurrentNumberOfValues() == 0)
                 {
                     if(j >= theOptionNumber)
                     {
+                        // I think this might be a debug message, since the value will be filled later despite this problem? Actually I don't think this will fill in later, so if this message pops up and doesn't make sense, need to change it a bit to be more specific
                         message(theOptions[theOptionNumber].get_optionName() + " specified before " + theOptions[j].get_optionName() + "!");
                         setupFail = false;
                     } else
@@ -167,14 +168,15 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
                     }
                 } else
                 {
-                    strm.str(theOptions[j].get_optionValues()[0]);
+                    s = theOptions[j].get_optionValues()[0];
                     n = 0;
-                    if((strm >> n).fail())
+                    if(is_size_t(s) == false)
                     {
                         message("Could not update current number of values to: " + theOptions[j].get_optionValues()[0]);
                     } else
                     {
-                        debugMessage("Updating current number of options to: " + theOptions[j].get_optionValues()[0]);
+                        n = stringToInt(s); // may be better to use a double or something else since n is type size_t
+                        debugMessage("Updating current number of options for " + theOptions[theOptionNumber].get_optionName() + " to: " + theOptions[j].get_optionValues()[0]);
                         theOptions[theOptionNumber].updateNumberOfValues(n);
                     }
                 }
@@ -182,7 +184,8 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
         }
     } else
     {
-        debugMessage("Updating numberOfValues to: " + theOptions[theOptionNumber].get_optionOriginalNumberOfValues());
+        n = stringToInt(s); // may be better to use a double or something else since n is type size_t
+        debugMessage("Updating numberOfValues for " + theOptions[theOptionNumber].get_optionName() + " to: " + theOptions[theOptionNumber].get_optionOriginalNumberOfValues());
         theOptions[theOptionNumber].updateNumberOfValues(n);
     }
 }
@@ -237,8 +240,8 @@ void readConfigFile::checkVariableFill()
             }
             for(size_t j = 0; j < currentOptionValues.size(); j++)
             {
-                std::string stringOfCounter = int_to_string(j);
-                if(currentOptionValues[j] == "") //oh yeah, I purposefully made it so instead of using "" to specify no change, I said all values had to be filled
+                std::string stringOfCounter = intToString(j);
+                if(currentOptionValues[j] == "") //oh yeah, I purposefully made it so instead of using "" to specify no change, I said all values had to be filled. I might need to add in some kind of check of conflicting options or some kind of boolean to check to see if it was supposed to be filled instead of just saying nothing can be empty
                 {
                     message("Values for " + theOptions[i].get_optionName() + " index " + stringOfCounter + " not specified!");
                     setupFail = true;
@@ -256,11 +259,11 @@ int readConfigFile::get_optionValues_singleInt(std::string desiredOptionName)
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 1)
             {
-                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + int_to_string(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
+                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + intToString(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
                 return -1;
             } else
             {
-                return string_to_int(theOptions[i].get_optionValues()[0]);
+                return stringToInt(theOptions[i].get_optionValues()[0]);
             }
         }
     }
@@ -277,7 +280,7 @@ std::vector<int> readConfigFile::get_optionValues_multiInt(std::string desiredOp
             std::vector<int> theOptionValues;
             for(size_t j = 0; j < theOptions[i].get_optionValues().size(); j ++)
             {
-                theOptionValues.push_back(string_to_int(theOptions[i].get_optionValues()[j]));
+                theOptionValues.push_back(stringToInt(theOptions[i].get_optionValues()[j]));
             }
             return theOptionValues;
         }
@@ -294,7 +297,7 @@ std::string readConfigFile::get_optionValues_singleString(std::string desiredOpt
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 1)
             {
-                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + int_to_string(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
+                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + intToString(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
                 return "";
             } else
             {
@@ -317,33 +320,4 @@ std::vector<std::string> readConfigFile::get_optionValues_multiString(std::strin
     }
     exitMessage(desiredOptionName + " is not a valid option!");
     return std::vector<std::string> {""};
-}
-
-
-int readConfigFile::string_to_int(std::string s)
-{
-    conversionFail = false;
-    istringstream strm;
-    strm.str(s);
-    int n = 0;
-    if((strm >> n).fail())
-    {
-        strm.clear();
-        exitMessage("conversion of string to int failed!");
-        conversionFail = true;
-    }
-    return n;
-}
-
-std::string readConfigFile::int_to_string(int n)
-{
-    conversionFail = false;
-    ostringstream strm;
-    if((strm << n).fail())
-    {
-        strm.clear();
-        exitMessage("conversion of int to string failed!");
-        conversionFail = true;
-    }
-    return strm.str();
 }

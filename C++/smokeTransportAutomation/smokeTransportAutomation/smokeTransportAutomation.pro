@@ -16,5 +16,6 @@ HEADERS += \
     readConfigFile.h \
     smokeTransportOptions.h \
     configOption.h \
-    usefulFunctions.h
+    usefulFunctions.h \
+    useCmd.h
 

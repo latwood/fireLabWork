@@ -9,8 +9,7 @@ using namespace std;
 
 int main()
 {
-
-    #define YESDEBUG   // comment this out if you don't want debug messages
+    // if you want debug messages, uncomment the #define YESDEBUG found in usefulFunction.h
 
     //initialize the classes before the loop
     smokeTransportOptions smokeOptions;

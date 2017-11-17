@@ -4,9 +4,6 @@
 #include <iostream>
 
 #include <vector>
-#include <istream>
-#include <fstream>
-#include <sstream>
 
 #include <smokeTransportOptions.h>
 #include <configOption.h>
@@ -38,9 +35,6 @@ public:
     std::string get_optionValues_singleString(std::string desiredOptionName);
     std::vector<std::string> get_optionValues_multiString(std::string desiredOptionName);
 
-    int string_to_int(std::string s);
-    std::string int_to_string(int n);
-
 private:
 
     std::string configFilePath;
@@ -65,7 +59,6 @@ private:
     std::vector<std::string> missingTimeDirectories;
 
     bool setupFail;
-    bool conversionFail;
 
 };
 

@@ -95,17 +95,17 @@ void smokeTransportRun::createTransportCase()
 {
     message("creating transport case");
     std::string removeOldCaseCommand = "rm -rf " + transportCase;
-    system(removeOldCaseCommand.c_str());
+    exec_cmd(removeOldCaseCommand.c_str());
     std::string createTransportCaseCommand = "cp -rT " + parentDirectory + startCase +
             " " + transportCase;
-    system(createTransportCaseCommand.c_str());
+    exec_cmd(createTransportCaseCommand.c_str());
 }
 
 void smokeTransportRun::copySmokeTransportConfigFile()
 {
     message("transferring transport config file");
     std::string copySmokeTransportConfigFileCommand = "cp " + configFilePath + " " + transportCase + configFileName;
-    system(copySmokeTransportConfigFileCommand.c_str());
+    exec_cmd(copySmokeTransportConfigFileCommand.c_str());
 }
 
 void smokeTransportRun::updateTimeDirectories()
@@ -116,7 +116,7 @@ void smokeTransportRun::updateTimeDirectories()
     {
         createTimeDirectoryCommand = "cp -rT " + transportCase + "0" +
                 " " + transportCase + missingTimeDirectories[i];
-        system(createTimeDirectoryCommand.c_str());
+        exec_cmd(createTimeDirectoryCommand.c_str());
     }
 }
 
@@ -140,21 +140,21 @@ void smokeTransportRun::updateUfile(int i)
     //it is i-1 because this is endTImes not startTimes. The UfileLocations is still i since that is the current case
     std::string copyUfileCommand = "cp -rT " + parentDirectory + UfileLocations[i] + "U" +
             " " + transportCase+endTimes[i-1]+"/U";
-    system(copyUfileCommand.c_str());
+    exec_cmd(copyUfileCommand.c_str());
     std::string deletePhiFileCommand = "rm -f " + transportCase + endTimes[i-1] + "/phi";  //doesn't error if it isn't already there
-    system(deletePhiFileCommand.c_str());
+    exec_cmd(deletePhiFileCommand.c_str());
 }
 
 void smokeTransportRun::runSetFields()
 {
     message("running setFields command\n"); //need an extra space, it just looks better
     std::string setFieldsCommand = "setFields -case " + transportCase;
-    system(setFieldsCommand.c_str());
+    exec_cmd(setFieldsCommand.c_str());
 }
 
 void smokeTransportRun::runSmokeTransport()
 {
     message("running myScalarTransportFoam command\n"); // need an extra space, it just looks better
     std::string runSmokeTransportCommand = "myScalarTransportFoam -case " + transportCase;
-    system(runSmokeTransportCommand.c_str());
+    exec_cmd(runSmokeTransportCommand.c_str());
 }

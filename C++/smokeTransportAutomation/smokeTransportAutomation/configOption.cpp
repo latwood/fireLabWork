@@ -38,7 +38,7 @@ bool configOption::check_optionDataType(std::string newOptionDataType)
         return true;
     } else
     {
-        message("optionDataType: " + newOptionDataType + " not valid type!");
+        message("optionDataType: " + newOptionDataType + " is not a valid type!");
         return false;
     }
 }
@@ -47,10 +47,7 @@ bool configOption::check_optionNumberOfValues(std::string newOptionNumberOfValue
 {
     //make sure this function doesn't get run on the constructor, but only when updating values.
     //some stuff is initialized as strings since it will be replaced by a variable
-    istringstream strm;
-    strm.str(newOptionNumberOfValues);
-    size_t n = 0;
-    if((strm >> n).fail())
+    if(is_double(newOptionNumberOfValues) == false)
     {
         message("optionNumberOfValues: " + newOptionNumberOfValues + " is not numeric!");
         return false;
@@ -63,58 +60,34 @@ bool configOption::check_optionNumberOfValues(std::string newOptionNumberOfValue
 bool configOption::check_optionValue(std::string newOptionValue)
 {
     bool valuesGood = true;
-    istringstream strm;
-    strm.str(newOptionValue);
+    bool isType = true;
     if(optionDataType == "std::string")
     {
-        valuesGood = true;  //it would break at some point if this weren't already true
+        isType = true;  //it would break at some point if this weren't already true
     } else if(optionDataType == "size_t")
     {
-        size_t n = 0;
-        if((strm >> n).fail())
-        {
-            valuesGood = false;
-        }
+        isType = is_size_t(newOptionValue);
     } else if(optionDataType == "int")
     {
-        int n = 0;
-        if((strm >> n).fail())
-        {
-            valuesGood = false;
-        }
+        isType = is_int(newOptionValue);
     } else if(optionDataType == "long")
     {
-        long n = 0;
-        if((strm >> n).fail())
-        {
-            valuesGood = false;
-        }
+        isType = is_long(newOptionValue);
     } else if(optionDataType == "float")
     {
-        float n = 0;
-        if((strm >> n).fail())
-        {
-            valuesGood = false;
-        }
+        isType = is_float(newOptionValue);
     } else if(optionDataType == "double")
     {
-        double n = 0;
-        if((strm >> n).fail())
-        {
-            valuesGood = false;
-        }
+        isType = is_double(newOptionValue);
     } else if(optionDataType == "bool")
     {
-        bool n = 0;
-        if((strm >> n).fail())
-        {
-            valuesGood = false;
-        }
+        isType = is_bool(newOptionValue);
     }
 
-    if(valuesGood == false)
+    if(isType == false)
     {
         message("optionDataType is " + optionDataType + " but newOptionValue \"" + newOptionValue + "\" is not that type!");
+        valuesGood = false;
     }
     return valuesGood;
 }
@@ -138,7 +111,7 @@ void configOption::addOptionValue(std::string newOptionValue)
         optionValues.push_back(newOptionValue);
     } else
     {
-        exitMessage("optionValue \"" + newOptionValue + "\" not valid!");
+        exitMessage("optionValue \"" + newOptionValue + "\" is not valid!");
     }
 }
 
