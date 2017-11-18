@@ -23,7 +23,16 @@ void readConfigFile::newConfigFile(std::string configFilePath_value)
 
     //now start reading config file to get new variables
     readFile();
+    // I think the idea here was to make sure that configFilePath is set no matter what, at least in the options. It may or not be set inside the readFile. You would think that it should be set there or something, or before that function, but I guess after makes sure that it will always be the right variable even if something else were to get put there.
+    // could also probably put this into checkVariableFill then.
     updateOption_configFilePath();
+    // I think the idea here was that while I don't have a good conflicting options yet, set a group of booleans
+    //inside the options themselves to a single value so there cannot be any conflicting options yet
+    // So this script is supposed to set the conflictingOptions boolean for each option, which since no method, set all to false so there are never conflicting options
+    // I'm probably going to change the way this is done, probably similar to the original and current number of values
+    // or I guess the boolean is the current status of the conflicting option, the conflictingOptions vector contains a list of what stuff could cause a conflict
+    // so maybe this script is correct since it sets all bool to a default so they can be set to their actual value in checkVariableFill.
+    // so probably should move checkConflictingOptions so that it is run at the beginning of checkVariableFill (so inside checkVariableFill).
     checkConflictingOptions();
     checkVariableFill();
     if(setupFail == true)
@@ -45,7 +54,64 @@ void readConfigFile::readFile()
     }
     std::ifstream is_file(configFilePath);
 
-//smokeTransportConfig
+/*
+ * smokeTransportConfig
+ *
+ * Important requirements of a config file format:
+ *
+ * Ideal format would be a single line for each configOption
+ * with each line consisting of a configOption name followed by an equals sign.
+ * The configOption values would follow the equals sign but would be surrounded by quotation marks
+ * and separated by commas or semicolons. The quotation marks would allow the configOption values to contain
+ * whitespace and any necessary symbols that are not quotation marks.
+ *
+ *
+ *
+ *
+ *
+ * Each separate configOption value would need to be separated by quotation marks
+ * so that they can contain whitespace if needed. These comma separated, quotation mark surrounded
+ * configOption values can then be separated into arrays and vectors by using comma separated brackets
+ * with each array or vector also separated by commas or semicolons, but not enclosed in quotation marks.
+ * This would also mean keeping each line of variables in the same order as the config options are filled.
+ *
+ * But it would be nicer to be more flexible, right? So the format won't be quite ideal.
+ * The format still consists of a variable name followed by an equals sign, then comma separated values,
+ * but now keeping things in the same line by line order shouldn't matter.
+ * Also, white space should be ignored, but variable values for a given variable still need to be
+ * on the same line as their variable value.
+ *
+ * In addition, semicolons could act as replacements for the commas in separating variables
+ * comma separated {} or [] symbols full of comma or semicolon separated values could be used
+ * for vectors and arrays of values.
+ *
+ * Finally the \, /, :, -, +, ., ", ', ?, and !, chars need to be counted as part of the variable values,
+ * so basically the only things that show that variable values are separate variable values
+ * are commas and semi colons, using equal signs and {} [] chars to help understand the sequence of values
+ *
+ * One last thing! While this format ignores whitespace, it can't quite totally ignore it.
+ * The ability to know when a sequence of values has ended requires discovering
+ * that a value doesn't have a comma or semicolon after it before the next specified value.
+ * It either needs to use this as a criteria that the next word is a variable name for a new set of values,
+ * or it needs to find the equals sign and go backwards to that word. The missing comma/semicolon in the
+ * whitespace between values is easier to use so that is the format for the config file.
+ *
+ * So this means that there cannot be any whitespace in a variable value. Instead, it is required to use
+ * an underline _ in a value to represent spaces.
+ *
+ * variable values are separated by commas and whitespace and follow a variable name and an equals sign
+ *  should have a variables should not need to be on the same line
+ * some variables are paths to files, which would need / characters
+ * can separate single values by commas
+ * need { and } to separate vectors of values
+ * spaces need to be ignored and not considered as values
+ * underlines could represent spaces in values that are multiple numbers normally separated by spaces
+ * negative signs and periods need to be included in the values
+ *
+ * so I guess the assumption is that
+ *
+ */
+
 //this parses by getting each line, then separating out the values, assuming that
 //spaces, quotes, equal signs, commas, single quotes, and semicolons are not variables
 
