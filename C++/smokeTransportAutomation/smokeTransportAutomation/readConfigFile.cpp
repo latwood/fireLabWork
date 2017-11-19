@@ -54,73 +54,51 @@ void readConfigFile::readFile()
     }
     std::ifstream is_file(configFilePath);
 
-/*
- * smokeTransportConfig
- *
- * Important requirements of a config file format:
- *
- * Ideal format would be a single line for each configOption
- * with each line consisting of a configOption name followed by an equals sign.
- * The configOption values would follow the equals sign but would be surrounded by quotation marks
- * and separated by commas or semicolons. The quotation marks would allow the configOption values to contain
- * whitespace and any necessary symbols that are not quotation marks.
- *
- *
- *
- *
- *
- * Each separate configOption value would need to be separated by quotation marks
- * so that they can contain whitespace if needed. These comma separated, quotation mark surrounded
- * configOption values can then be separated into arrays and vectors by using comma separated brackets
- * with each array or vector also separated by commas or semicolons, but not enclosed in quotation marks.
- * This would also mean keeping each line of variables in the same order as the config options are filled.
- *
- * But it would be nicer to be more flexible, right? So the format won't be quite ideal.
- * The format still consists of a variable name followed by an equals sign, then comma separated values,
- * but now keeping things in the same line by line order shouldn't matter.
- * Also, white space should be ignored, but variable values for a given variable still need to be
- * on the same line as their variable value.
- *
- * In addition, semicolons could act as replacements for the commas in separating variables
- * comma separated {} or [] symbols full of comma or semicolon separated values could be used
- * for vectors and arrays of values.
- *
- * Finally the \, /, :, -, +, ., ", ', ?, and !, chars need to be counted as part of the variable values,
- * so basically the only things that show that variable values are separate variable values
- * are commas and semi colons, using equal signs and {} [] chars to help understand the sequence of values
- *
- * One last thing! While this format ignores whitespace, it can't quite totally ignore it.
- * The ability to know when a sequence of values has ended requires discovering
- * that a value doesn't have a comma or semicolon after it before the next specified value.
- * It either needs to use this as a criteria that the next word is a variable name for a new set of values,
- * or it needs to find the equals sign and go backwards to that word. The missing comma/semicolon in the
- * whitespace between values is easier to use so that is the format for the config file.
- *
- * So this means that there cannot be any whitespace in a variable value. Instead, it is required to use
- * an underline _ in a value to represent spaces.
- *
- * variable values are separated by commas and whitespace and follow a variable name and an equals sign
- *  should have a variables should not need to be on the same line
- * some variables are paths to files, which would need / characters
- * can separate single values by commas
- * need { and } to separate vectors of values
- * spaces need to be ignored and not considered as values
- * underlines could represent spaces in values that are multiple numbers normally separated by spaces
- * negative signs and periods need to be included in the values
- *
- * so I guess the assumption is that
- *
- */
-
-//this parses by getting each line, then separating out the values, assuming that
-//spaces, quotes, equal signs, commas, single quotes, and semicolons are not variables
-
-//you HAVE to keep the variables and their values on the same line!
-
-//Currently this ignores everything that isn't _key variable name_ value value value
-//could eventually do multiple lines but why complicate it? That's what boost is for.
-//plus it would require always checking the word in the moment for a key, and all words
-//following until the next key would have to be considered variables for that key
+    /*
+     * This script goes through the config file line by line, analyzing each line one character at a time,
+     * skipping any lines that begin with the pound # sign to allow for commenting, ignoring equals signs, commas, and semicolons
+     * (unless they are in quotation marks, then they would be part of the configOption values and later error handling will hopefully deal with it if that isn't a valid option).
+     * If it comes across a character that is not whitespace, a forwards brace {, a forwards bracket [, a forwards parenthesis(, a backwards brace }, a backwards bracket ], a backwards parenthesis ),
+     * or a double quotation mark ", then the script marks that char as the beginning of a configOption name.
+     * It then continues until it finds the next whitespace or ignored characters (equals sign, commas, and semicolons), getting mad if it sees braces, brackets, parenthesis, or double quotation marks,
+     * using the next whitespace and ignored characters to tell itself that it has found the end of the configOption name.
+     *
+     * After the script has found a configOption name, it checks it to make sure the configOption name matches
+     * with one of the configOptions given in the program, then continues reading the next characters
+     * until it finds a forwards brace {, forward bracket [, or forward parenthesis (. The script marks this spot as the beginning of a vector of values
+     * for the given configOption name that it has last found. Then continues reading until it finds a double quotation mark.
+     * The script will mark this spot as the beginning of a value for that vector of values and continue on until it finds
+     * another double quotation mark, using the next double quotation mark to tell the script that it has found the end of the value for the given vector.
+     * The script stores that value in a vector, which when it has found all the values in that vector will be added as one of the given configOption vector of values given by that configOption name,
+     * doing error checking to make sure that the value is the right type for what is allowed for the given config option (but not necessarily checking to see if the value is perfect).
+     * The script then continues on until it finds another double quotation mark or a backwards brace }, backwards bracket ], or backwards parenthesis ) to let it know that it has
+     * found more values for the given vector, that it has found all the values for the given vector.
+     *
+     * When the script finds a backwards brace, bracket, or parenthesis to finish off a vector of configOption values, it continues reading.
+     * If it finds a character that isn't a forwards brace {, forwards bracket [, forwards parenthesis (, whitespace, or ignored characters (equals signs, commas, semicolons),
+     * then the script has found all the vectors of values for that given configOption and it has found a new configOption name and repeats the above process again, but for this new configOption.
+     * If it finds another forwards brace, bracket, or parenthesis first, then it repeats the process of finding a vector of values,
+     * adding each vector it finds this way for that given configOption to the vector of vectors for the given config option.
+     *
+     * To clarify the symbols stuff, a forward brace must be followed by a backwards brace, not backwards brackets or backwards parenthesis.
+     * A forward bracket must be followed by a backwards bracket, not backwards braces or backwards parenthesis.
+     * A forward parenthesis must be followed by a backwards parenthesis, not backwards braces or backwards brackets.
+     *
+     * A given vector of values will always have the values separated by double quotation marks. This allows the values to contain whitespace if necessary. This also allows the values to contain
+     * single quotation marks ' if necessary for using variables that need special string manipulation (paths, command line commands).
+     *
+     * The program gets mad if it ever sees a backward brace }, bracket ], or parenthesis ), without first seeing a forward brace {, bracket [, or parenthesis (.
+     * The program also gets mad if it sees a second forwards brace {, bracket [, or parenthesis ( before it has seen the corresponding backwards brace, bracket, or parenthesis
+     * as determined by the type of the forward symbol.
+     *
+     * This style allows the user to place equals signs between the variable name and the values, and even commas to separate values,
+     * but technically it is not required to do so. That would just be for improving readability for the user.
+     *
+     * After all the characters in the config file are analyzed and used to update the values of the config options,
+     * the script checks to make sure that the numbers of vectors and the numbers of values per vector are valid.
+     * This involves interaction between the different configOptions, since some options are for giving the size of some of the vectors.
+     *
+     */
 
     //get each line in the file
     std::string line;
