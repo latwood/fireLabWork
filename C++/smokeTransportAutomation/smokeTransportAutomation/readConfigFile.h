@@ -21,9 +21,8 @@ public:
     void newConfigFile(std::string configFilePath_value);    //this is the redo of the constructor, but can be done without the constructor
 
     void readFile();    //returns words
-    void processWords();
+    void processWords(std::string foundOptionName, std::vector< std::vector<std::string> > foundOptionValues);
     void updateNumberOfValues(size_t theOptionNumber);
-    void emptyWords();
     void updateOption_configFilePath();
     void checkConflictingOptions();  //first check to see if any of the filled variables have conflicting options with other filled variables, then check the fill
     void checkVariableFill();

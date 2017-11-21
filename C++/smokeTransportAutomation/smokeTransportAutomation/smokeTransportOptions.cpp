@@ -14,6 +14,10 @@ smokeTransportOptions::smokeTransportOptions()
     {
         exitMessage("invalid numberOfValues found during setup!");
     }
+    if(check_duplicateOptions() == true)    // probably need to mess with variable naming to make sure the booleans keep the same logic for each setup
+    {
+        exitMessage("invalid conflictingOptions found during setup!");
+    }
 }
 
 void smokeTransportOptions::addOption(std::string newOptionName,std::string newOptionDataType,std::string newOptionNumberOfValues,std::vector<std::string> newConflictingOtions)
@@ -74,10 +78,12 @@ bool smokeTransportOptions::check_OriginalNumberOfValues()
     {
         istringstream strm;
         theNumberOfValues = theOptions[i].get_optionOriginalNumberOfValues();
-        strm.str(theNumberOfValues);
+        strm.str(theNumberOfValues);    // at some time try replacing this with one of the useful functions
         size_t n = 0;
         if((strm >> n).fail())
         {
+            // so if it is a string on purpose (the number of values is specified by another option)
+            // if it doesn't fail, then the it was of type size_t, or numeric, so we are good
             strm.clear();
             bool foundName = false;
             std::string theOptionName;
@@ -86,7 +92,12 @@ bool smokeTransportOptions::check_OriginalNumberOfValues()
                 theOptionName = theOptions[j].get_optionName();
                 if(theNumberOfValues == theOptionName)
                 {
-                   foundName = true;
+                    // the given number of values was found to be given by one of the other options
+                    // maybe should do some kind of conflicting option trick here.
+                    //No, this is figured out later since if this configOption is needed based off
+                    //of conflicting options, then it looks to see if the other value was filled and if not,
+                    //that is when the error trips
+                    foundName = true;
                 }
                 if(j == theOptions.size()-1 && foundName == false)
                 {
@@ -103,6 +114,7 @@ bool smokeTransportOptions::check_OriginalNumberOfValues()
 //Another loop for extra vector somehow. Check the right thing (conflict option) with right thing (option name)
 //but return the right stuff in the right way. Right now exits on a good thing if it were to work.
 bool smokeTransportOptions::check_ConflictingOptions()//probably need this in readConfig, not here, except this is just making sure each conflicting option really does exist as a variable name
+// okay I just looked over this and it looks like it should work with vectors of conflicting options to me.
 {
     bool conflictingOptionsPass = true;
     for(size_t i = 0; i < theOptions.size(); i++)

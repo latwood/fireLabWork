@@ -27,7 +27,7 @@ public:
 
     //update some values of the options
     void updateNumberOfValues(size_t newNumberOfValues);
-    void addOptionValue(std::string newOptionValue);
+    void addOptionValue(std::string newOptionValue, size_t vectorCounter);
     void updateOptionConflicts(bool newOptionConflictsValue);
 
     //get values from the options (for passing on to other stuff)
@@ -36,7 +36,7 @@ public:
     std::string get_optionOriginalNumberOfValues();
     std::vector<std::string> get_conflictingOptions();
     size_t get_optionCurrentNumberOfValues();
-    std::vector<std::string> get_optionValues();
+    std::vector< std::vector<std::string> > get_optionValues();
     bool get_optionConflicts();
 
 private:
@@ -46,7 +46,7 @@ private:
     std::string optionOriginalNumberOfValues;
     std::vector<std::string> conflictingOptions;    //basically fill this with the variable names of other options that can't go along with.
     size_t optionCurrentNumberOfValues;
-    std::vector<std::string> optionValues;
+    std::vector< std::vector<std::string> > optionValues;
     bool optionConflicts;
 
 };
