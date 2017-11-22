@@ -154,7 +154,7 @@ void readConfigFile::readFile()
                 // first set up error checking that isn't so specific that
                 // it has to be done while actually finding values
                 // so stuff that is only allowed during specific read status
-                if(readStatus != "findValue")
+                if(readStatus != "findValue" && readStatus != "foundValue")
                 {
                     if(current_chr == "}" || current_chr == "]" || current_chr == ")")
                     {
@@ -231,6 +231,7 @@ void readConfigFile::readFile()
                             // found a char that isn't a configOption name char
                             // AND had already started filling in a configOption name
                             // so we have reached the end of the configOption name
+                            debugMessage("Storing word " + foundWord + " into foundOptionName");
                             foundOptionName = foundWord;
                             foundWord = "";
                             readStatus = "findVector";
@@ -248,7 +249,8 @@ void readConfigFile::readFile()
                     {
                         // found the start of a new configOption. Yay!
                         // process the finished configOption
-//                                  processWords(foundOptionName,foundOptionValues); // need to revamp this function to deal with the new variable storage format
+                        debugMessage("Found end of optionName " + foundOptionName + ". Processing values");
+                        processWords(foundOptionName,foundOptionValues); // need to revamp this function to deal with the new variable storage format
                         // now clean up and start the beginning process of the new config option
                         readStatus = "findName";
                         foundWord = current_chr;
@@ -265,14 +267,28 @@ void readConfigFile::readFile()
                         }
                     }
                 }
+                if(readStatus == "foundValue")
+                {
+                    if(current_chr == "\"")
+                    {
+                        // found the end of the value, even if it is empty
+                        debugMessage("Storing word " + foundWord + " into foundSingleOptionValue");
+                        foundSingleOptionValue.push_back(foundWord);
+                        foundWord = "";
+                        readStatus = "findValue";
+                    } else
+                    {
+                        foundWord = foundWord + current_chr;
+                    }
+                }
                 if(readStatus == "findValue")
                 {
                     if(current_chr == "\"")
                     {
-                        if(foundWord != "")
-                        {
+                        //if(foundWord != "")
+                        //{
                             readStatus = "foundValue";
-                        }
+                        //}
                     } else if(current_chr == vectorEndChr)
                     {
                         // found the end of a vector
@@ -282,22 +298,10 @@ void readConfigFile::readFile()
                             exitMessage("Missing end quotation mark for a value!");
                         } else
                         {
+                            debugMessage("Found the end of a vector. Storing foundSingleOptionValue vector into foundOptionValues. foundSingleOptionValue.size = " + foundSingleOptionValue.size());
                             foundOptionValues.push_back(foundSingleOptionValue);
                             readStatus = "findVector";
                         }
-                    }
-                }
-                if(readStatus == "foundValue")
-                {
-                    if(current_chr == "\"")
-                    {
-                        // found the end of the value, even if it is empty
-                        foundSingleOptionValue.push_back(foundWord);
-                        foundWord = "";
-                        readStatus = "findValue";
-                    } else
-                    {
-                        foundWord = foundWord + current_chr;
                     }
                 }
             }

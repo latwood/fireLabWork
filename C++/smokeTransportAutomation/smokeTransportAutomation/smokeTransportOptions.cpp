@@ -14,7 +14,7 @@ smokeTransportOptions::smokeTransportOptions()
     {
         exitMessage("invalid numberOfValues found during setup!");
     }
-    if(check_duplicateOptions() == true)    // probably need to mess with variable naming to make sure the booleans keep the same logic for each setup
+    if(check_duplicateOptions() == false)    // probably need to mess with variable naming to make sure the booleans keep the same logic for each setup
     {
         exitMessage("invalid conflictingOptions found during setup!");
     }
