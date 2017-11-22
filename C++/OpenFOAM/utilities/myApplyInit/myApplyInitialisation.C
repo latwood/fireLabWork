@@ -52,12 +52,28 @@ Description
 
 int main(int argc, char *argv[])
 {
+
 /*
+	okay, so if I am going to try to set a potential temperature instead of a temperature
+	with that equation, then I'm going to need to first set pressure.
+		Use P2 = P1 + rho*g*(Z2-Z1), adapting for number of fluid types (changing rho).
+	Then calculate p_rgh from this pressure field. Finally, this all depends on the temperature
+	So since there's this interdependence, would need to calculate rhok from T eqn and redo P
+	and p_rgh, then redo T iteratively.
+	Finally, potential temperature is the following phi = T * (Pnot/P)^(R/Cp)
+
+	To avoid this iterative process, assume rhok = rho at Tref for now
+*/
+
+	Info<< "Calculating innerField profile for T using potential temperature" << endl;
+	Info<< "This involves setting inner fields for p and p_rgh" << endl;
+
     #include "setRootCase.H"
 
 	#include "createTime.H"
     #include "createMesh.H"
 
+	Info<< "Reading field T\n" << endl;
 	volScalarField T
 	(
 		IOobject
@@ -71,48 +87,191 @@ int main(int argc, char *argv[])
 		mesh
 	);
 	
-	Info<< "Calculating innerField profile for T" << endl;
+	Info<< "Reading field p\n" << endl;
+	volScalarField p
+	(
+		IOobject
+		(
+			"p",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	
+	Info<< "Reading field p_rgh\n" << endl;
+	volScalarField p_rgh
+	(
+		IOobject
+		(
+			"p_rgh",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
 
-	volScalarField z_innerField = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ. Notice that this is only for the inner field!
+	//volScalarField z_innerField = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ. Notice that this is only for the inner field!
+	volScalarField z_innerField(mesh.C().component(2)); //z-component of cell center. So height above lowest z point, not height above z0 for each z point.
 	
-	scalar phi_s = 280; // K
-	scalar gamma = 0.0032;	// K/m
-	scalar deltaphi = 5;	// K
-	scalar beta = 0.002;	// 1/m
+	dimensionedScalar phi_s
+	(
+	"phi_s",
+	dimensionSet(0,0,0,1,0,0,0),
+	scalar(280)
+	);
+
+	dimensionedScalar gamma
+	(
+	"gamma",
+	dimensionSet(0,-1,0,1,0,0,0),
+	scalar(0.0032)
+	);
+
+	dimensionedScalar deltaphi
+	(
+	"deltaphi",
+	dimensionSet(0,0,0,1,0,0,0),
+	scalar(5)
+	);
+
+	dimensionedScalar beta
+	(
+	"beta",
+	dimensionSet(0,-1,0,0,0,0,0),
+	scalar(0.002)
+	);
+
+	Info<< "Reading field U\n" << endl;
+    volVectorField U
+    (
+        IOobject
+        (
+            "U",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
 	
+	#include "createPhi.H"
+
+	singlePhaseTransportModel laminarTransport(U, phi);
+	// Thermal expansion coefficient [1/K]
+    //dimensionedScalar beta(laminarTransport.lookup("beta"));
+	dimensionedScalar TRef(laminarTransport.lookup("TRef"));
+	// Reference density
+    dimensionedScalar rho(laminarTransport.lookup("rho"));
+
+	// get g
+	//#include "readGravitationalAcceleration.H"
+	// because standard g seems to be hard to get the right values, going to do this
+	dimensionedScalar g
+	(
+	"g",
+	dimensionSet(0,1,-2,0,0,0,0),
+	scalar(-9.81)
+	);
+	
+	dimensionedScalar p1 
+	(
+	"p1",
+	dimensionSet(1,-1,-2,0,0,0,0),
+	scalar(101325)
+	); 	// Pa, assumes height 0 is sea level
+	// Pa is N/m^2. N = kg*m/s^2. So Pa is kg/(m*s^2). So going to have to use density in equations
+	dimensionedScalar z1
+	(
+	"z1",
+	dimensionSet(0,1,0,0,0,0,0),
+	scalar(0)
+	);			// m, height 0
+	
+	/*Info<< "Creating turbulence model to get rhok\n" << endl;
+    autoPtr<incompressible::RASModel> turbulence
+    (
+        incompressible::RASModel::New(U, phi, laminarTransport)
+    );*/
+	//dimensionedScalar rhok = 1.0 - beta*(T - TRef); // need to calculate T field before this. Use this for iterative tricks
 	
 	// Loop over all the faces in the patch
 	// and initialize the temperature profile
 	// find Tmin for setting minZ temperature
-	scalar Tmin = 99999999;	// set to huge value initially
+	dimensionedScalar Tmin
+	(
+	"Tmin",
+	dimensionSet(0,0,0,1,0,0,0),
+	scalar(99999999) 	// set to huge value initially
+	);
+
+	Info<< "Calculating values for p, p_rgh, phi, and T\n" << endl;
 	forAll(z_innerField, cellI)
 	{
 		// relative height from ground for face lists
-		scalar z = z_innerField[cellI];	//I think that AGL is the height of the cell
-
+		dimensionedScalar z
+		(
+		"z",
+		dimensionSet(0,1,0,0,0,0,0),
+		scalar(z_innerField[cellI])
+		);
+		//dimensionedScalar z = z_innerField[cellI];	//I think that AGL is the height of the cell
+		
+		dimensionedScalar pCalc = p1+rho*g*z;
+		dimensionedScalar p_rghCalc = pCalc - rho*g*z;
+		dimensionedScalar phiCalc = phi_s + gamma*z + deltaphi*(1 - exp(-beta*z));
+		
 		//Apply formula to get profile. Make sure that the AGL is corrected for the minZ height
-		scalar Tcalc = phi_s + gamma*z + deltaphi*(1 - std::exp(-beta*z));
+		dimensionedScalar Tcalc = phiCalc*pow(pCalc/p1,0.286);
 		if(Tcalc < Tmin)
 		{
 			Tmin = Tcalc;
 		}
-    	T[cellI] = Tcalc;
+		p[cellI] = pCalc.value();
+		p_rgh[cellI] = p_rghCalc.value();
+		T[cellI] = Tcalc.value();
+	}
+	Info<< "Writing innerField values for p, p_rgh, and T\n" << endl;
+	p.write();
+	p_rgh.write();
+	T.write();
+
+	Info<< "Setting minZ T profile" << endl;
+	
+	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
+	scalarField& minZTpatch = refCast<scalarField>(T.boundaryField()[minZpatchID]);
+	// get the cell indices of cells along the patch
+	scalarField minZfaceCells = minZTpatch.faceCells();
+
+	forAll(z_innerField,cellI)
+	{
+		forAll(minZfaceCells, faceI)
+		{
+			if(minZfaceCells[faceI] == cellI)
+			{
+				minZTpatch[faceI] = T[cellI];
+				break;
+			}
+		}
 	}
 	T.write();
 
-	Info<< "Set innerField profile for T" << endl;
-	std::cout << "Tmin = " << Tmin << "\n";
-	Info<< "Setting minZ profile using Tmin" << endl;
+	/*Info<< "Setting minZ profile to Tmin. Tmin = " << Tmin.value() << endl;
 	
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
 	scalarField& minZTpatch = refCast<scalarField>(T.boundaryField()[minZpatchID]);
 	forAll(minZTpatch, faceI)
 	{
-		minZTpatch[faceI] = Tmin;
+		minZTpatch[faceI] = Tmin.value();
 	}
-	T.write();
+	T.write();*/
 	
-*/
+/*
 	// this is what I used to do. I like this, but it has some issues
 	// I set a temperature field, but apparently a potential temperature field is better
     
@@ -173,7 +332,7 @@ int main(int argc, char *argv[])
 		Tcalc = TsurfMax - TlapseRate*AGL;
     	T[cellI] = Tcalc;
 	}
-	T.write();
+	T.write();*/
 
 	Info<< "End\n" << endl;
 
