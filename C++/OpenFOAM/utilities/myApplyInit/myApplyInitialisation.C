@@ -246,8 +246,8 @@ int main(int argc, char *argv[])
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
 	scalarField& minZTpatch = refCast<scalarField>(T.boundaryField()[minZpatchID]);
 	// get the cell indices of cells along the patch
-	scalarField minZfaceCells = minZTpatch.faceCells();
-
+	const labelList& minZfaceCells = mesh.boundaryMesh()[minZpatchID].faceCells();
+	
 	forAll(z_innerField,cellI)
 	{
 		forAll(minZfaceCells, faceI)
