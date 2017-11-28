@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 		dimensionedScalar Tcalc = phiCalc*pow(pCalc/p1,0.286);
 		if(Tcalc < Tmin)
 		{
-			Tmin = Tcalc;
+			Tmin = Tcalc;	// I don't actually use this in this setup though, since I'm setting minZ faces using the innerField cell values, but you can use this if you want to use minZ as Tmin instead.
 		}
 		p[cellI] = pCalc.value();
 		p_rgh[cellI] = p_rghCalc.value();
@@ -260,6 +260,98 @@ int main(int argc, char *argv[])
 		}
 	}
 	T.write();
+	
+// comment out the profile setting for other patches if you want to use zeroGradient instead of fixed value for them. Also note that patches don't get set if the type is zeroGradient instead of fixedValue
+	Info << "Setting maxZ T profile" << endl;
+	label maxZpatchID = mesh.boundaryMesh().findPatchID("maxZ");
+	scalarField& maxZTpatch = refCast<scalarField>(T.boundaryField()[maxZpatchID]);
+	// get the cell indices of cells along the patch
+	const labelList& maxZfaceCells = mesh.boundaryMesh()[maxZpatchID].faceCells();
+	forAll(z_innerField,cellI)
+	{
+		forAll(maxZfaceCells, faceI)
+		{
+			if(maxZfaceCells[faceI] == cellI)
+			{
+				maxZTpatch[faceI] = T[cellI];
+				break;
+			}
+		}
+	}
+	T.write();
+	
+	Info << "Setting west_face T profile" << endl;
+	label westFacePatchID = mesh.boundaryMesh().findPatchID("west_face");
+	scalarField& westFaceTpatch = refCast<scalarField>(T.boundaryField()[westFacePatchID]);
+	// get the cell indices of cells along the patch
+	const labelList& westFaceFaceCells = mesh.boundaryMesh()[westFacePatchID].faceCells();
+	forAll(z_innerField,cellI)
+	{
+		forAll(westFaceFaceCells, faceI)
+		{
+			if(westFaceFaceCells[faceI] == cellI)
+			{
+				westFaceTpatch[faceI] = T[cellI];
+				break;
+			}
+		}
+	}
+	T.write();
+	
+	Info << "Setting east_face T profile" << endl;
+	label eastFacePatchID = mesh.boundaryMesh().findPatchID("east_face");
+	scalarField& eastFaceTpatch = refCast<scalarField>(T.boundaryField()[eastFacePatchID]);
+	// get the cell indices of cells along the patch
+	const labelList& eastFaceFaceCells = mesh.boundaryMesh()[eastFacePatchID].faceCells();
+	forAll(z_innerField,cellI)
+	{
+		forAll(eastFaceFaceCells, faceI)
+		{
+			if(eastFaceFaceCells[faceI] == cellI)
+			{
+				eastFaceTpatch[faceI] = T[cellI];
+				break;
+			}
+		}
+	}
+	T.write();
+	
+	Info << "Setting south_face T profile" << endl;
+	label southFacePatchID = mesh.boundaryMesh().findPatchID("south_face");
+	scalarField& southFaceTpatch = refCast<scalarField>(T.boundaryField()[southFacePatchID]);
+	// get the cell indices of cells along the patch
+	const labelList& southFaceFaceCells = mesh.boundaryMesh()[southFacePatchID].faceCells();
+	forAll(z_innerField,cellI)
+	{
+		forAll(southFaceFaceCells, faceI)
+		{
+			if(southFaceFaceCells[faceI] == cellI)
+			{
+				southFaceTpatch[faceI] = T[cellI];
+				break;
+			}
+		}
+	}
+	T.write();
+	
+	Info << "Setting north_face T profile" << endl;
+	label northFacePatchID = mesh.boundaryMesh().findPatchID("north_face");
+	scalarField& northFaceTpatch = refCast<scalarField>(T.boundaryField()[northFacePatchID]);
+	// get the cell indices of cells along the patch
+	const labelList& northFaceFaceCells = mesh.boundaryMesh()[northFacePatchID].faceCells();
+	forAll(z_innerField,cellI)
+	{
+		forAll(northFaceFaceCells, faceI)
+		{
+			if(northFaceFaceCells[faceI] == cellI)
+			{
+				northFaceTpatch[faceI] = T[cellI];
+				break;
+			}
+		}
+	}
+	T.write();
+
 
 	/*Info<< "Setting minZ profile to Tmin. Tmin = " << Tmin.value() << endl;
 	
