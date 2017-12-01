@@ -149,8 +149,9 @@ void readConfigFile::readFile()
         {
             for(std::size_t i = 0; i < line.length(); i++)
             {
+                bool changedStatus = false;
                 std::string current_chr = line.substr(i,1);
-
+                std::cout << "current chr = " << current_chr << ", status = " << readStatus << "\n";
                 // first set up error checking that isn't so specific that
                 // it has to be done while actually finding values
                 // so stuff that is only allowed during specific read status
@@ -238,12 +239,13 @@ void readConfigFile::readFile()
                         }
                     }
                 }
-                if(readStatus == "findVector")
+                if(readStatus == "findVector" && changedStatus == false)
                 {
                     if(current_chr == vectorStartChr)
                     {
                         // found the start of a vector, now look for values
                         readStatus = "findValue";
+                        changedStatus = true;
 
                     } else if(current_chr != " " && current_chr != "=" && current_chr != "," && current_chr != ";")
                     {
@@ -253,6 +255,7 @@ void readConfigFile::readFile()
                         processWords(foundOptionName,foundOptionValues); // need to revamp this function to deal with the new variable storage format
                         // now clean up and start the beginning process of the new config option
                         readStatus = "findName";
+                        changedStatus = true;
                         foundWord = current_chr;
                         vectorStartChr = "\"value not assigned yet\"";
                         vectorEndChr = "\"value not assigned yet\"";
@@ -267,7 +270,7 @@ void readConfigFile::readFile()
                         }
                     }
                 }
-                if(readStatus == "foundValue")
+                if(readStatus == "foundValue" && changedStatus == false)
                 {
                     if(current_chr == "\"")
                     {
@@ -276,18 +279,20 @@ void readConfigFile::readFile()
                         foundSingleOptionValue.push_back(foundWord);
                         foundWord = "";
                         readStatus = "findValue";
+                        changedStatus = true;
                     } else
                     {
                         foundWord = foundWord + current_chr;
                     }
                 }
-                if(readStatus == "findValue")
+                if(readStatus == "findValue" && changedStatus == false)
                 {
                     if(current_chr == "\"")
                     {
                         //if(foundWord != "")
                         //{
                             readStatus = "foundValue";
+                            changedStatus = true;
                         //}
                     } else if(current_chr == vectorEndChr)
                     {
@@ -301,6 +306,7 @@ void readConfigFile::readFile()
                             debugMessage("Found the end of a vector. Storing foundSingleOptionValue vector into foundOptionValues. foundSingleOptionValue.size = " + foundSingleOptionValue.size());
                             foundOptionValues.push_back(foundSingleOptionValue);
                             readStatus = "findVector";
+                            changedStatus = true;
                         }
                     }
                 }
