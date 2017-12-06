@@ -1,2 +1,0 @@
-This is a copy of the original bouyantBoussinesqPimpleFoam solver, but set up to output some of the intermediate values. Similar steps need done with the wall, inlet, and outlet functions of the mesh if the desired values want to be easily displayed.
-

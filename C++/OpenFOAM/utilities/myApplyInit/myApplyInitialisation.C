@@ -22,20 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-	applyInitialTemperatureField
+	myApplyInit
 
 Description
 	Apply a simple temperature field initial condition to all inner cells.
 	Based on the simple correlation that temperature drops by 0.0098 K/m in the z direction
 	for dry air when in the planetary boundary layer of the troposphere.
 
-    Apply a simplified boundary-layer model to the velocity and
-    turbulence fields based on the 1/7th power-law.
-
-    The uniform boundary-layer thickness is either provided via the -ybl option
-    or calculated as the average of the distance to the wall scaled with
-    the thickness coefficient supplied via the option -Cbl.  If both options
-    are provided -ybl is used.
+    Alternatively, you can comment that part out and uncomment another part that
+	sets the pressure and temperature using a potential temperature equation.
+	This assumes a standard pressure variation with height.
+	
+	This script is very useful for understanding how to mess with OpenFoam code/syntax.
+	Also makes it easy to find some useful functions for setting values.
+	Finally, it can be adjusted to set any value/property in the mesh according to 
+	whatever profile that is based on height.
 
 \*---------------------------------------------------------------------------*/
 
@@ -52,7 +53,70 @@ Description
 
 int main(int argc, char *argv[])
 {
+	// this is what I used to do. I like this, but apparently a potential temperature field is better
+	// note that even when not accessing p_rgh, it rewrites some BC condition field stuff from being a value to a gradient, which happens also if you run a simulation, the value turns to gradient.
+	#include "setRootCase.H"
 
+	#include "createTime.H"
+    #include "createMesh.H"
+
+	volScalarField T
+	(
+		IOobject
+		(
+			"T",
+			runTime.timeName(),
+			mesh,
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		mesh
+	);
+	
+	Info<< "Calculating lapse rate profile for T" << endl;
+
+	// calculating maxSurfaceT for use in generating the lapse rate
+	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
+	const scalarField& minZTvalues = T.boundaryField()[minZpatchID];
+	scalar TsurfMax = 0;
+	forAll(minZTvalues,facei)
+	{
+		scalar Tvalue = minZTvalues[facei];
+		if(Tvalue > TsurfMax)
+		{
+			TsurfMax = Tvalue;
+		}
+	} 
+
+	std::cout << "TsurfMax = " << TsurfMax << "\n";
+	if(TsurfMax == 0)
+	{
+		std::cout << "changing TsurfMax to value of 310\n";
+		TsurfMax = 310;
+	}
+	scalar Tcalc(0.0);
+	scalar TlapseRate = 0.0098;
+	std::cout << "TlapseRate = " << TlapseRate << "\n";
+
+	volScalarField z = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ
+	//volScalarField z(mesh.C().component(2)); //z-component of cell center. So height above lowest z point, not height above z0 for each z point.
+	//looks like you can replace wallDist with patchDistMethod for other options
+
+	// Loop over all the faces in the patch
+	// and initialize the log profile
+	forAll(z, cellI)
+	{
+		// relative height from ground for face lists
+		scalar AGL = z[cellI];	//I think that AGL is the height of the cell
+
+		//Apply formula to get profile. Make sure that the AGL is corrected for the minZ height
+		Tcalc = TsurfMax - TlapseRate*AGL;
+    	T[cellI] = Tcalc;
+	}
+	T.write();
+	
+	
+	
 /*
 	okay, so if I am going to try to set a potential temperature instead of a temperature
 	with that equation, then I'm going to need to first set pressure.
@@ -64,7 +128,7 @@ int main(int argc, char *argv[])
 
 	To avoid this iterative process, assume rhok = rho at Tref for now
 */
-
+/*
 	Info<< "Calculating innerField profile for T using potential temperature" << endl;
 	Info<< "This involves setting inner fields for p and p_rgh" << endl;
 
@@ -165,13 +229,13 @@ int main(int argc, char *argv[])
 	singlePhaseTransportModel laminarTransport(U, phi);
 	// Thermal expansion coefficient [1/K]
     //dimensionedScalar beta(laminarTransport.lookup("beta"));
-	dimensionedScalar TRef(laminarTransport.lookup("TRef"));
+	//dimensionedScalar TRef(laminarTransport.lookup("TRef"));
 	// Reference density
     dimensionedScalar rho(laminarTransport.lookup("rho"));
 
 	// get g
 	//#include "readGravitationalAcceleration.H"
-	// because standard g seems to be hard to get the right values, going to do this
+	// because standard g seems to be hard to get the right values/dimensional math, going to do this
 	dimensionedScalar g
 	(
 	"g",
@@ -193,11 +257,12 @@ int main(int argc, char *argv[])
 	scalar(0)
 	);			// m, height 0
 	
-	/*Info<< "Creating turbulence model to get rhok\n" << endl;
-    autoPtr<incompressible::RASModel> turbulence
-    (
-        incompressible::RASModel::New(U, phi, laminarTransport)
-    );*/
+	// if you were iteratively setting the values use this chunk of code somewhere
+	//Info<< "Creating turbulence model to get rhok\n" << endl;
+    //autoPtr<incompressible::RASModel> turbulence
+    //(
+    //    incompressible::RASModel::New(U, phi, laminarTransport)
+    //);
 	//dimensionedScalar rhok = 1.0 - beta*(T - TRef); // need to calculate T field before this. Use this for iterative tricks
 	
 	// Loop over all the faces in the patch
@@ -232,17 +297,20 @@ int main(int argc, char *argv[])
 		{
 			Tmin = Tcalc;	// I don't actually use this in this setup though, since I'm setting minZ faces using the innerField cell values, but you can use this if you want to use minZ as Tmin instead.
 		}
-		p[cellI] = pCalc.value();
-		p_rgh[cellI] = p_rghCalc.value();
+		// divide by rho to get the right units
+		p[cellI] = (pCalc/rho).value();
+		p_rgh[cellI] = (p_rghCalc/rho).value();
 		T[cellI] = Tcalc.value();
 	}
 	Info<< "Writing innerField values for p, p_rgh, and T\n" << endl;
 	p.write();
-	p_rgh.write();
+	p_rgh.write();	// it keeps overwriting the fixedFluxPressure BCs to have gradient 0 instead of value 0. Technically need the value given by inner field here probably.
 	T.write();
 
+
+	// use this to set minZ to equal the values as given by the inner cells
+	// alternatively, comment it out to use Tmin for minZ.
 	Info<< "Setting minZ T profile" << endl;
-	
 	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
 	scalarField& minZTpatch = refCast<scalarField>(T.boundaryField()[minZpatchID]);
 	// get the cell indices of cells along the patch
@@ -260,8 +328,23 @@ int main(int argc, char *argv[])
 		}
 	}
 	T.write();
+	*/
+
+	// comment this section out if setting minZ T to the values given in the inner fields
+	// comment above section out and uncomment this section if you want a single minZ temperature as the smallest temperature in the inner field
+	/*Info<< "Setting minZ profile to Tmin. Tmin = " << Tmin.value() << endl;
 	
-// comment out the profile setting for other patches if you want to use zeroGradient instead of fixed value for them. Also note that patches don't get set if the type is zeroGradient instead of fixedValue
+	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
+	scalarField& minZTpatch = refCast<scalarField>(T.boundaryField()[minZpatchID]);
+	forAll(minZTpatch, faceI)
+	{
+		minZTpatch[faceI] = Tmin.value();
+	}
+	T.write();*/
+	
+
+	/*
+// This next section is for setting the inner T values to all other patches and should be commented out unless you are planning on using fixed T values for all boundaries. So comment out this whole section if you want to use zeroGradient instead of fixed value for them. Also note that patches don't get set if the type is zeroGradient instead of fixedValue
 	Info << "Setting maxZ T profile" << endl;
 	label maxZpatchID = mesh.boundaryMesh().findPatchID("maxZ");
 	scalarField& maxZTpatch = refCast<scalarField>(T.boundaryField()[maxZpatchID]);
@@ -351,80 +434,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	T.write();
-
-
-	/*Info<< "Setting minZ profile to Tmin. Tmin = " << Tmin.value() << endl;
-	
-	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
-	scalarField& minZTpatch = refCast<scalarField>(T.boundaryField()[minZpatchID]);
-	forAll(minZTpatch, faceI)
-	{
-		minZTpatch[faceI] = Tmin.value();
-	}
-	T.write();*/
-	
-/*
-	// this is what I used to do. I like this, but it has some issues
-	// I set a temperature field, but apparently a potential temperature field is better
-    
-	#include "setRootCase.H"
-
-	#include "createTime.H"
-    #include "createMesh.H"
-
-	volScalarField T
-	(
-		IOobject
-		(
-			"T",
-			runTime.timeName(),
-			mesh,
-			IOobject::MUST_READ,
-			IOobject::AUTO_WRITE
-		),
-		mesh
-	);
-	
-	Info<< "Calculating log profile for T" << endl;
-
-	label minZpatchID = mesh.boundaryMesh().findPatchID("minZ");
-	const scalarField& minZTvalues = T.boundaryField()[minZpatchID];
-	scalar TsurfMax = 0;
-	forAll(minZTvalues,facei)
-	{
-		scalar Tvalue = minZTvalues[facei];
-		if(Tvalue > TsurfMax)
-		{
-			TsurfMax = Tvalue;
-		}
-	} 
-
-	std::cout << "TsurfMax = " << TsurfMax << "\n";
-	if(TsurfMax == 0)
-	{
-		std::cout << "changing TsurfMax to value of 310\n";
-		TsurfMax = 310;
-	}
-	scalar Tcalc(0.0);
-	scalar TlapseRate = 0.0098;
-	std::cout << "TlapseRate = " << TlapseRate << "\n";
-
-	volScalarField z = wallDist(mesh).y();	//distance to nearest wall zmin. So height above z0 for each z point. Beware if there are other walls than minZ
-	//volScalarField z(mesh.C().component(2)); //z-component of cell center. So height above lowest z point, not height above z0 for each z point.
-	//looks like you can replace wallDist with patchDistMethod for other options
-
-	// Loop over all the faces in the patch
-	// and initialize the log profile
-	forAll(z, cellI)
-	{
-		// relative height from ground for face lists
-		scalar AGL = z[cellI];	//I think that AGL is the height of the cell
-
-		//Apply formula to get profile. Make sure that the AGL is corrected for the minZ height
-		Tcalc = TsurfMax - TlapseRate*AGL;
-    	T[cellI] = Tcalc;
-	}
-	T.write();*/
+	*/
 
 	Info<< "End\n" << endl;
 

@@ -1,8 +1,5 @@
     singlePhaseTransportModel laminarTransport(U, phi);
 
-	// fake value just to get the right dimensions for kappatEff [m^2/s]
-    dimensionedScalar fakeKappaEff(laminarTransport.lookup("fakeKappaEff"));
-
     // Thermal expansion coefficient [1/K]
     dimensionedScalar beta(laminarTransport.lookup("beta"));
 
