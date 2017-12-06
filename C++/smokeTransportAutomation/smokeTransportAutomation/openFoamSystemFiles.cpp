@@ -7,7 +7,7 @@ OpenFoamSystemFiles::OpenFoamSystemFiles(bool firstTime,std::string outputPath,s
                                          std::string sourceValue_value)
 {
 
-    debugMessage("\nSetting up OpenFOAM file system options");
+    handy.debugMessage("\nSetting up OpenFOAM file system options");
     foam_version = "2.0";
     fzout = NULL;
 

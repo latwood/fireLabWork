@@ -99,6 +99,7 @@ private:
     std::string sourceMaxCoordinates;  //set of xmax, ymax, and zmax coordinates for the bounding box if using boxToCell distribution method
     std::string distributionSourceValue;    //value of source in the location to be specified
 
+    usefulFunctions handy;
 };
 
 #endif // OPENFOAMSYSTEMFILES_H

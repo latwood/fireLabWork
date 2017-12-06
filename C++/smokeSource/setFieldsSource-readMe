@@ -1,5 +1,0 @@
-I was trying to figure out a new way to set up a source model used by openFoamPolyMesh and this was the result. Just as I was about to start making the models, I realized that my method was incorrect and not what I was really wanting. It would be much better to simply write the setFieldsDict, and the output values from what I was creating would be the same thing as the input values. Plus, how would I set up the bounding box coordinates? Again those would be the same as an output as they would be for an input unless I was actually using this as a special function for setting up actual models and not setFieldsDict methods.
-
-So this is written as if I were creating setFieldsDict methods, but that isn't what is needed. Instead, adapt this to create something that is a model for the source, using setFieldsDict methods as necessary.
-
-

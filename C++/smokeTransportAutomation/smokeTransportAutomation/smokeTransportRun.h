@@ -49,6 +49,7 @@ private:
     int missingTimes;
     std::vector<std::string> missingTimeDirectories;
 
+    usefulFunctions handy;
 };
 
 #endif // SMOKETRANSPORTRUN_H

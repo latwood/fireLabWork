@@ -37,6 +37,7 @@ private:
 
     std::vector<configOption> theOptions;
 
+    usefulFunctions handy;
 };
 
 #endif // SMOKETRANSPORTOPTIONS_H

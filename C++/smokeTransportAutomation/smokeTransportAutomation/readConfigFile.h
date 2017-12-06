@@ -59,6 +59,7 @@ private:
 
     bool setupFail;
 
+    usefulFunctions handy;
 };
 
 #endif // READCONFIGFILE_H

@@ -11,7 +11,7 @@ configOption::configOption(std::string optionName_value,std::string optionDataTy
         optionDataType = optionDataType_value;
     } else
     {
-        message("optionDataType: " + optionDataType_value + " for option: " + optionName_value + " not a valid data type!");
+        handy.message("optionDataType: " + optionDataType_value + " for option: " + optionName_value + " not a valid data type!");
     }
     // no initial check on optionOriginalNumberOfValues because value can be a string meaning a reference to another option. This will be checked when updating the options or by classes that use the configOptions
     optionOriginalNumberOfValues = optionNumberOfValues_value;
@@ -40,7 +40,7 @@ bool configOption::check_optionDataType(std::string newOptionDataType)
         return true;
     } else
     {
-        message("optionDataType: " + newOptionDataType + " is not a valid type!");
+        handy.message("optionDataType: " + newOptionDataType + " is not a valid type!");
         return false;
     }
 }
@@ -50,9 +50,9 @@ bool configOption::check_optionNumberOfValues(std::string newOptionNumberOfValue
     //make sure this function doesn't get run on the constructor, but only when updating values.
     //some stuff is initialized as strings since it will be replaced by a variable
     // So this needs to be used on the currentNumberOfValues, not originalNumberOfValues
-    if(is_double(newOptionNumberOfValues) == false)
+    if(handy.is_double(newOptionNumberOfValues) == false)
     {
-        message("optionNumberOfValues: " + newOptionNumberOfValues + " is not numeric!");
+        handy.message("optionNumberOfValues: " + newOptionNumberOfValues + " is not numeric!");
         return false;
     } else
     {
@@ -69,27 +69,27 @@ bool configOption::check_optionValue(std::string newOptionValue)
         isType = true;  //it would break at some point if this weren't already true
     } else if(optionDataType == "size_t")
     {
-        isType = is_size_t(newOptionValue);
+        isType = handy.is_size_t(newOptionValue);
     } else if(optionDataType == "int")
     {
-        isType = is_int(newOptionValue);
+        isType = handy.is_int(newOptionValue);
     } else if(optionDataType == "long")
     {
-        isType = is_long(newOptionValue);
+        isType = handy.is_long(newOptionValue);
     } else if(optionDataType == "float")
     {
-        isType = is_float(newOptionValue);
+        isType = handy.is_float(newOptionValue);
     } else if(optionDataType == "double")
     {
-        isType = is_double(newOptionValue);
+        isType = handy.is_double(newOptionValue);
     } else if(optionDataType == "bool")
     {
-        isType = is_bool(newOptionValue);
+        isType = handy.is_bool(newOptionValue);
     }
 
     if(isType == false)
     {
-        message("optionDataType is " + optionDataType + " but newOptionValue \"" + newOptionValue + "\" is not that type!");
+        handy.message("optionDataType is " + optionDataType + " but newOptionValue \"" + newOptionValue + "\" is not that type!");
         valuesGood = false;
     }
     return valuesGood;
@@ -114,7 +114,7 @@ void configOption::addOptionValue(std::string newOptionValue, size_t vectorCount
     // don't need a check for negativity because type size_t
     if(vectorCounter > optionValues.size()+1)
     {
-        exitMessage("vectorCounter exceeds one plus the number of vectors in optionValues! Only allowed to add at most one vector to optionValues!");
+        handy.exitMessage("vectorCounter exceeds one plus the number of vectors in optionValues! Only allowed to add at most one vector to optionValues!");
     }
 
     if(check_optionValue(newOptionValue) == true)
@@ -130,7 +130,7 @@ void configOption::addOptionValue(std::string newOptionValue, size_t vectorCount
         }
     } else
     {
-        exitMessage("optionValue \"" + newOptionValue + "\" is not valid!");
+        handy.exitMessage("optionValue \"" + newOptionValue + "\" is not valid!");
     }
 }
 

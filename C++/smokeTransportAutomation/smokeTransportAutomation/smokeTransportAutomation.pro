@@ -8,7 +8,8 @@ SOURCES += main.cpp \
     smokeTransportRun.cpp \
     readConfigFile.cpp \
     smokeTransportOptions.cpp \
-    configOption.cpp
+    configOption.cpp \
+    usefulFunctions.cpp
 
 HEADERS += \
     openFoamSystemFiles.h \
@@ -16,6 +17,6 @@ HEADERS += \
     readConfigFile.h \
     smokeTransportOptions.h \
     configOption.h \
-    usefulFunctions.h \
-    useCmd.h
+    useCmd.h \
+    usefulFunctions.h
 

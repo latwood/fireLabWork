@@ -4,19 +4,19 @@
 //constructor related functions
 smokeTransportOptions::smokeTransportOptions()
 {
-    message("\nSetting up available smokeTransportOptions");    // extra line at the beginning because this is a new set of functions/operations
+    handy.message("\nSetting up available smokeTransportOptions");    // extra line at the beginning because this is a new set of functions/operations
     setupAvailableOptions();
     if(check_duplicateOptions() == false)
     {
-        exitMessage("duplicate option found during setup!");
+        handy.exitMessage("duplicate option found during setup!");
     }
     if(check_OriginalNumberOfValues() == false)
     {
-        exitMessage("invalid numberOfValues found during setup!");
+        handy.exitMessage("invalid numberOfValues found during setup!");
     }
     if(check_duplicateOptions() == false)    // probably need to mess with variable naming to make sure the booleans keep the same logic for each setup
     {
-        exitMessage("invalid conflictingOptions found during setup!");
+        handy.exitMessage("invalid conflictingOptions found during setup!");
     }
 }
 
@@ -63,7 +63,7 @@ bool smokeTransportOptions::check_duplicateOptions()
         {
             if(theOptions[i].get_optionName() == theOptions[j].get_optionName())
             {
-                message("Duplicate option: " + theOptions[i].get_optionName() + "!");
+                handy.message("Duplicate option: " + theOptions[i].get_optionName() + "!");
                 return false;
             }
         }
@@ -101,7 +101,7 @@ bool smokeTransportOptions::check_OriginalNumberOfValues()
                 }
                 if(j == theOptions.size()-1 && foundName == false)
                 {
-                    message("invalid numberOfValues for option " + theOptions[i].get_optionName() + "!");
+                    handy.message("invalid numberOfValues for option " + theOptions[i].get_optionName() + "!");
                     return false;
                 }
             }
@@ -126,7 +126,7 @@ bool smokeTransportOptions::check_ConflictingOptions()//probably need this in re
             {
                 if(currentConflictingOptions[k] == theOptions[i].get_optionName())
                 {
-                    message("Conflicting option: " + currentConflictingOptions[k] + " specified the same as it's own option!");
+                    handy.message("Conflicting option: " + currentConflictingOptions[k] + " specified the same as it's own option!");
                     conflictingOptionsPass = false;
                 } else
                 {
@@ -139,7 +139,7 @@ bool smokeTransportOptions::check_ConflictingOptions()//probably need this in re
                         }
                         if(j == theOptions.size()-1 && foundOptionName == false)
                         {
-                            message("Conflicting option: " + currentConflictingOptions[k] + " for option: " + theOptions[i].get_optionName() + "specified during setup but is not an option!");
+                            handy.message("Conflicting option: " + currentConflictingOptions[k] + " for option: " + theOptions[i].get_optionName() + "specified during setup but is not an option!");
                             conflictingOptionsPass = false;
                         }
                     }

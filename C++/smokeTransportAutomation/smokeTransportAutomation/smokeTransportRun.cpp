@@ -3,7 +3,7 @@
 smokeTransportRun::smokeTransportRun(readConfigFile configFile)
 {
 
-    message("\nStarting smokeTransportRun");    // extra line at the beginning because this is the beginning of a new set of functions/operations
+    handy.message("\nStarting smokeTransportRun");    // extra line at the beginning because this is the beginning of a new set of functions/operations
 
     //need to change all these to: getOption("configFileName") . . .
     //thought about passing the config file on to openFoamSystemFiles, but in the end, each variable that
@@ -49,7 +49,7 @@ smokeTransportRun::smokeTransportRun(readConfigFile configFile)
             sourceMinCoordinates = sourceMinCoordinates.substr(0,i) + " " + sourceMinCoordinates.substr(i+1,sourceMinCoordinates.size());
         }
     }
-    debugMessage("sourceMinCoordinates = " + sourceMinCoordinates);
+    handy.debugMessage("sourceMinCoordinates = " + sourceMinCoordinates);
     sourceMaxCoordinates = configFile.get_optionValues_singleString("sourceMaxCoordinates");
     for(size_t i = 0; i < sourceMaxCoordinates.length(); i++)
     {
@@ -58,7 +58,7 @@ smokeTransportRun::smokeTransportRun(readConfigFile configFile)
             sourceMaxCoordinates = sourceMaxCoordinates.substr(0,i) + " " + sourceMaxCoordinates.substr(i+1,sourceMaxCoordinates.size());
         }
     }
-    debugMessage("sourceMaxCoordinates = " + sourceMaxCoordinates);
+    handy.debugMessage("sourceMaxCoordinates = " + sourceMaxCoordinates);
     sourceValues = configFile.get_optionValues_multiString("sourceValues");
     UfileLocations = configFile.get_optionValues_multiString("UfileLocations");
     missingTimes = configFile.get_optionValues_singleInt("missingTimes");
@@ -93,7 +93,7 @@ smokeTransportRun::smokeTransportRun(readConfigFile configFile)
 
 void smokeTransportRun::createTransportCase()
 {
-    message("creating transport case");
+    handy.message("creating transport case");
     std::string removeOldCaseCommand = "rm -rf " + transportCase;
     exec_cmd(removeOldCaseCommand.c_str());
     std::string createTransportCaseCommand = "cp -rT " + parentDirectory + startCase +
@@ -103,14 +103,14 @@ void smokeTransportRun::createTransportCase()
 
 void smokeTransportRun::copySmokeTransportConfigFile()
 {
-    message("transferring transport config file");
+    handy.message("transferring transport config file");
     std::string copySmokeTransportConfigFileCommand = "cp " + configFilePath + " " + transportCase + configFileName;
     exec_cmd(copySmokeTransportConfigFileCommand.c_str());
 }
 
 void smokeTransportRun::updateTimeDirectories()
 {
-    message("adding missing time directories");
+    handy.message("adding missing time directories");
     std::string createTimeDirectoryCommand;
     for(int i = 0; i < missingTimes; i++)
     {
@@ -122,7 +122,7 @@ void smokeTransportRun::updateTimeDirectories()
 
 void smokeTransportRun::updateSystemFiles(int i)
 {
-    message("updating system files");
+    handy.message("updating system files");
     if(i == 0)
     {
         OpenFoamSystemFiles updateSystem(true,transportCase,initialTime,endTimes[i],writeIntervals[i],
@@ -136,7 +136,7 @@ void smokeTransportRun::updateSystemFiles(int i)
 
 void smokeTransportRun::updateUfile(int i)
 {
-    message("updating velocity files");
+    handy.message("updating velocity files");
     //it is i-1 because this is endTImes not startTimes. The UfileLocations is still i since that is the current case
     std::string copyUfileCommand = "cp -rT " + parentDirectory + UfileLocations[i] + "U" +
             " " + transportCase+endTimes[i-1]+"/U";
@@ -147,14 +147,14 @@ void smokeTransportRun::updateUfile(int i)
 
 void smokeTransportRun::runSetFields()
 {
-    message("running setFields command\n"); //need an extra space, it just looks better
+    handy.message("running setFields command\n"); //need an extra space, it just looks better
     std::string setFieldsCommand = "setFields -case " + transportCase;
     exec_cmd(setFieldsCommand.c_str());
 }
 
 void smokeTransportRun::runSmokeTransport()
 {
-    message("running myScalarTransportFoam command\n"); // need an extra space, it just looks better
+    handy.message("running myScalarTransportFoam command\n"); // need an extra space, it just looks better
     std::string runSmokeTransportCommand = "myScalarTransportFoam -case " + transportCase;
     exec_cmd(runSmokeTransportCommand.c_str());
 }

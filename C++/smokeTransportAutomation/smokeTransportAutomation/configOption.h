@@ -49,6 +49,8 @@ private:
     std::vector< std::vector<std::string> > optionValues;
     bool optionConflicts;
 
+    usefulFunctions handy;
+
 };
 
 #endif // CONFIGOPTION_H

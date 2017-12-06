@@ -14,7 +14,7 @@ readConfigFile::readConfigFile(std::vector<configOption> theOptions_value)
 void readConfigFile::newConfigFile(std::string configFilePath_value)
 {
 
-    message("\nreading config file");   // extra space because this is a new set of functions/operations
+    handy.message("\nreading config file");   // extra space because this is a new set of functions/operations
 
     //clear old variables
     for(size_t i = 0; i < theOptions.size(); i++)
@@ -48,23 +48,23 @@ void readConfigFile::newConfigFile(std::string configFilePath_value)
     checkVariableFill();
     if(setupFail == true)
     {
-        exitMessage("failed to read config file: " + configFilePath);
+        handy.exitMessage("failed to read config file: " + configFilePath);
     } else
     {
-        message("succeeded in reading config file");
+        handy.message("succeeded in reading config file");
     }
 }
 
 
 void readConfigFile::readFile()
 {
-    if(fileExists(configFilePath) != true)
+    if(handy.fileExists(configFilePath) != true)
     {
         // instead of an exit message here, I should have a separate boolean throughout that ends the
         // process of reading a configFile and running the program, but still allows reading of the
         // next configFile and keeps a log file explaining all that has occurred
         // for now, it is fine to just exit
-        exitMessage("config file: " + configFilePath + " doesn't exist!");
+        handy.exitMessage("config file: " + configFilePath + " doesn't exist!");
     }
     std::ifstream is_file(configFilePath);
 
@@ -151,7 +151,7 @@ void readConfigFile::readFile()
             {
                 bool changedStatus = false;
                 std::string current_chr = line.substr(i,1);
-                std::cout << "current chr = " << current_chr << ", status = " << readStatus << "\n";
+                handy.excessDebugMessage("current chr = " + current_chr + ", status = " + readStatus);
                 // first set up error checking that isn't so specific that
                 // it has to be done while actually finding values
                 // so stuff that is only allowed during specific read status
@@ -159,18 +159,18 @@ void readConfigFile::readFile()
                 {
                     if(current_chr == "}" || current_chr == "]" || current_chr == ")")
                     {
-                        exitMessage("Found vector end char }, ], or ) before start vector char {, [, or (!");
+                        handy.exitMessage("Found vector end char }, ], or ) before start vector char {, [, or (!");
                     }
                     if(current_chr == "\"")
                     {
-                        exitMessage("Found configOption value start char \" before finding start vector char {, [, or (!");
+                        handy.exitMessage("Found configOption value start char \" before finding start vector char {, [, or (!");
                     }
                 }
                 if(readStatus != "findVector")
                 {
                     if(current_chr == "{" || current_chr == "[" || current_chr == "(")
                     {
-                        exitMessage("Found start vector char {, [, or ( when read status isn't \"findVector\"!");
+                        handy.exitMessage("Found start vector char {, [, or ( when read status isn't \"findVector\"!");
                     }
                 }
 
@@ -185,7 +185,7 @@ void readConfigFile::readFile()
                         {
                             if(current_chr != vectorStartChr)
                             {
-                                exitMessage("Second or later vector start char " + current_chr + " doesn't match first vector start char " + vectorStartChr + " for a configFile line!");
+                                handy.exitMessage("Second or later vector start char " + current_chr + " doesn't match first vector start char " + vectorStartChr + " for a configFile line!");
                             }
                         } else
                         {
@@ -213,7 +213,7 @@ void readConfigFile::readFile()
                     {
                         if(current_chr != vectorEndChr)
                         {
-                            exitMessage("Vector end char " + current_chr + " doesn't match vector start char " + vectorStartChr + "!");
+                            handy.exitMessage("Vector end char " + current_chr + " doesn't match vector start char " + vectorStartChr + "!");
                         }
                     }
                 }
@@ -232,7 +232,7 @@ void readConfigFile::readFile()
                             // found a char that isn't a configOption name char
                             // AND had already started filling in a configOption name
                             // so we have reached the end of the configOption name
-                            debugMessage("Storing word " + foundWord + " into foundOptionName");
+                            handy.debugMessage("Storing word " + foundWord + " into foundOptionName");
                             foundOptionName = foundWord;
                             foundWord = "";
                             readStatus = "findVector";
@@ -251,7 +251,7 @@ void readConfigFile::readFile()
                     {
                         // found the start of a new configOption. Yay!
                         // process the finished configOption
-                        debugMessage("Found end of optionName " + foundOptionName + ". Processing values");
+                        handy.debugMessage("Found end of optionName " + foundOptionName + ". Processing values");
                         processWords(foundOptionName,foundOptionValues); // need to revamp this function to deal with the new variable storage format
                         // now clean up and start the beginning process of the new config option
                         readStatus = "findName";
@@ -275,8 +275,9 @@ void readConfigFile::readFile()
                     if(current_chr == "\"")
                     {
                         // found the end of the value, even if it is empty
-                        debugMessage("Storing word " + foundWord + " into foundSingleOptionValue");
+                        handy.debugMessage("Storing word " + foundWord + " into foundSingleOptionValue");
                         foundSingleOptionValue.push_back(foundWord);
+                        handy.debugMessage("foundSingleOptionValue.size() = " + handy.intToString(foundSingleOptionValue.size()));
                         foundWord = "";
                         readStatus = "findValue";
                         changedStatus = true;
@@ -289,22 +290,20 @@ void readConfigFile::readFile()
                 {
                     if(current_chr == "\"")
                     {
-                        //if(foundWord != "")
-                        //{
-                            readStatus = "foundValue";
-                            changedStatus = true;
-                        //}
+                        readStatus = "foundValue";
+                        changedStatus = true;
                     } else if(current_chr == vectorEndChr)
                     {
                         // found the end of a vector
                         if(foundWord != "")
                         {
                             // was not finished filling in a word, so forgot an end quotation mark
-                            exitMessage("Missing end quotation mark for a value!");
+                            handy.exitMessage("Missing end quotation mark for a value!");
                         } else
                         {
-                            debugMessage("Found the end of a vector. Storing foundSingleOptionValue vector into foundOptionValues. foundSingleOptionValue.size = " + foundSingleOptionValue.size());
+                            handy.debugMessage("Found the end of a vector. Storing foundSingleOptionValue vector into foundOptionValues");
                             foundOptionValues.push_back(foundSingleOptionValue);
+                            handy.debugMessage("foundOptionValues.size = " + handy.intToString(foundOptionValues.size()));
                             readStatus = "findVector";
                             changedStatus = true;
                         }
@@ -313,21 +312,21 @@ void readConfigFile::readFile()
             }
         }
     }
-    debugMessage("finished reading config file");
+    handy.debugMessage("finished reading config file");
 }
 
 void readConfigFile::processWords(std::string foundOptionName, std::vector< std::vector<std::string> > foundOptionValues)
 {
     if(foundOptionName == "")
     {
-        exitMessage("processWords somehow run with empty foundOptionName!");
+        handy.exitMessage("processWords somehow run with empty foundOptionName!");
     }
     if(foundOptionValues.size() == 0)
     {
         // maybe need to go through again and see if an empty variable places a "" value
         // then could have a variable checking that multiple configOptions have the same number of vectors
         // using a neededOptions variable similar to the conflictingOptions variable
-        message("foundOptionName = " + foundOptionName + ", but found no values for its foundOptionValues!");
+        handy.message("foundOptionName = " + foundOptionName + ", but found no values for its foundOptionValues!");
         setupFail = true;
     }
 
@@ -350,25 +349,32 @@ void readConfigFile::processWords(std::string foundOptionName, std::vector< std:
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 0)
             {
-                message("Duplicate option: " + theOptions[i].get_optionName() + "!");
+                handy.message("Duplicate option: " + theOptions[i].get_optionName() + "!");
             } else
             {
                 updateNumberOfValues(i);
+                handy.excessDebugMessage("updated number of values");
                 for(size_t k = 0; k < foundOptionValues.size(); k++)
                 {
+                    handy.excessDebugMessage("foundOptionValues[" + handy.intToString(k) + "].size() = " + handy.intToString(foundOptionValues[k].size()));
+                    handy.excessDebugMessage("theOptions[" + handy.intToString(i) + "].get_optionCurrentNumberOfValues() = " + handy.intToString(theOptions[i].get_optionCurrentNumberOfValues()));
                     if(foundOptionValues[k].size() != theOptions[i].get_optionCurrentNumberOfValues())
                     {
-                        message(theOptions[i].get_optionName() + " specified but wrong number of values for vector " + intToString(k) + "!");
+                        handy.message(theOptions[i].get_optionName() + " specified but wrong number of values for vector " + handy.intToString(k) + "!");
                         setupFail = true;
                     } else
                     {
-                        splitDebugMessage("Inserting " + intToString(foundOptionValues[k].size()) + " words into " + theOptions[i].get_optionName() + ":");
+                        //std::cout << "ugh" << std::endl;
+                        handy.splitDebugMessage("Inserting ");
+                        handy.splitDebugMessage(handy.intToString(foundOptionValues[k].size()));
+                        handy.splitDebugMessage(" words into " + theOptions[i].get_optionName() + ":");
+                        //handy.splitDebugMessage("Inserting " + handy.intToString(foundOptionValues[k].size()) + " words into " + theOptions[i].get_optionName() + ":");
                         for(size_t j = 0; j < foundOptionValues[k].size(); j++)
                         {
-                            splitDebugMessage(" \"" + foundOptionValues[k][j] + "\"");
+                            handy.splitDebugMessage(" \"" + foundOptionValues[k][j] + "\"");
                             theOptions[i].addOptionValue(foundOptionValues[k][j],k);
                         }
-                        debugMessage("");
+                        handy.debugMessage("");
                     }
                 }
             }
@@ -382,7 +388,7 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
     std::string s = theOptions[theOptionNumber].get_optionOriginalNumberOfValues();
     //Some of the originalNumberOfValues were purposefully left as strings because the value is specified somewhere else
     size_t n = 0;
-    if(is_size_t(s) == false)
+    if(handy.is_size_t(s) == false)
     {
         for(size_t j = 0; j < theOptions.size(); j++)
         {
@@ -394,11 +400,11 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
                     if(j >= theOptionNumber)
                     {
                         // I think this might be a debug message, since the value will be filled later despite this problem? Actually I don't think this will fill in later, so if this message pops up and doesn't make sense, need to change it a bit to be more specific
-                        message(theOptions[theOptionNumber].get_optionName() + " specified before " + theOptions[j].get_optionName() + "!");
+                        handy.message(theOptions[theOptionNumber].get_optionName() + " specified before " + theOptions[j].get_optionName() + "!");
                         setupFail = false;
                     } else
                     {
-                        message(theOptions[j].get_optionName() + " not filled! Can't update currentNumberOfValues for: " + theOptions[theOptionNumber].get_optionName() + "!");
+                        handy.message(theOptions[j].get_optionName() + " not filled! Can't update currentNumberOfValues for: " + theOptions[theOptionNumber].get_optionName() + "!");
                         setupFail = false;
                     }
                 } else
@@ -407,13 +413,13 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
                     // this also assumes that the very first of all variables for this past option is already filled
                     s = theOptions[j].get_optionValues()[0][0];
                     n = 0;
-                    if(is_size_t(s) == false)
+                    if(handy.is_size_t(s) == false)
                     {
-                        message("Could not update current number of values to: " + theOptions[j].get_optionValues()[0][0] + ". The value is not numeric!");
+                        handy.message("Could not update current number of values to: " + theOptions[j].get_optionValues()[0][0] + ". The value is not numeric!");
                     } else
                     {
-                        n = stringToInt(s); // may be better to use a double or something else since n is type size_t
-                        debugMessage("Updating current number of options for " + theOptions[theOptionNumber].get_optionName() + " to: " + theOptions[j].get_optionValues()[0][0]);
+                        n = handy.stringToInt(s); // may be better to use a double or something else since n is type size_t
+                        handy.debugMessage("Updating current number of options for " + theOptions[theOptionNumber].get_optionName() + " to: " + theOptions[j].get_optionValues()[0][0]);
                         theOptions[theOptionNumber].updateNumberOfValues(n);
                     }
                 }
@@ -421,8 +427,8 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber)
         }
     } else
     {
-        n = stringToInt(s); // may be better to use a double or something else since n is type size_t
-        debugMessage("Updating numberOfValues for " + theOptions[theOptionNumber].get_optionName() + " to: " + theOptions[theOptionNumber].get_optionOriginalNumberOfValues());
+        n = handy.stringToInt(s); // may be better to use a double or something else since n is type size_t
+        handy.debugMessage("Updating numberOfValues for " + theOptions[theOptionNumber].get_optionName() + " to: " + s);
         theOptions[theOptionNumber].updateNumberOfValues(n);
     }
 }
@@ -449,7 +455,7 @@ void readConfigFile::checkConflictingOptions()
 
 void readConfigFile::checkVariableFill()
 {
-    message("verifying all variables specified and assigned values");
+    handy.message("verifying all variables specified and assigned values");
     for(size_t i = 0; i < theOptions.size(); i++)
     {
         if(theOptions[i].get_optionConflicts() == true)
@@ -457,14 +463,14 @@ void readConfigFile::checkVariableFill()
             // make sure it doesn't have even a single value
             if(theOptions[i].get_optionCurrentNumberOfValues() != 0 || theOptions[i].get_optionValues().size() != 0)
             {
-                message("the " + theOptions[i].get_optionName() + " option conflicts! It should have no values!");
+                handy.message("the " + theOptions[i].get_optionName() + " option conflicts! It should have no values!");
                 setupFail = true;
             }
         } else
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() == 0)
             {
-                message("NumberOfValues for " + theOptions[i].get_optionName() + " didn't get filled!");
+                handy.message("NumberOfValues for " + theOptions[i].get_optionName() + " didn't get filled!");
                 setupFail = true;
             }
 
@@ -476,7 +482,7 @@ void readConfigFile::checkVariableFill()
                 {
                     if(currentOptionValues[k][j] == "") //oh yeah, I purposefully made it so instead of using "" to specify no change, I said all values had to be filled. I might need to add in some kind of check of conflicting options or some kind of boolean to check to see if it was supposed to be filled instead of just saying nothing can be empty
                     {
-                        message("Values for " + theOptions[i].get_optionName() + " index [" + intToString(k) + "][" + intToString(j) + "] not specified!");
+                        handy.message("Values for " + theOptions[i].get_optionName() + " index [" + handy.intToString(k) + "][" + handy.intToString(j) + "] not specified!");
                         setupFail = true;
                     }
                 }
@@ -493,15 +499,15 @@ int readConfigFile::get_optionValues_singleInt(std::string desiredOptionName)
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 1)
             {
-                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + intToString(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
+                handy.exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + handy.intToString(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
                 return -1;
             } else
             {
-                return stringToInt(theOptions[i].get_optionValues()[0][0]);
+                return handy.stringToInt(theOptions[i].get_optionValues()[0][0]);
             }
         }
     }
-    exitMessage(desiredOptionName + " is not a valid option!");
+    handy.exitMessage(desiredOptionName + " is not a valid option!");
     return -1;
 }
 
@@ -514,12 +520,12 @@ std::vector<int> readConfigFile::get_optionValues_multiInt(std::string desiredOp
             std::vector<int> theOptionValues;
             for(size_t j = 0; j < theOptions[i].get_optionValues()[0].size(); j ++)
             {
-                theOptionValues.push_back(stringToInt(theOptions[i].get_optionValues()[0][j]));
+                theOptionValues.push_back(handy.stringToInt(theOptions[i].get_optionValues()[0][j]));
             }
             return theOptionValues;
         }
     }
-    exitMessage(desiredOptionName + " is not a valid option!");
+    handy.exitMessage(desiredOptionName + " is not a valid option!");
     return {-1};
 }
 
@@ -531,7 +537,7 @@ std::string readConfigFile::get_optionValues_singleString(std::string desiredOpt
         {
             if(theOptions[i].get_optionCurrentNumberOfValues() != 1)
             {
-                exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + intToString(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
+                handy.exitMessage("Requested single int value for " + desiredOptionName + " when there are currently " + handy.intToString(theOptions[i].get_optionCurrentNumberOfValues()) + " values!");
                 return "";
             } else
             {
@@ -539,7 +545,7 @@ std::string readConfigFile::get_optionValues_singleString(std::string desiredOpt
             }
         }
     }
-    exitMessage(desiredOptionName + " is not a valid option!");
+    handy.exitMessage(desiredOptionName + " is not a valid option!");
     return "";
 }
 
@@ -552,6 +558,6 @@ std::vector<std::string> readConfigFile::get_optionValues_multiString(std::strin
             return theOptions[i].get_optionValues()[0];
         }
     }
-    exitMessage(desiredOptionName + " is not a valid option!");
+    handy.exitMessage(desiredOptionName + " is not a valid option!");
     return std::vector<std::string> {""};
 }
