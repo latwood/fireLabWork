@@ -59,7 +59,7 @@ void readConfigFile::readFile()
         // for now, it is fine to just exit. But maybe this could be handled with a completeExitMessage vs exitMessage, or exitrunMessage
         handy.exitMessage("config file: " + configFilePath + " doesn't exist!");
     }
-    std::ifstream is_file(configFilePath);
+    std::ifstream is_file(configFilePath.c_str());
 
     /*
      * This script goes through the config file line by line, analyzing each line one character at a time,
@@ -375,6 +375,7 @@ void readConfigFile::processWords(std::vector<std::string> foundOptionNames, std
             {
                 foundOption = true;
                 updateNumberOfValues(i,false);
+                handy.excessDebugMessage("updated number of values");
                 // now that the number of values is updated, check to see if it is the right number of values then put them in the option
                 for(size_t k = 0; k < foundOptionValues[j].size(); k++)
                 {
@@ -449,6 +450,7 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber, bool fillStrin
         {
             handy.debugMessage("Updating numberOfValues for " + theOptions[theOptionNumber].get_optionName() + " to: " + originalNumberOfValues);
             theOptions[theOptionNumber].updateNumberOfValues(handy.stringToInt(originalNumberOfValues));
+            handy.debugMessage("theOptions[" + handy.intToString(theOptionNumber) + "].currentNumberOfValues = " + handy.intToString(theOptions[theOptionNumber].get_optionCurrentNumberOfValues()));
         }
     } else
     {
@@ -575,7 +577,7 @@ std::vector<int> readConfigFile::get_optionValues_multiInt(std::string desiredOp
         }
     }
     handy.exitMessage(desiredOptionName + " is not a valid option!");
-    return {-1};
+    return std::vector<int> ();
 }
 
 std::string readConfigFile::get_optionValues_singleString(std::string desiredOptionName)
@@ -608,5 +610,5 @@ std::vector<std::string> readConfigFile::get_optionValues_multiString(std::strin
         }
     }
     handy.exitMessage(desiredOptionName + " is not a valid option!");
-    return std::vector<std::string> {""};
+    return std::vector<std::string> ();
 }

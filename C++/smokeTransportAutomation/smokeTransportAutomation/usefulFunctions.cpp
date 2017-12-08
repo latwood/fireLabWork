@@ -15,7 +15,7 @@ bool usefulFunctions::fileExists(const std::string& name)
 // message functions
 void usefulFunctions::message(std::string theMessage)
 {
-    std::cout << theMessage << "\n";
+    std::cout << theMessage << std::endl;
     system("sleep 0.25");
 }
 
@@ -28,7 +28,7 @@ void usefulFunctions::exitMessage(std::string theMessage)
 void usefulFunctions::debugMessage(std::string theMessage)
 {
 #ifdef YESDEBUG
-    std::cout << theMessage << "\n";
+    std::cout << theMessage << std::endl;
     system("sleep 0.10");
 #else
     UNUSED(theMessage);
@@ -38,7 +38,7 @@ void usefulFunctions::debugMessage(std::string theMessage)
 // the idea here is that the debug message is split up, so always follow this type with a regular debugMessage
 void usefulFunctions::splitDebugMessage(std::string theMessage)
 {
-    std::cout << "ugh";
+    //std::cout << "ugh";
 //#ifdef YESDEBUG
     std::cout << theMessage;
 //#else
@@ -50,7 +50,7 @@ void usefulFunctions::excessDebugMessage(std::string theMessage)
 {
     if(excessDebug == true)
     {
-        std::cout << theMessage << "\n";
+        std::cout << theMessage << std::endl;
     }
 }
 
