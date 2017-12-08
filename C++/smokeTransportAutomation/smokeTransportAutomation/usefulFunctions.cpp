@@ -2,7 +2,7 @@
 
 usefulFunctions::usefulFunctions()
 {
-    excessDebug = true;  // in addition to #define YESDEBUG
+    excessDebug = false;  // in addition to #define YESDEBUG
 }
 
 // make sure file exists before opening it
@@ -29,7 +29,7 @@ void usefulFunctions::debugMessage(std::string theMessage)
 {
 #ifdef YESDEBUG
     std::cout << theMessage << "\n";
-    system("sleep 0.25");
+    system("sleep 0.10");
 #else
     UNUSED(theMessage);
 #endif

@@ -28,7 +28,7 @@ void smokeTransportOptions::addOption(std::string newOptionName,std::string newO
 void smokeTransportOptions::setupAvailableOptions()
 {
     //here is where each and every possible option is specified
-    addOption("configFilePath","std::string","1",{"NA"});
+    // note that the config file path used/given by readConfigFile will be kept separately as a variable in readConfigFile
     addOption("parentDirectory","std::string","1",{"NA"});
     addOption("startCase","std::string","1",{"NA"});
     addOption("initialTime","std::string","1",{"NA"});

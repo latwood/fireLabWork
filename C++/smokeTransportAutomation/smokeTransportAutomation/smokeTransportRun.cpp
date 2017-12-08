@@ -34,7 +34,7 @@ smokeTransportRun::smokeTransportRun(readConfigFile configFile)
     missingTimeDirectories = configFile.getMissingTimeDirectories();
     */
 
-    configFilePath = configFile.get_optionValues_singleString("configFilePath");
+    configFilePath = configFile.get_configFilePath();
     parentDirectory = configFile.get_optionValues_singleString("parentDirectory");
     startCase = configFile.get_optionValues_singleString("startCase");
     initialTime = configFile.get_optionValues_singleString("initialTime");

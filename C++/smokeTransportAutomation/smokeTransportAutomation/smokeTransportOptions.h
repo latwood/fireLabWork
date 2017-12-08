@@ -16,7 +16,6 @@ public:
     // also checks to make sure the available options were set correctly
     smokeTransportOptions();
 
-
     void addOption(std::string newOptionName,std::string newOptionDataType,std::string newOptionNumberOfValues,std::vector<std::string> newConflictingOtions); //might make this private so that it is only called by constructor
     void setupAvailableOptions();
 
