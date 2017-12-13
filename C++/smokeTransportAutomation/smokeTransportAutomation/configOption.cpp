@@ -119,14 +119,14 @@ void configOption::addOptionValue(std::string newOptionValue, size_t vectorCount
 
     if(check_optionValue(newOptionValue) == true)
     {
-        if(vectorCounter == optionValues.size()+1)
+        if(vectorCounter < optionValues.size())
+        {
+            optionValues[vectorCounter].push_back(newOptionValue);
+        } else
         {
             std::vector<std::string> newOptionVector;
             newOptionVector.push_back(newOptionValue);
             optionValues.push_back(newOptionVector);
-        } else
-        {
-            optionValues[vectorCounter].push_back(newOptionValue);
         }
     } else
     {
