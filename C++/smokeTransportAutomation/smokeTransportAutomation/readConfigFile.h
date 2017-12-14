@@ -18,16 +18,9 @@ public:
 
     readConfigFile(std::vector<configOption> theOptions_value);
 
-    void newConfigFile(std::string configFilePath_value);    //this is the redo of the constructor, but can be done without the constructor
+    void newConfigFile(std::string configFilePath_value);    //this is the redo of the constructor, so that the class can use one copy of itself over and over
 
-    void readFile();    //returns words
-    void processWords(std::vector<std::string> foundOptionNames, std::vector< std::vector< std::vector<std::string> > > foundOptionValues);
-    void updateNumberOfValues(size_t theOptionNumber, bool fillStrings);
-    void checkConflictingOptions();  //first check to see if any of the filled variables have conflicting options with other filled variables, then check the fill
-    void checkVariableFill();
-
-
-    //kay overloaded options for returning stuff of differing types. Build other types as needed
+    //something like overloaded functions for returning stuff of differing types. Build other types as needed
     std::string get_configFilePath();
     int get_optionValues_singleInt(std::string desiredOptionName);
     std::vector<int> get_optionValues_multiInt(std::string desiredOptionName);
@@ -35,6 +28,12 @@ public:
     std::vector<std::string> get_optionValues_multiString(std::string desiredOptionName);
 
 private:
+
+    void readFile();
+    void processWords(std::vector<std::string> foundOptionNames, std::vector< std::vector< std::vector<std::string> > > foundOptionValues);
+    void updateNumberOfValues(size_t theOptionNumber, bool fillStrings);
+    void checkConflictingOptions();  //first check to see if any of the filled variables have conflicting options with other filled variables, then check the fill
+    void checkVariableFill();
 
     std::string configFilePath;
     std::vector<configOption> theOptions;

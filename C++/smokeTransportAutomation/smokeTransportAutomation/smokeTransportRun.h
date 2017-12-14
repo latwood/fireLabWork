@@ -20,6 +20,9 @@ class smokeTransportRun
 public:
 
     smokeTransportRun(readConfigFile configFile);
+
+private:
+
     void createTransportCase();
     void copySmokeTransportConfigFile();
     void updateTimeDirectories();
@@ -27,8 +30,6 @@ public:
     void updateUfile(int i);
     void runSetFields();
     void runSmokeTransport();
-
-private:
 
     std::string configFileName;
     std::string configFilePath;

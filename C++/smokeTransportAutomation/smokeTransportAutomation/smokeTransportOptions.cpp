@@ -1,6 +1,5 @@
 #include "smokeTransportOptions.h"
 
-
 //constructor related functions
 smokeTransportOptions::smokeTransportOptions()
 {
@@ -10,11 +9,11 @@ smokeTransportOptions::smokeTransportOptions()
     {
         handy.exitMessage("duplicate option found during setup!");
     }
-    if(check_OriginalNumberOfValues() == false)
+    if(check_originalNumberOfValues() == false)
     {
         handy.exitMessage("invalid numberOfValues found during setup!");
     }
-    if(check_duplicateOptions() == false)    // probably need to mess with variable naming to make sure the booleans keep the same logic for each setup
+    if(check_conflictingOptions() == false)    // probably need to mess with variable naming to make sure the booleans keep the same logic for each setup
     {
         handy.exitMessage("invalid conflictingOptions found during setup!");
     }
@@ -71,50 +70,54 @@ bool smokeTransportOptions::check_duplicateOptions()
     return true;
 }
 
-bool smokeTransportOptions::check_OriginalNumberOfValues()
+bool smokeTransportOptions::check_originalNumberOfValues()
 {
+    // so if it is purposefully a string type, need to make sure that the string is the optionName of another type
+    // also make sure that the two options don't conflict
     std::string theNumberOfValues;
     for(size_t i = 0; i < theOptions.size(); i++)
     {
-        istringstream strm;
         theNumberOfValues = theOptions[i].get_optionOriginalNumberOfValues();
-        strm.str(theNumberOfValues);    // at some time try replacing this with one of the useful functions
-        size_t n = 0;
-        if((strm >> n).fail())
+        if(handy.is_size_t(theNumberOfValues) == false)
         {
-            // so if it is a string on purpose (the number of values is specified by another option)
-            // if it doesn't fail, then the it was of type size_t, or numeric, so we are good
-            strm.clear();
             bool foundName = false;
-            std::string theOptionName;
             for(size_t j = 0; j < theOptions.size(); j++)
             {
-                theOptionName = theOptions[j].get_optionName();
-                if(theNumberOfValues == theOptionName)
+                if(theNumberOfValues == theOptions[j].get_optionName())
                 {
                     // the given number of values was found to be given by one of the other options
-                    // maybe should do some kind of conflicting option trick here.
-                    //No, this is figured out later since if this configOption is needed based off
-                    //of conflicting options, then it looks to see if the other value was filled and if not,
-                    //that is when the error trips
+                    // make sure these two interdependent options don't conflict
+                    for(size_t k = 0; k < theOptions[j].get_conflictingOptions().size(); k++)
+                    {
+                        if(theNumberOfValues == theOptions[j].get_conflictingOptions()[k])
+                        {
+                            handy.message("the conflicting option for option " + theOptions[i].get_optionName() + " is the same as the originalNumberOfValues \"" + theNumberOfValues + "\"!");
+                            return false;
+                        }
+                    }
+                    for(size_t k = 0; k < theOptions[i].get_conflictingOptions().size(); k++)
+                    {
+                        if(theNumberOfValues == theOptions[i].get_conflictingOptions()[k])
+                        {
+                            handy.message("the conflicting option for option " + theOptions[i].get_optionName() + " is the same as the originalNumberOfValues \"" + theNumberOfValues + "\"!");
+                            return false;
+                        }
+                    }
                     foundName = true;
                 }
-                if(j == theOptions.size()-1 && foundName == false)
-                {
-                    handy.message("invalid numberOfValues for option " + theOptions[i].get_optionName() + "!");
-                    return false;
-                }
+            }
+            if(foundName == false)
+            {
+                handy.message("invalid numberOfValues for option " + theOptions[i].get_optionName() + "!");
+                return false;
             }
         }
     }
-    return true;
+    return true; // can only get to here if foundName always ends up true
 }
 
-//need to work some more on this. Still doesn't handle vector inside the option.
-//Another loop for extra vector somehow. Check the right thing (conflict option) with right thing (option name)
-//but return the right stuff in the right way. Right now exits on a good thing if it were to work.
-bool smokeTransportOptions::check_ConflictingOptions()//probably need this in readConfig, not here, except this is just making sure each conflicting option really does exist as a variable name
-// okay I just looked over this and it looks like it should work with vectors of conflicting options to me.
+//make sure each conflicting option really does exist as a variable name
+bool smokeTransportOptions::check_conflictingOptions()
 {
     bool conflictingOptionsPass = true;
     for(size_t i = 0; i < theOptions.size(); i++)
@@ -137,11 +140,11 @@ bool smokeTransportOptions::check_ConflictingOptions()//probably need this in re
                         {
                             foundOptionName = true;
                         }
-                        if(j == theOptions.size()-1 && foundOptionName == false)
-                        {
-                            handy.message("Conflicting option: " + currentConflictingOptions[k] + " for option: " + theOptions[i].get_optionName() + "specified during setup but is not an option!");
-                            conflictingOptionsPass = false;
-                        }
+                    }
+                    if(foundOptionName == false)
+                    {
+                        handy.message("Conflicting option: " + currentConflictingOptions[k] + " for option: " + theOptions[i].get_optionName() + "specified during setup but is not an option!");
+                        conflictingOptionsPass = false;
                     }
                 }
             }

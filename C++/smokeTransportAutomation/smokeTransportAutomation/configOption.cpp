@@ -14,6 +14,7 @@ configOption::configOption(std::string optionName_value,std::string optionDataTy
         handy.message("optionDataType: " + optionDataType_value + " for option: " + optionName_value + " not a valid data type!");
     }
     // no initial check on optionOriginalNumberOfValues because value can be a string meaning a reference to another option. This will be checked when updating the options or by classes that use the configOptions
+    // the optionDataType is not for the type of the originalNumberOfValues
     optionOriginalNumberOfValues = optionNumberOfValues_value;
     // no initial check on conflictingOptions because value will be a string meaning a reference to another option. This will be checked by the classes that use the configOptions
     conflictingOptions = conflictingOptions_value;
@@ -24,7 +25,7 @@ void configOption::resetOption()
     optionCurrentNumberOfValues = 0;
     while(!optionValues.empty())
     {
-        optionValues.pop_back();    // might have to do something tricky because vector of vectors
+        optionValues.pop_back();    // might have to do something tricky because vector of vectors; update: don't need to worry about inner vector unless using vector of pointers
     }
     optionConflicts = false;
 }

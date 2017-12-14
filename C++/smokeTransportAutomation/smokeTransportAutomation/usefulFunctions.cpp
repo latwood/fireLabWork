@@ -2,7 +2,7 @@
 
 usefulFunctions::usefulFunctions()
 {
-    excessDebug = false;  // in addition to #define YESDEBUG
+    debug = false;  // seems easier to use than #define YESDEBUG
 }
 
 // make sure file exists before opening it
@@ -27,35 +27,24 @@ void usefulFunctions::exitMessage(std::string theMessage)
 
 void usefulFunctions::debugMessage(std::string theMessage)
 {
-#ifdef YESDEBUG
-    std::cout << theMessage << std::endl;
-    system("sleep 0.10");
-#else
-    UNUSED(theMessage);
-#endif
+    if(debug == true)
+    {
+        std::cout << theMessage << std::endl;
+        system("sleep 0.10");
+    }
 }
 
 // the idea here is that the debug message is split up, so always follow this type with a regular debugMessage
 void usefulFunctions::splitDebugMessage(std::string theMessage)
 {
-    //std::cout << "ugh";
-//#ifdef YESDEBUG
-    std::cout << theMessage;
-//#else
-    UNUSED(theMessage);
-//#endif
-}
-
-void usefulFunctions::excessDebugMessage(std::string theMessage)
-{
-    if(excessDebug == true)
+    if(debug == true)
     {
-        std::cout << theMessage << std::endl;
+        std::cout << theMessage;
     }
 }
 
 
-// check data type functions. Notice that you can't use the stringstream again
+// check data type functions
 // do we even need all these types? Need to see what is actually being used by the program
 bool usefulFunctions::is_size_t(std::string s)
 {

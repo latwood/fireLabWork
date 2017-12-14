@@ -20,11 +20,6 @@ public:
                   std::string optionNumberOfValues_value,std::vector<std::string> conflictingOptions_value);
     void resetOption();     //kind of a reusable constructor/destructor
 
-    //error handling for new values as they come in, to be used by constructor and value updater functions
-    bool check_optionDataType(std::string newOptionDataType);
-    bool check_optionNumberOfValues(std::string newOptionNumberOfValues);   //assumes the numberOfValues will be turned into a size_t or an int, not sure which is best yet.
-    bool check_optionValue(std::string newOptionValue);
-
     //update some values of the options
     void updateNumberOfValues(size_t newNumberOfValues);
     void addOptionValue(std::string newOptionValue, size_t vectorCounter);
@@ -40,6 +35,11 @@ public:
     bool get_optionConflicts();
 
 private:
+
+    //error handling for new values as they come in, to be used by constructor and value updater functions
+    bool check_optionDataType(std::string newOptionDataType);
+    bool check_optionNumberOfValues(std::string newOptionNumberOfValues);   //assumes the numberOfValues will be turned into a size_t or an int, not sure which is best yet.
+    bool check_optionValue(std::string newOptionValue);
 
     std::string optionName;
     std::string optionDataType;

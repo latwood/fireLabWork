@@ -21,24 +21,18 @@ void readConfigFile::newConfigFile(std::string configFilePath_value)
 
     //reset variables
     configFilePath = configFilePath_value;
-
     setupFail = false;  //if this becomes true in the error handling, then the program ends early
 
     //now start reading config file to get new variables
     readFile();
 
-    // I think the idea here was that while I don't have a good conflicting options yet, set a group of booleans
-    // inside the options themselves to a single value so there cannot be any conflicting options yet
-    // So this script is supposed to reset the conflictingOptions boolean for each option, which since no method, set all to false so there are never conflicting options
-    // I'm probably going to change the way this is done, probably similar to the original and current number of values
-    // or I guess the boolean is the current status of the conflicting option, the conflictingOptions vector contains a list of what stuff could cause a conflict
-    // so maybe this script is correct since it sets all bool to a default so they can be set to their actual value in checkVariableFill.
-    // so probably should move checkConflictingOptions so that it is run at the beginning of checkVariableFill (so inside checkVariableFill).
-
-    // I actually like this as it is, but resetOption already resets all the conflictingOptions
-    // so this function is probably redundant unless it is to set the new bool value for each option
+    // determine if there are any conflicting options and warn if there are
     checkConflictingOptions();
+
+    // determine if all variables without conflicting options were filled
     checkVariableFill();
+
+    // end the program if there were any problems
     if(setupFail == true)
     {
         handy.exitMessage("failed to read config file: " + configFilePath);
@@ -148,7 +142,8 @@ void readConfigFile::readFile()
             {
                 bool changedStatus = false;
                 std::string current_chr = line.substr(i,1);
-                handy.excessDebugMessage("current chr = " + current_chr + ", status = " + readStatus);
+                //handy.debugMessage("current chr = " + current_chr + ", status = " + readStatus);
+
                 // first set up error checking that isn't so specific that
                 // it has to be done while actually finding values
                 // so stuff that is only allowed during specific read status
@@ -261,7 +256,7 @@ void readConfigFile::readFile()
                         vectorEndChr = "\"value not assigned yet\"";
                         while(!foundMultiOptionValues.empty())
                         {
-                            foundMultiOptionValues.pop_back();   //might have to improve this because vector of vectors
+                            foundMultiOptionValues.pop_back();    // might have to do something tricky because vector of vectors; update: don't need to worry about inner vector unless using vector of pointers
                         }
                         while(!foundSingleOptionValue.empty())
                         {
@@ -327,12 +322,40 @@ void readConfigFile::readFile()
         foundOptionValues.push_back(foundMultiOptionValues);
         handy.debugMessage("foundOptionValues.size() = " + handy.intToString(foundOptionValues.size()));
     }
-    handy.debugMessage("finished reading config file");
-    processWords(foundOptionNames,foundOptionValues);
+    handy.debugMessage("finished reading config file\n");   // extra \n because end of work
+
+    // this is just handy debug information, maybe even more interesting than the above information
+    handy.debugMessage("Looking at words before processing");
+    handy.debugMessage("foundOptionNames.size() = " + handy.intToString(foundOptionNames.size()));
+    handy.debugMessage("foundOptionValues.size() = " + handy.intToString(foundOptionValues.size()));
+    for(size_t j = 0; j < foundOptionNames.size(); j++)
+    {
+        handy.debugMessage("foundOptionNames[" + handy.intToString(j) + "] = " + foundOptionNames[j]);
+        handy.debugMessage("foundOptionValues[" + handy.intToString(j) + "].size() = " + handy.intToString(foundOptionValues[j].size()));
+        for(size_t i = 0; i < foundOptionValues[j].size(); i++)
+        {
+            handy.debugMessage("foundOptionValues[" + handy.intToString(j) + "][" + handy.intToString(i) + "].size() = " + handy.intToString(foundOptionValues[j][i].size()));
+            for(size_t k = 0; k < foundOptionValues[j][i].size(); k++)
+            {
+                handy.debugMessage("foundOptionValues[" + handy.intToString(j) + "][" + handy.intToString(i) + "][" + handy.intToString(k) + "] = " + foundOptionValues[j][i][k]);
+            }
+        }
+    }
+    handy.debugMessage("");     // just adding an extra endline
+
+    // check to make sure the size indices match and process the words as new config options
+    if(foundOptionNames.size() != foundOptionValues.size())
+    {
+        handy.exitMessage("foundOptionNames.size() " + handy.intToString(foundOptionNames.size()) + " != foundOptionValues.size() " + handy.intToString(foundOptionValues.size()));
+    } else
+    {
+        processWords(foundOptionNames,foundOptionValues);
+    }
 }
 
 void readConfigFile::processWords(std::vector<std::string> foundOptionNames, std::vector< std::vector< std::vector<std::string> > > foundOptionValues)
 {
+    // not sure if all these error checks are enough or even necessary, but keep them for now just in case
     for(size_t j = 0; j < foundOptionNames.size(); j++)
     {
         if(foundOptionNames[j] == "")
@@ -344,9 +367,9 @@ void readConfigFile::processWords(std::vector<std::string> foundOptionNames, std
     {
         if(foundOptionValues[j].size() == 0)
         {
-            // maybe need to go through again and see if an empty variable places a "" value
+            // maybe should actually check to see if an empty variable places a "" value
             // then could have a variable checking that multiple configOptions have the same number of vectors
-            // using a neededOptions variable similar to the conflictingOptions variable
+            // if that is even necessary, using a neededOptions variable similar to the conflictingOptions variable
             handy.message("foundOptionName = " + foundOptionNames[j] + ", but found no values for its foundOptionValues!");
             setupFail = true;
         }
@@ -366,6 +389,7 @@ void readConfigFile::processWords(std::vector<std::string> foundOptionNames, std
     // then verify that the number of found values is correct
     // and upload the found values to the option values
     // then do a separate loop to make sure all the other values get updated
+    handy.debugMessage("updating currentNumberOfValues for numeric originalNumberOfValues");
     for(size_t j = 0; j < foundOptionNames.size(); j++)
     {
         bool foundOption = false;
@@ -375,25 +399,28 @@ void readConfigFile::processWords(std::vector<std::string> foundOptionNames, std
             {
                 foundOption = true;
                 updateNumberOfValues(i,false);
-                handy.excessDebugMessage("updated number of values");
-                // now that the number of values is updated, check to see if it is the right number of values then put them in the option
-                for(size_t k = 0; k < foundOptionValues[j].size(); k++)
+                // only do stuff with the options whose originalNumberOfValues are numeric strings
+                if(handy.is_size_t(theOptions[i].get_optionOriginalNumberOfValues()) == true)
                 {
-                    handy.excessDebugMessage("foundOptionValues[" + handy.intToString(j) + "][" + handy.intToString(k) + "].size() = " + handy.intToString(foundOptionValues[j][k].size()));
-                    handy.excessDebugMessage("theOptions[" + handy.intToString(i) + "].get_optionCurrentNumberOfValues() = " + handy.intToString(theOptions[i].get_optionCurrentNumberOfValues()));
-                    if(foundOptionValues[j][k].size() != theOptions[i].get_optionCurrentNumberOfValues())
+                    // now that the number of values is updated, check to see if it is the right number of values then put them in the option
+                    for(size_t k = 0; k < foundOptionValues[j].size(); k++)
                     {
-                        handy.message(theOptions[i].get_optionName() + " specified but wrong number of values for vector!");
-                        setupFail = true;
-                    } else
-                    {
-                        handy.splitDebugMessage("Inserting " + handy.intToString(foundOptionValues[j][k].size()) + " words into " + theOptions[i].get_optionName() + ":");
-                        for(size_t jj = 0; jj < foundOptionValues[j][k].size(); jj++)
+                        handy.debugMessage("foundOptionValues[" + handy.intToString(j) + "][" + handy.intToString(k) + "].size() = " + handy.intToString(foundOptionValues[j][k].size()));
+                        handy.debugMessage("theOptions[" + handy.intToString(i) + "].get_optionCurrentNumberOfValues() = " + handy.intToString(theOptions[i].get_optionCurrentNumberOfValues()));
+                        if(foundOptionValues[j][k].size() != theOptions[i].get_optionCurrentNumberOfValues())
                         {
-                            handy.splitDebugMessage(" \"" + foundOptionValues[j][k][jj] + "\"");
-                            theOptions[i].addOptionValue(foundOptionValues[j][k][jj],k);
+                            handy.message(theOptions[i].get_optionName() + " specified but wrong number of values for vector!");
+                            setupFail = true;
+                        } else
+                        {
+                            handy.splitDebugMessage("Inserting " + handy.intToString(foundOptionValues[j][k].size()) + " words into " + theOptions[i].get_optionName() + ":");
+                            for(size_t jj = 0; jj < foundOptionValues[j][k].size(); jj++)
+                            {
+                                handy.splitDebugMessage(" \"" + foundOptionValues[j][k][jj] + "\"");
+                                theOptions[i].addOptionValue(foundOptionValues[j][k][jj],k);
+                            }
+                            handy.debugMessage("");
                         }
-                        handy.debugMessage("");
                     }
                 }
                 break;
@@ -408,6 +435,7 @@ void readConfigFile::processWords(std::vector<std::string> foundOptionNames, std
     // now update number of values for those options whose originalNumberOfValues is a string
     // still need to make sure the option is found, but don't need to warn if a foundOptionName is not valid,
     // already gave that warning in above loop
+    handy.debugMessage("\nupdating currentNumberOfValues for non-numeric originalNumberOfValues"); // extra linebreak since this section is so different from above
     for(size_t j = 0; j < foundOptionNames.size(); j++)
     {
         for(size_t i = 0; i < theOptions.size(); i++)
@@ -415,24 +443,28 @@ void readConfigFile::processWords(std::vector<std::string> foundOptionNames, std
             if(foundOptionNames[j] == theOptions[i].get_optionName())
             {
                 updateNumberOfValues(i,true);
-                // now that the number of values is updated, check to see if it is the right number of values then put them in the option
-                for(size_t k = 0; k < foundOptionValues[j].size(); k++)
+                // only do stuff with the options whose originalNumberOfValues are non-numeric strings
+                if(handy.is_size_t(theOptions[i].get_optionOriginalNumberOfValues()) == false)
                 {
-                    handy.excessDebugMessage("foundOptionValues[" + handy.intToString(j) + "][" + handy.intToString(k) + "].size() = " + handy.intToString(foundOptionValues[j][k].size()));
-                    handy.excessDebugMessage("theOptions[" + handy.intToString(i) + "].get_optionCurrentNumberOfValues() = " + handy.intToString(theOptions[i].get_optionCurrentNumberOfValues()));
-                    if(foundOptionValues[j][k].size() != theOptions[i].get_optionCurrentNumberOfValues())
+                    // now that the number of values is updated, check to see if it is the right number of values then put them in the option
+                    for(size_t k = 0; k < foundOptionValues[j].size(); k++)
                     {
-                        handy.message(theOptions[i].get_optionName() + " specified but wrong number of values for vector!");
-                        setupFail = true;
-                    } else
-                    {
-                        handy.splitDebugMessage("Inserting " + handy.intToString(foundOptionValues[j][k].size()) + " words into " + theOptions[i].get_optionName() + ":");
-                        for(size_t jj = 0; jj < foundOptionValues[j][k].size(); jj++)
+                        handy.debugMessage("foundOptionValues[" + handy.intToString(j) + "][" + handy.intToString(k) + "].size() = " + handy.intToString(foundOptionValues[j][k].size()));
+                        handy.debugMessage("theOptions[" + handy.intToString(i) + "].get_optionCurrentNumberOfValues() = " + handy.intToString(theOptions[i].get_optionCurrentNumberOfValues()));
+                        if(foundOptionValues[j][k].size() != theOptions[i].get_optionCurrentNumberOfValues())
                         {
-                            handy.splitDebugMessage(" \"" + foundOptionValues[j][k][jj] + "\"");
-                            theOptions[i].addOptionValue(foundOptionValues[j][k][jj],k);
+                            handy.message(theOptions[i].get_optionName() + " specified but wrong number of values for vector!");
+                            setupFail = true;
+                        } else
+                        {
+                            handy.splitDebugMessage("Inserting " + handy.intToString(foundOptionValues[j][k].size()) + " words into " + theOptions[i].get_optionName() + ":");
+                            for(size_t jj = 0; jj < foundOptionValues[j][k].size(); jj++)
+                            {
+                                handy.splitDebugMessage(" \"" + foundOptionValues[j][k][jj] + "\"");
+                                theOptions[i].addOptionValue(foundOptionValues[j][k][jj],k);
+                            }
+                            handy.debugMessage("");
                         }
-                        handy.debugMessage("");
                     }
                 }
                 break;
@@ -461,13 +493,17 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber, bool fillStrin
             {
                 if(theOptions[theOptionNumber].get_optionOriginalNumberOfValues() == theOptions[ii].get_optionName())
                 {
-                  // assumes the new value isn't a string?
-                    if(theOptions[ii].get_optionCurrentNumberOfValues() == 0)
+                  // assumes the new value cannot be a string. If it somehow is, then some option initialization error checking needs updated; or need to adjust the whole method to allow to check series of values back to one that is a number instead of a string
+                    if(theOptions[ii].get_optionCurrentNumberOfValues() == 0 || handy.is_size_t(theOptions[ii].get_optionOriginalNumberOfValues()) == false)
                     {
                         handy.message(theOptions[ii].get_optionName() + " not filled! Can't update currentNumberOfValues for: " + theOptions[theOptionNumber].get_optionName() + "!");
                         setupFail = true;
                     } else
                     {
+                        // this requires that all variables that specify the next variable's size have to be only one vector and only one value
+                        handy.debugMessage("theOptions[" + handy.intToString(ii) + "].get_optionName() = " + theOptions[ii].get_optionName());
+                        handy.debugMessage("theOptions[" + handy.intToString(ii) + "].get_optionValues().size() = " + handy.intToString(theOptions[ii].get_optionValues().size()));
+                        handy.debugMessage("theOptions[" + handy.intToString(ii) + "].get_optionValues()[0].size() = " + handy.intToString(theOptions[ii].get_optionValues()[0].size()));
                         if(theOptions[ii].get_optionValues().size() == 1 && theOptions[ii].get_optionValues()[0].size() == 1)
                         {
                             std::string s = theOptions[ii].get_optionValues()[0][0];
@@ -493,6 +529,8 @@ void readConfigFile::updateNumberOfValues(size_t theOptionNumber, bool fillStrin
 
 void readConfigFile::checkConflictingOptions()
 {
+    // so for now set them all to false (which is already done with reset options)
+    // but at some point need to change this so it sets some of these to true if the options conflict
     for(size_t i = 0; i < theOptions.size(); i++)
     {
         theOptions[i].updateOptionConflicts(false);
@@ -501,7 +539,7 @@ void readConfigFile::checkConflictingOptions()
 
 void readConfigFile::checkVariableFill()
 {
-    handy.message("verifying all variables specified and assigned values");
+    handy.message("verifying variable specification and value assignment");
     for(size_t i = 0; i < theOptions.size(); i++)
     {
         if(theOptions[i].get_optionConflicts() == true)
@@ -526,7 +564,7 @@ void readConfigFile::checkVariableFill()
             {
                 for(size_t j = 0; j < currentOptionValues[k].size(); j++)
                 {
-                    if(currentOptionValues[k][j] == "") //oh yeah, I purposefully made it so instead of using "" to specify no change, I said all values had to be filled. I might need to add in some kind of check of conflicting options or some kind of boolean to check to see if it was supposed to be filled instead of just saying nothing can be empty
+                    if(currentOptionValues[k][j] == "") //nothing that isn't a conflicting option can be empty
                     {
                         handy.message("Values for " + theOptions[i].get_optionName() + " index [" + handy.intToString(k) + "][" + handy.intToString(j) + "] not specified!");
                         setupFail = true;
@@ -541,6 +579,10 @@ std::string readConfigFile::get_configFilePath()
 {
     return configFilePath;
 }
+
+// need to rework all the get option values of single and multi int and string, but first need to adapt smoke transport
+// everything above here except conflicting options seems to be working correctly. Still need to error test the config file stuff
+// could also probably use work tightening up messages and debug info so less wordy
 
 int readConfigFile::get_optionValues_singleInt(std::string desiredOptionName)
 {
