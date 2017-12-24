@@ -209,6 +209,13 @@ void readConfigFile::readFile()
                         }
                     }
                 }
+                if(readStatus == "foundValue")
+                {
+                    if(current_chr == "(" || current_chr == "[" || current_chr == "{" || current_chr == "}" || current_chr == "]" || current_chr == ")")
+                    {
+                        handy.exitMessage("Found vector char " + current_chr + " which is not allowed as part of a value! Probably forgot end quotation mark for a value!");
+                    }
+                }
 
                 // now set up what to do in a given status
                 if(readStatus == "findName")
@@ -277,6 +284,7 @@ void readConfigFile::readFile()
                         if(foundWord != "")
                         {
                             // was not finished filling in a word, so forgot an end quotation mark
+                            // this isn't really a great checker if there isn't a complete start vector char
                             handy.exitMessage("Missing end quotation mark for a value!");
                         } else
                         {
@@ -288,6 +296,10 @@ void readConfigFile::readFile()
                             // need to detect if it is the end of a file
                             // maybe just detect to make sure that this was the last step when it leaves the loop, if not, it didn't end on a vector!
                         }
+                    } else if(current_chr != " " && current_chr != "=" && current_chr != "," && current_chr != ";")
+                    {
+                        //forgot the vector end char!
+                        handy.exitMessage("found keyword in vector without quotation marks around it! Vector was probably missing end char!");
                     }
                 }
                 if(readStatus == "foundValue" && changedStatus == false)

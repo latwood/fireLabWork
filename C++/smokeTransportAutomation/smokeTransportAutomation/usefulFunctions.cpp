@@ -2,7 +2,7 @@
 
 usefulFunctions::usefulFunctions()
 {
-    debug = false;  // seems easier to use than #define YESDEBUG
+    debug = true;  // seems easier to use than #define YESDEBUG
 }
 
 // make sure file exists before opening it
