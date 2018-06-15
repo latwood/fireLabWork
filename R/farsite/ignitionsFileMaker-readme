@@ -1,0 +1,4 @@
+The goal here is to take a lat long location and create the necessary ignition shapefile needed by Linux Farsite.
+
+Before this is created, need to figure out how to read and understand shapefiles in R. Eventually this project will need to be done with C++, probably with some kind of OGR/GDAL utility.
+
