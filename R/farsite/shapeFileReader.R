@@ -8,13 +8,13 @@ library(ggmap)
 
 
 ###variables you can change
-mainPath <- "/home/latwood/Documents/ne_10m_parks_and_protected_lands/"
-#mainPath <- "/home/latwood/Documents/windninjaPanther/test1177973/currentInput/"
-shapeFilePath_shp <- paste(mainPath,"ne_10m_parks_and_protected_lands_area.shp",sep="")
-#shapeFilePath_shp <- paste(mainPath,"Documents/windninjaPanther/test1177973/currentInput/test1177973_NTFBIgnition.shp",sep="")
-#shapeFilePath_shx <- paste(mainPath,"Documents/windninjaPanther/test1177973/currentInput/test1177973_NTFBIgnition.shx",sep="")
-#shapeFilePath_dbf <- paste(mainPath,"Documents/windninjaPanther/test1177973/currentInput/test1177973_NTFBIgnition.dbf",sep="")
-#shapeFilePath_prj <- paste(mainPath,"Documents/windninjaPanther/test1177973/currentInput/test1177973_NTFBIgnition.prj",sep="")
+#mainPath <- "/home/latwood/Documents/ne_10m_parks_and_protected_lands/"
+mainPath <- "/home/latwood/Documents/windninjaPanther/test1177973/currentInput/"
+#shapeFilePath_shp <- paste(mainPath,"ne_10m_parks_and_protected_lands_area.shp",sep="")
+shapeFilePath_shp <- paste(mainPath,"test1177973_NTFBIgnition.shp",sep="")
+#shapeFilePath_shx <- paste(mainPath,"test1177973_NTFBIgnition.shx",sep="")
+#shapeFilePath_dbf <- paste(mainPath,"test1177973_NTFBIgnition.dbf",sep="")
+#shapeFilePath_prj <- paste(mainPath,"test1177973_NTFBIgnition.prj",sep="")
 
 colors <- brewer.pal(9, "BuGn")
 
@@ -24,16 +24,17 @@ colors <- brewer.pal(9, "BuGn")
 ### now make things happen
 
 # choose one of these two options. Note this command only looks to work on the .shp file. 
-# Not sure if it reads all the other separate files too or now]t
+# Not sure if it reads all the other separate files too or now
+## note it gives a warning on this: use rgdal::readOGR or sf::st_read
 area <- readShapePoly(shapeFilePath_shp)
 # area <- readShapePoly(file.choose())
 
 # create map image
-mapImage <- get_map(location = c(lon = -118, lat = 37.5),
+mapImage <- get_map(location = c(lon = -118, lat = 40),
                     color = "color",
-                    source = "osm",
+                    source = "google",
                     # maptype = "terrain",
-                    zoom = 6)
+                    zoom = "auto")
 
 # convert this strange shape file format into a dataframe that ggmap likes to work with. fortify is a ggplot2 package function
 area.points <- fortify(area)
@@ -50,3 +51,4 @@ ggmap(mapImage) +
   labs(x = "Longitude",
        y = "Latitude")
 
+print("finished plotting\n")
