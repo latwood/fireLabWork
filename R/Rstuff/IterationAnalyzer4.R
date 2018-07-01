@@ -118,7 +118,7 @@ data_parser <- function(fileName,extendedPath,overallDataFrameTextOutput,iterati
 					{
 						endSpot <- k + startSpot - 1
 						break
-					}	
+					}
 				}	
 				initial_residual[j] <- substr(all_data[spot[j]],startSpot,endSpot)	
 				startSpot <- endSpot + 20    # 3 + 13 + 4 which is to get to the right start spot, skips the names
