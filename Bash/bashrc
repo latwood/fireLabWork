@@ -10,3 +10,17 @@ alias paraFoamNew="paraFoam -touch && find . -name '*.OpenFOAM' -exec sh -c 'mv 
 # I believe this had something to do with the python in paraview tutorials, for adding tab completion
 export PYTHONSTARTUP=/home/latwood/.pythonrc
 
+# stuff for extraLibs for compiling and running extra programs
+# note that you can run ldd ~/someprogram after the build process to make sure the libraries got grabbed correctly
+# turns out that you have to be incredibly specific with all libraries, it always seems to mix and match stuff even with these paths
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/netcdf-c/build_netcdf-c-4.6.1/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/netcdf-cxx/build_netcdf-cxx4-4.3.0/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/hdf5/build_hdf5-1.10.2/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/szlib/build_szip-2.1/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/zlib/build_zlib-1.2.11/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/curl/build_curl-7.61.0/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/jasper/build_jasper-1.900.1/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/gdal/build_gdal-2.3.1/lib/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/src/extraLibs/netcdf-c/build_netcdf-c-4.6.1/lib/:$LD_LIBRARY_PATH"
+
+
